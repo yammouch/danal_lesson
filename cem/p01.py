@@ -3,17 +3,17 @@ import numpy as np
 vp = np.array( [ [0,0,0,1,1,2]
                , [1,2,3,2,3,3] ], dtype=np.int64 )
 
-def make_mass(p):
+def ntet(p): # p.shape: (3, 4)
+  ax = np.array( [ [1,2,0] , [2,0,1] ], dtype=np.int64 )
+  cb = np.array( [ [1,2,0] , [2,0,1] ], dtype=np.int64 )
   q = p[:,1:] - p[:,0][...,None] #; print(q)
-
-  ax = np.array( [ [1,2,0]
-                 , [2,0,1] ], dtype=np.int64 )
-  cb = np.array( [ [1,2,0]
-                 , [2,0,1] ], dtype=np.int64 )
   n = np.zeros((3,4), dtype=np.float64)
   n[:,1:] = q[ax[0][:,None],cb[0]]*q[ax[1][:,None],cb[1]] \
           - q[ax[1][:,None],cb[0]]*q[ax[0][:,None],cb[1]]
   n[:,0] = -n[:,1:].sum(axis=-1) #; print(n)
+  return n
+
+def make_mass(n): # n.shape == (3, 4)
   cc = (  vp[[1,1,0]][...,None  ]
        == vp[[1,0,0]][...,None,:] ) + 1 #; print(cc)
   ma  = (n[:,vp[0]][...,None]*n[:,vp[0]][...,None,:]).sum(axis=-3)*cc[0]
@@ -29,10 +29,10 @@ if __name__ == '__main__':
     , [ 0, 0, 1, 0 ]
     , [ 0, 0, 0, 1 ] ]
   , dtype=np.float64 )
-  print(make_mass(p))
+  print(make_mass(ntet(p)))
   p = np.array \
   ( [ [ 0, 2, 1, 1 ]
     , [ 1, 1, 2, 1 ]
     , [ 1, 1, 1, 2 ] ]
   , dtype=np.float64 )
-  print(make_mass(p))
+  print(make_mass(ntet(p)))
