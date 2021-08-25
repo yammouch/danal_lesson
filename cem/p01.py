@@ -1,16 +1,15 @@
 import numpy as np
 
 def make_mass(p):
-  q = p[:, 1:] - p[:, 0][..., np.newaxis]
+  q = p[:, 1:] - p[:, 0][..., np.newaxis] ; print(q)
 
-  ax = np.array( [ [ 1, 2 ]
-                 , [ 2, 0 ]
-                 , [ 0, 1 ] ] )
+  ax = np.array( [ [ 1, 2, 0 ]
+                 , [ 2, 0, 1 ] ], dtype=np.int64 )
   cb = np.array( [ [ 1, 2, 0 ]
-                 , [ 2, 0, 1 ] ] )
+                 , [ 2, 0, 1 ] ], dtype=np.int64 )
   n = np.zeros((3, 4), dtype=np.float64)
-  n[:,1:] = q[ax[:,0:1],cb[0]]*q[ax[:,1:2],cb[1]] \
-          - q[ax[:,1:2],cb[0]]*q[ax[:,0:1],cb[1]]
+  n[:,1:] = q[ax[0][:,np.newaxis],cb[0]]*q[ax[1][:,np.newaxis],cb[1]] \
+          - q[ax[1][:,np.newaxis],cb[0]]*q[ax[0][:,np.newaxis],cb[1]]
   n[:,0] = -n[:,1:].sum(axis=-1)
 
   return n
