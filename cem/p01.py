@@ -5,7 +5,7 @@ vp = np.array( [ [0,0,0,1,1,2]
 
 def ntet(p): # p.shape: (..., 3, 4)
   q = p[..., 1:] - p[..., 0][..., None] #; print(q)
-  n = np.zeros_like(p, dtype=np.float64)
+  n = np.empty_like(p, dtype=np.float64)
   n[..., 1:] \
   = q[..., [[1],[2],[0]], [1,2,0]] * q[..., [[2],[0],[1]], [2,0,1]] \
   - q[..., [[2],[0],[1]], [1,2,0]] * q[..., [[1],[2],[0]], [2,0,1]]
@@ -35,6 +35,17 @@ def make_mass(n, vol): # n.shape: (..., 3, 4)
   ma *= vol[..., None, None]/120
   return ma
 
+def ntri(p): # p: (..., 3, 3)
+  q = p[..., 1:] - p[..., [0]] # (..., 3, 2)
+  n = np.empty_like(p, dtype=np.float64)
+  ip = q.prod(axis=-1).sum(axis=-1)
+  sf = ip[..., None]/((q**2).sum(axis=-2))
+  n[..., 1:] = q
+  n[..., 1:] -= sf[..., None, :] * q[..., ::-1]
+  n[..., 0] = -n[..., 1:].sum(axis=-1)
+  n /= (n**2).sum(axis=-2)[..., None, :]
+  return n
+
 if __name__ == '__main__':
   p = np.array \
   ( [ [ [  1,  2,  1,  1 ]
@@ -50,6 +61,7 @@ if __name__ == '__main__':
   print(m / vol[..., None, None] * 120)
   s = make_stiff(n, vol)
   print(s / vol[..., None, None])
+  print(ntri(p[..., 0:3]))
 
  #p = np.array \
  #( [ [ 0, 2, 1, 1 ]
