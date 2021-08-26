@@ -14,6 +14,13 @@ def ntet(p): # p.shape: (..., 3, 4)
   n /= vol[..., None, None]
   return n, vol
 
+def make_stiff(n, vol): # n.shape: (..., 3, 4)
+  np = n[..., [[1],[2],[0]], vp[0]] * n[..., [[2],[0],[1]], vp[1]] \
+     - n[..., [[2],[0],[1]], vp[0]] * n[..., [[1],[2],[0]], vp[1]]
+  ip = ( np[..., None] * np[..., None, :] ).sum(axis=-3)
+  ip *= vol[..., None, None]
+  return ip
+
 def make_mass(n, vol): # n.shape: (..., 3, 4)
   cc = (  vp[[1,1,0]][..., None   ]
        == vp[[1,0,0]][..., None, :] ) + 1 #; print(cc)
@@ -41,6 +48,8 @@ if __name__ == '__main__':
   m = make_mass(n, vol)
   print(vol)
   print(m / vol[..., None, None] * 120)
+  s = make_stiff(n, vol)
+  print(s / vol[..., None, None])
 
  #p = np.array \
  #( [ [ 0, 2, 1, 1 ]
