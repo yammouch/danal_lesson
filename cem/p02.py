@@ -67,7 +67,7 @@ def solve(vrt, spt, edg, freq):
   for p, e in zip(spt, edg):
     n, area = ntri(vrt[:, p])
     b1 = bound(n, area)
-    b[e[:,None],e[None,:]] += 2j*np.pi*freq*np.sqrt(1/(u0*e0))*b1
+    b[e[:,None],e[None,:]] += 2j*np.pi*freq*np.sqrt(u0*e0)*b1
   n, vol = ntet(vrt)
   stiff = make_stiff(n, vol)
   mass = make_mass(n, vol)
@@ -92,6 +92,6 @@ if __name__ == '__main__':
   edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
   freq = 1e3
   np.set_printoptions(1)
-  for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6]:
+  for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
     sol = solve(vrt, spt, edg, freq)
     print(sol)
