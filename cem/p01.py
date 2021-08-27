@@ -60,18 +60,10 @@ def bound(n, area): # n: (..., 3, 3), area: (...)
   a3[..., [0, 0, 1, 1, 2], [0, 1, 0, 1, 2]] *= 2
   return (a0 + a1 + a2 + a3)*(area[..., None, None]/24)
 
-
-if __name__ == '__main__':
+def solve(vrt, spt, edg, freq):
   u0 = 4e-7*np.pi
   e0 = 8.854e-12
-  vrt = np.array \
-  ( [ [ 0, 2*3**0.5, 0, 3**0.5 ]
-    , [ 0, 0       , 3, 1      ]
-    , [ 0, 0       , 0, 2**0.5 ] ] )
-  spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
-  edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
   b = np.zeros((6, 6), dtype=np.complex128)
-  freq = 1e3
   for p, e in zip(spt, edg):
     n, area = ntri(vrt[:, p])
     b1 = bound(n, area)
@@ -81,4 +73,16 @@ if __name__ == '__main__':
   mass = make_mass(n, vol)
   lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass + b
   sol = np.linalg.solve(lhs, np.zeros(6, dtype=np.complex128))
-  print(sol)
+  return sol
+
+if __name__ == '__main__':
+  vrt = np.array \
+  ( [ [ 0, 2*3**0.5, 0, 3**0.5 ]
+    , [ 0, 0       , 3, 1      ]
+    , [ 0, 0       , 0, 2**0.5 ] ] )
+  spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
+  edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
+  freq = 1e3
+  for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6]:
+    sol = solve(vrt, spt, edg, freq)
+    print(sol)
