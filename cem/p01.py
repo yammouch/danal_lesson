@@ -62,6 +62,8 @@ def bound(n, area): # n: (..., 3, 3), area: (...)
 
 
 if __name__ == '__main__':
+  u0 = 4e-7*np.pi
+  e0 = 8.854e-12
   vrt = np.array \
   ( [ [ 0, 2*3**0.5, 0, 3**0.5 ]
     , [ 0, 0       , 3, 1      ]
@@ -69,8 +71,14 @@ if __name__ == '__main__':
   spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
   edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
   b = np.zeros((6, 6), dtype=np.complex128)
+  freq = 1e3
   for p, e in zip(spt, edg):
     n, area = ntri(vrt[:, p])
     b1 = bound(n, area)
-    b[e[:,None],e[None,:]] += 2j*np.pi*1e3*(1/3.0e8)*b1
-  print(b)
+    b[e[:,None],e[None,:]] += 2j*np.pi*freq*np.sqrt(1/(u0*e0))*b1
+  n, vol = ntet(vrt)
+  stiff = make_stiff(n, vol)
+  mass = make_mass(n, vol)
+  lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass + b
+  sol = np.linalg.solve(lhs, np.zeros(6, dtype=np.complex128))
+  print(sol)
