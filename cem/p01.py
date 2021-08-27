@@ -60,30 +60,17 @@ def bound(n, area): # n: (..., 3, 3), area: (...)
   a3[..., [0, 0, 1, 1, 2], [0, 1, 0, 1, 2]] *= 2
   return (a0 + a1 + a2 + a3)*(area[..., None, None]/24)
 
-if __name__ == '__main__':
-  p = np.array \
-  ( [ [ [  1,  2,  1,  1 ]
-      , [  0,  0,  1,  0 ]
-      , [ -1, -1, -1,  0 ] ]
-    , [ [ 0, 2*3**0.5, 0, 3**0.5 ]
-      , [ 0, 0       , 3, 1      ]
-      , [ 0, 0       , 0, 2**0.5 ] ] ]
-  , dtype=np.float64 )
-  n, vol = ntet(p)
-  m = make_mass(n, vol)
-  print(vol)
-  print(m / vol[..., None, None] * 120)
-  s = make_stiff(n, vol)
-  print(s / vol[..., None, None])
-  n, area = ntri(p[..., 0:3])
-  print(n, area)
-  print(bound(n, area))
 
- #p = np.array \
- #( [ [ 0, 2, 1, 1 ]
- #  , [ 1, 1, 2, 1 ]
- #  , [ 1, 1, 1, 2 ] ]
- #, dtype=np.float64 )
- #n, vol = ntet(p)
- #print(make_mass(n))
- #print(make_mass(n)*vol*vol)
+if __name__ == '__main__':
+  vrt = np.array \
+  ( [ [ 0, 2*3**0.5, 0, 3**0.5 ]
+    , [ 0, 0       , 3, 1      ]
+    , [ 0, 0       , 0, 2**0.5 ] ] )
+  spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
+  edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
+  b = np.zeros((6, 6), dtype=np.complex128)
+  for p, e in zip(spt, edg):
+    n, area = ntri(vrt[:, p])
+    b1 = bound(n, area)
+    b[e[:,None],e[None,:]] += 2j*np.pi*1e3*(1/3.0e8)*b1
+  print(b)
