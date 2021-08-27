@@ -72,7 +72,9 @@ def solve(vrt, spt, edg, freq):
   stiff = make_stiff(n, vol)
   mass = make_mass(n, vol)
   lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass + b
-  sol = np.linalg.solve(lhs, np.zeros(6, dtype=np.complex128))
+  rhs = np.zeros(6, dtype=np.complex128)
+  rhs[2] = 2j*np.pi*freq*2*np.sqrt(3)
+  sol = np.linalg.solve(lhs, rhs)
   return sol
 
 if __name__ == '__main__':
@@ -83,6 +85,7 @@ if __name__ == '__main__':
   spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
   edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
   freq = 1e3
+  np.set_printoptions(1)
   for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6]:
     sol = solve(vrt, spt, edg, freq)
     print(sol)
