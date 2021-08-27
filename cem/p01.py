@@ -44,7 +44,10 @@ def ntri(p): # p: (..., 3, 3)
   n[..., 1:] -= sf[..., None, :] * q[..., ::-1]
   n[..., 0] = -n[..., 1:].sum(axis=-1)
   n /= (n**2).sum(axis=-2)[..., None, :]
-  return n
+  op = q[..., [1,2,0], 0]*q[..., [2,0,1], 1] \
+     - q[..., [2,0,1], 0]*q[..., [1,2,0], 1]
+  area = np.sqrt((op**2).sum(axis=-1))
+  return n, area
 
 if __name__ == '__main__':
   p = np.array \
