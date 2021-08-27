@@ -49,6 +49,17 @@ def ntri(p): # p: (..., 3, 3)
   area = np.sqrt((op**2).sum(axis=-1))
   return n, area
 
+def bound(n, area): # n: (..., 3, 3), area: (...)
+  a0 = (n[..., [[0],[0],[1]]] * n[..., [[0,0,1]]]).sum(axis=-3)
+  a0[..., [0, 1, 1, 2, 2], [0, 1, 2, 1, 2]] *= 2
+  a1 = (n[..., [[0],[0],[1]]] * n[..., [[1,2,2]]]).sum(axis=-3)
+  a1[..., [2, 2], [0, 1]] *= 2
+  a2 = (n[..., [[1],[2],[2]]] * n[..., [[0,0,1]]]).sum(axis=-3)
+  a2[..., [0, 1], [2, 2]] *= 2
+  a3 = (n[..., [[1],[2],[2]]] * n[..., [[1,2,2]]]).sum(axis=-3)
+  a3[..., [0, 0, 1, 1, 2], [0, 1, 0, 1, 2]] *= 2
+  return (a0 + a1 + a2 + a3)*(area[..., None, None]/24)
+
 if __name__ == '__main__':
   p = np.array \
   ( [ [ [  1,  2,  1,  1 ]
@@ -64,7 +75,9 @@ if __name__ == '__main__':
   print(m / vol[..., None, None] * 120)
   s = make_stiff(n, vol)
   print(s / vol[..., None, None])
-  print(ntri(p[..., 0:3]))
+  n, area = ntri(p[..., 0:3])
+  print(n, area)
+  print(bound(n, area))
 
  #p = np.array \
  #( [ [ 0, 2, 1, 1 ]
