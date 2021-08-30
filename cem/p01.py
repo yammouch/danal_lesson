@@ -37,16 +37,13 @@ def make_mass(n, vol): # n.shape: (..., 3, 4)
 
 def ntri(p): # p: (..., 3, 3)
   q = p[..., 1:] - p[..., [0]] # (..., 3, 2)
-  n = np.empty_like(p, dtype=np.float64)
-  ip = q.prod(axis=-1).sum(axis=-1)
-  sf = ip[..., None]/((q**2).sum(axis=-2))
-  n[..., 1:] = q
-  n[..., 1:] -= sf[..., None, :] * q[..., ::-1]
-  n[..., 0] = -n[..., 1:].sum(axis=-1)
-  n /= (n**2).sum(axis=-2)[..., None, :]
   op = q[..., [1,2,0], 0]*q[..., [2,0,1], 1] \
-     - q[..., [2,0,1], 0]*q[..., [1,2,0], 1]
-  area = np.sqrt((op**2).sum(axis=-1))
+     - q[..., [2,0,1], 0]*q[..., [1,2,0], 1] # (..., 3)
+  area = np.sqrt((op**2).sum(axis=-1)) # (...)
+  n = np.empty_like(p, dtype=np.float64) # (..., 3, 3)
+  n[..., 1] =  q[..., 1]/area[..., None]
+  n[..., 2] = -q[..., 0]/area[..., None]
+  n[..., 0] = -n[..., 1]-n[..., 2]
   return n, area
 
 def bound(n, area): # n: (..., 3, 3), area: (...)
@@ -71,7 +68,7 @@ def solve(vrt, spt, edg, freq):
   n, vol = ntet(vrt)
   stiff = make_stiff(n, vol)
   mass = make_mass(n, vol)
-  lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass + b
+  lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass - b
   rhs = np.zeros(6, dtype=np.complex128)
   rhs[2] = 2j*np.pi*freq*2*np.sqrt(3)
   #print(lhs)
@@ -87,7 +84,7 @@ if __name__ == '__main__':
   spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
   edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
   freq = 1e3
-  np.set_printoptions(1)
+  np.set_printoptions(3)
   for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
     sol = solve(vrt, spt, edg, freq)
     print(sol)

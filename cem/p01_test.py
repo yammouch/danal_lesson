@@ -2,6 +2,7 @@ import numpy as np
 import p01 as dut
 
 if __name__ == '__main__':
+  np.set_printoptions(2)
   p = np.array \
   ( [ [ [  1,  2,  1,  1 ]
       , [  0,  0,  1,  0 ]
