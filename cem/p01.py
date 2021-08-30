@@ -50,25 +50,35 @@ def bound(n, area): # n: (..., 3, 3), area: (...)
   a0 = (n[..., [[0],[0],[1]]] * n[..., [[0,0,1]]]).sum(axis=-3)
   a0[..., [0, 1, 1, 2, 2], [0, 1, 2, 1, 2]] *= 2
   a1 = (n[..., [[0],[0],[1]]] * n[..., [[1,2,2]]]).sum(axis=-3)
-  a1[..., [2, 2], [0, 1]] *= 2
+ #a1[..., [2, 2], [0, 1]] *= 2
+  a1[..., [0, 1], [2, 2]] *= 2
   a2 = (n[..., [[1],[2],[2]]] * n[..., [[0,0,1]]]).sum(axis=-3)
-  a2[..., [0, 1], [2, 2]] *= 2
+ #a2[..., [0, 1], [2, 2]] *= 2
+  a2[..., [2, 2], [0, 1]] *= 2
   a3 = (n[..., [[1],[2],[2]]] * n[..., [[1,2,2]]]).sum(axis=-3)
   a3[..., [0, 0, 1, 1, 2], [0, 1, 0, 1, 2]] *= 2
   return (a0 + a1 + a2 + a3)*(area[..., None, None]/24)
 
-def solve(vrt, spt, edg, freq):
-  u0 = 4e-7*np.pi
-  e0 = 8.854e-12
+spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
+edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
+
+def make_b(vrt):
   b = np.zeros((6, 6), dtype=np.complex128)
   for p, e in zip(spt, edg):
     n, area = ntri(vrt[:, p])
     b1 = bound(n, area)
-    b[e[:,None],e[None,:]] += 2j*np.pi*freq*np.sqrt(u0*e0)*b1
+    b[e[:,None],e[None,:]] += b1
+  return b
+
+def solve(vrt, spt, edg, freq):
+  u0 = 4e-7*np.pi
+  e0 = 8.854e-12
   n, vol = ntet(vrt)
   stiff = make_stiff(n, vol)
   mass = make_mass(n, vol)
-  lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass - b
+  lhs = stiff/(4e-7*np.pi) \
+      - (2*np.pi*freq)**2*e0*mass \
+      - 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt)
   rhs = np.zeros(6, dtype=np.complex128)
   rhs[2] = 2j*np.pi*freq*2*np.sqrt(3)
   #print(lhs)
@@ -78,11 +88,12 @@ def solve(vrt, spt, edg, freq):
 
 if __name__ == '__main__':
   vrt = np.array \
-  ( [ [ 0, 2*3**0.5, 0, 3**0.5 ]
-    , [ 0, 0       , 3, 1      ]
-    , [ 0, 0       , 0, 2**0.5 ] ] )
-  spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
-  edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
+  ( [ [  0, 2**0.5,  2**0.5, 0 ]
+    , [  0, 1     , -1     , 0 ]
+    , [ -1, 0     ,  0     , 1 ] ] )
+ #( [ [ 0, 2*3**0.5, 0, 3**0.5   ]
+ #  , [ 0, 0       , 3, 1        ]
+ #  , [ 0, 0       , 0, 2*2**0.5 ] ] )
   freq = 1e3
   np.set_printoptions(3)
   for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
