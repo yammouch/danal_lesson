@@ -28,8 +28,8 @@ def make_mass(n, vol): # n.shape: (..., 3, 4)
         * n[..., vp[0]][..., None, :] ).sum(axis=-3) * cc[0]
   m1  = ( n[..., vp[0]][..., None   ]
         * n[..., vp[1]][..., None, :] ).sum(axis=-3) * cc[1]
-  ma += m1
-  ma += np.moveaxis(m1,-2,-1)
+  ma -= m1
+  ma -= np.moveaxis(m1,-2,-1)
   ma += ( n[..., vp[1]][..., None   ]
         * n[..., vp[1]][..., None, :] ).sum(axis=-3) * cc[2]
   ma *= vol[..., None, None]/120

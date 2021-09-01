@@ -17,6 +17,7 @@ if __name__ == '__main__':
   n, vol = dut.ntet(p)
   m = dut.make_mass(n, vol)
   print(vol)
+  print(n)
   print(m / vol[..., None, None] * 120)
   s = dut.make_stiff(n, vol)
   print(s / vol[..., None, None])
