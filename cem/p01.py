@@ -78,11 +78,16 @@ def solve(vrt, spt, edg, freq):
   n, vol = ntet(vrt)
   stiff = make_stiff(n, vol)
   mass = make_mass(n, vol)
-  lhs = stiff/(4e-7*np.pi) \
-      - (2*np.pi*freq)**2*e0*mass \
-      - 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt)
+ #lhs = stiff/(4e-7*np.pi) \
+ #    - (2*np.pi*freq)**2*e0*mass \
+ #    - 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt)
+  lhs = - (2*np.pi*freq)**2*e0*mass
+  print(mass)
+  print(vol)
+  print(lhs)
   rhs = np.zeros(6, dtype=np.complex128)
-  rhs[2] = 2j*np.pi*freq*2*np.sqrt(3)
+  rhs[2] = 2j*np.pi*freq*2
+  print(rhs)
   #print(lhs)
   #print(rhs)
   sol = np.linalg.solve(lhs, rhs)
@@ -96,8 +101,12 @@ if __name__ == '__main__':
  #( [ [ 0, 2*3**0.5, 0, 3**0.5   ]
  #  , [ 0, 0       , 3, 1        ]
  #  , [ 0, 0       , 0, 2*2**0.5 ] ] )
-  freq = 1e3
   np.set_printoptions(3)
-  for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
+  e0 = 8.854e-12
+ #for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
+  for freq in [1e3, 10e3, 100e3, 1e6, 10e6]:
     sol = solve(vrt, spt, edg, freq)
     print(sol)
+    print(sol[2] * 2)
+    print(2*(1/freq)/4*(2/np.pi)/(4*np.pi*e0))
+    
