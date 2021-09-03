@@ -13,6 +13,7 @@ sl = gmsh.model.occ.addSurfaceLoop(s)
 v = gmsh.model.occ.addVolume([sl])
 
 gmsh.model.occ.synchronize()
+gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
 gmsh.model.mesh.generate(3)
 #gmsh.write("g01.msh2")
 gmsh.fltk.run()
