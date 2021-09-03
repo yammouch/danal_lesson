@@ -14,7 +14,7 @@ def solve(vrt, spt, edg, freq):
   mass = p01.make_mass(n, vol)
   lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass + b
   rhs = np.zeros(6, dtype=np.complex128)
-  rhs[2] = 2j*np.pi*freq*2*np.sqrt(3)
+  rhs[2] = 2j*np.pi*freq*1e-3
   lhs[0:2, :] = 0
   lhs[3:6, :] = 0
   lhs[[0,1  ], [0,1  ]] = 1
@@ -36,3 +36,4 @@ if __name__ == '__main__':
   for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
     sol = solve(vrt, spt, edg, freq)
     print(sol)
+    print(sol[2]*1e-3*1e-3/(2*np.pi*freq))
