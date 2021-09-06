@@ -19,6 +19,7 @@ if __name__ == '__main__':
   print(vol)
   print(n)
   print(m / vol[..., None, None] * 120)
+  print(m)
   s = dut.make_stiff(n, vol)
   print(s / vol[..., None, None])
   n, area = dut.ntri(p[..., 0:3])

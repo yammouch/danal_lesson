@@ -15,10 +15,10 @@ def ntet(p): # p.shape: (..., 3, 4)
   return n, vol
 
 def make_stiff(n, vol): # n.shape: (..., 3, 4)
-  np = n[..., [[1],[2],[0]], vp[0]] * n[..., [[2],[0],[1]], vp[1]] \
+  pr = n[..., [[1],[2],[0]], vp[0]] * n[..., [[2],[0],[1]], vp[1]] \
      - n[..., [[2],[0],[1]], vp[0]] * n[..., [[1],[2],[0]], vp[1]]
-  ip = ( np[..., None] * np[..., None, :] ).sum(axis=-3)
-  ip *= vol[..., None, None]
+  ip = ( pr[..., None] * pr[..., None, :] ).sum(axis=-3)
+  ip *= np.abs(vol)[..., None, None]
   return ip
 
 def make_mass(n, vol): # n.shape: (..., 3, 4)
@@ -32,7 +32,7 @@ def make_mass(n, vol): # n.shape: (..., 3, 4)
   ma -= np.moveaxis(m1,-2,-1)
   ma += ( n[..., vp[1]][..., None   ]
         * n[..., vp[1]][..., None, :] ).sum(axis=-3) * cc[2]
-  ma *= vol[..., None, None]/120
+  ma *= np.abs(vol)[..., None, None]/120
   return ma
 
 def ntri(p): # p: (..., 3, 3)
@@ -63,6 +63,8 @@ def bound(n, area): # n: (..., 3, 3), area: (...)
 
 spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
 edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
+#spt = np.array([ [0,1,2], [1,2,3] ])
+#edg = np.array([ [0,1,3], [3,4,5] ])
 
 def make_b(vrt):
   b = np.zeros((6, 6), dtype=np.complex128)
@@ -81,12 +83,17 @@ def solve(vrt, spt, edg, freq):
  #lhs = stiff/(4e-7*np.pi) \
  #    - (2*np.pi*freq)**2*e0*mass \
  #    - 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt)
-  lhs = - (2*np.pi*freq)**2*e0*mass
+  lhs = stiff/(4e-7*np.pi) \
+      - (2*np.pi*freq)**2*e0*mass
+ #lhs = - (2*np.pi*freq)**2*e0*mass
+  print(stiff)
   print(mass)
+  print(- 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt))
+  print(make_b(vrt))
   print(vol)
   print(lhs)
   rhs = np.zeros(6, dtype=np.complex128)
-  rhs[2] = 2j*np.pi*freq*2
+  rhs[2] = 2j*np.pi*freq
   print(rhs)
   #print(lhs)
   #print(rhs)
@@ -95,12 +102,15 @@ def solve(vrt, spt, edg, freq):
 
 if __name__ == '__main__':
   vrt = np.array \
-  ( [ [  0, 2**0.5,  2**0.5, 0 ]
-    , [  0, 1     , -1     , 0 ]
-    , [ -1, 0     ,  0     , 1 ] ] )
+  ( [ [  0,   7 ,    7 , 0 ]
+    , [  0,   7 , -  7 , 0 ]
+    , [ -1,   0,    0, 1 ] ] )
  #( [ [ 0, 2*3**0.5, 0, 3**0.5   ]
  #  , [ 0, 0       , 3, 1        ]
  #  , [ 0, 0       , 0, 2*2**0.5 ] ] )
+ #( [ [  0, 2**0.5,  2**0.5, 0 ]
+ #  , [  0, 1     , -1     , 0 ]
+ #  , [ -1, 0     ,  0     , 1 ] ] )
   np.set_printoptions(3)
   e0 = 8.854e-12
  #for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
@@ -109,4 +119,3 @@ if __name__ == '__main__':
     print(sol)
     print(sol[2] * 2)
     print(2*(1/freq)/4*(2/np.pi)/(4*np.pi*e0))
-    
