@@ -62,3 +62,27 @@ $\vec{i}$を$\vec{i}+\sigma\vec{E}$とおいて,
 
 \subsection{弱形式の導出}
 
+基底関数$v$をかけて体積分
+文献 Nasa では edge basis function とあるので,
+「基底関数」でよいだろう。「辺基底関数」とか言うか?
+$N_i$ というか文献 Nasa 内では shape function と書いているが,
+これがノードベースFEMの基底関数なんだよな。一気に書くのは大変だから,
+分けて書くか。
+\begin{align}
+\iiint_{\Omega}\nabla\times\left[
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+\right]\cdot\vec{v}\,d^3\vec{r}
+\end{align}
+ベクトル解析の公式
+$\left(\nabla\times\vec{a}\right)\cdot\vec{b}
+=\nabla\cdot\left(\vec{a}\times\vec{b}\right)
++\vec{a}\cdot\left(\nabla\times\vec{b}\right)$
+に$\vec{a}=\mu^{-1}\left(\nabla\times\vec{E}\right)$, $\vec{b}=\vec{v}$
+を適用して
+\begin{align}
+(\textrm{与式})=
+\iiint_{\Omega}\nabla\cdot
+\left\{\left[\mu^{-1}\left(\nabla\times\vec{E}\right)\right]\times\vec{v}\right\}\,d^3\vec{r}
++\iiint_{\Omega}\left[\mu^{-1}\left(\nabla\times\vec{E}\right)\right]\cdot
+\left(\nabla\times\vec{v}\right)\,d^3\vec{r}
+\end{align}

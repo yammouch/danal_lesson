@@ -1,0 +1,18 @@
+\subsection{ベクトル解析の公式}
+
+%\begin{align}
+%&\vec{a}\cdot\left(\nabla\times\vec{b})\\
+%=&a_i\epsilon_{ijk}\partial_jb_k\\
+%=&
+%\end{align}
+
+\begin{align}
+&\nabla\cdot\left(\vec{a}\times\vec{b}\right)\\
+=&\epsilon_{ijk}\partial_i\left(a_jb_k\right)\\
+=&b_k\epsilon_{ijk}\left(\partial_ia_j\right)
+ +a_j\epsilon_{ijk}\left(\partial_ib_k\right)\\
+=&b_k\epsilon_{kij}\left(\partial_ia_j\right)
+ -a_j\epsilon_{jik}\left(\partial_ib_k\right)\\
+=&\vec{b}\cdot\left(\nabla\times\vec{a}\right)
+ -\vec{a}\cdot\left(\nabla\times\vec{b}\right)
+\end{align}
