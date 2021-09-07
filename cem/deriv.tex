@@ -1,7 +1,64 @@
-\subsection{とりあえず何か}
+\subsection{ベクトルヘルムホルツ方程式の導出}
 
-とりあえず方程式
+文献Elmerでは$\frac{\partial}{\partial t}=-j\omega$としている。
+本書では電磁気学では一般的な$\frac{\partial}{\partial t}=j\omega$とする。
+
+マクスウェル方程式
 \begin{align}
-\frac{1}{\mu}\nabla\times\left(\nabla\times\vec{E}\right)
--\omega^2\epsilon\vec{E}=j\omega\vec{i}
+\nabla\times\vec{H}&=\vec{i}+j\omega\epsilon\vec{E}\label{fml:maxh}\\
+\nabla\times\vec{E}&=-j\omega\mu\vec{H}\label{fml:maxe}
 \end{align}
+
+ここでマクスウェルの方程式の解説をしようか。
+式(\ref{fml:maxh})は中学校で習ったなんとかの法則,
+電流が方位磁針の針を動かすやつ。
+式(\ref{fml:maxe})はやっぱり中学校で習った電磁誘導の法則。
+$\epsilon$は高校で習った誘電率で,
+真空では$8.854\times10^{-12}$[F/m]。
+$\mu$は透磁率という値で,
+大体の物質では$4\pi\times10^{-7}$(単位忘れた),
+鉄などの磁性を持つ物質ではその数千倍以上となる。
+また, 方向によって値が異なる場合があり,
+一般には場所の関数である$3\times3$行列であらわされるテンソルとなる。
+$\vec{i}$は電流減, とか, グダグダ書いているが, 表か箇条書きにすべきだな。
+
+式(\ref{fml:maxh})の両辺に$-j\omega$,
+式(\ref{fml:maxe})の両辺に$\mu^{-1}$ をかけて
+\begin{align}
+\nabla\times\left(-j\omega\vec{H}\right)
+&=-j\omega\vec{i}+\omega^2\epsilon\vec{E}\\
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+&=-j\omega\vec{H}
+\end{align}
+上の2式において$-j\omega\vec{H}$が共通なので
+\begin{align}
+\nabla\times\left[
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+\right]
+&=-j\omega\vec{i}+\omega^2\epsilon\vec{E}\\
+\nabla\times\left[
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+\right]-\omega^2\epsilon\vec{E}
+&=-j\omega\vec{i}
+\end{align}
+となる。さらに, 媒質が導電率$\sigma$[S/m]を持つ場合,
+$\vec{i}$を$\vec{i}+\sigma\vec{E}$とおいて,
+\begin{align}
+\nabla\times\left[
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+\right]-\omega^2\epsilon\vec{E}
+&=-j\omega\left(\vec{i}+\sigma\vec{E}\right)\\
+&=-j\omega\vec{i}+j\omega\sigma\vec{E}\\
+\nabla\times\left[
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+\right]-\omega^2\epsilon\vec{E}-j\omega\sigma\vec{E}
+&=-j\omega\vec{i}\\
+\nabla\times\left[
+\mu^{-1}\left(\nabla\times\vec{E}\right)
+\right]-\omega\left(\omega\epsilon+j\sigma\right)\vec{E}
+&=-j\omega\vec{i}
+\end{align}
+と考えればよい。鉄損を考える場合は$\mu$を複素数とすればよい。
+
+\subsection{弱形式の導出}
+
