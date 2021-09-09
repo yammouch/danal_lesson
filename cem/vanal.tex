@@ -1,10 +1,19 @@
 \subsection{ベクトル解析の公式}
 
-%\begin{align}
-%&\vec{a}\cdot\left(\nabla\times\vec{b})\\
-%=&a_i\epsilon_{ijk}\partial_jb_k\\
-%=&
-%\end{align}
+\begin{align}
+&\nabla\times\left(\nabla f\right)\\
+=&\epsilon_{ijk}\partial_j\partial_k f
+\end{align}
+$i=0$を考えて
+\begin{align}
+&\epsilon_{0jk}\partial_j\partial_k f\\
+=&\partial_1\partial_2 f-\partial_2\partial_1 f\\
+=&0
+\end{align}
+$i=1$, 2の場合も同様に0になる。したがって
+\begin{align}
+\nabla\times\left(\nabla f\right)=\bm{0}
+\end{align}
 
 \begin{align}
 &\nabla\cdot\left(\vec{a}\times\vec{b}\right)\\
@@ -33,6 +42,49 @@
 =&\epsilon_{ijk}a_k\partial_jf+f\epsilon_{ijk}\partial_ja_k\\
 =&\left(\nabla f\right)\times\vec{a}+f\left(\nabla\times\vec{a}\right)
 \end{align}
+
+\begin{align}
+&\vec{a}\times\left(\vec{b}\times\vec{c}\right)\\
+=&\epsilon_{ijk}a_j\epsilon_{klm}b_lc_m
+\end{align}
+$\left(i,j,k\right)=\left(0,1,2\right)$
+を考えて
+\begin{align}
+&a_1\left(\epsilon_{2lm}b_lc_m\right)\\
+=&a_1\left(b_0c_1-b_1c_0\right)\\
+=&a_1b_0c_1-a_1b_1c_0
+\end{align}
+同様
+$\left(i,j,k\right)=\left(0,2,1\right)$
+を考えて
+\begin{align}
+&-a_2\left(\epsilon_{1lm}b_lc_m\right)\\
+=&-a_2\left(b_2c_0-b_0c_2\right)\\
+=&-a_2b_2c_0+a_2b_0c_2
+\end{align}
+和をとって
+\begin{align}
+&a_1b_0c_1+a_2b_0c_2-a_1b_1c_0-a_2b_2c_0\\
+=&b_0\left(a_1c_1+a_2c_2\right)-c_0\left(a_1b_1+a_2b_2\right)\\
+=&b_0\left(a_0c_0+a_1c_1+a_2c_2\right)-c_0\left(a_0b_0+a_1b_1+a_2b_2\right)\\
+=&b_0\left(\bm{a}\cdot\bm{c}\right)-c_0\left(\bm{a}\cdot\bm{b}\right)
+\end{align}
+同様に$i=1$, 2の場合はそれぞれ
+\begin{align}
+b_1\left(\bm{a}\cdot\bm{c}\right)
+-c_1\left(\bm{a}\cdot\bm{b}\right)\\
+b_2\left(\bm{a}\cdot\bm{c}\right)
+-c_2\left(\bm{a}\cdot\bm{b}\right)
+\end{align}
+となる。まとめると
+\begin{align}
+\bm{a}\times\left(\bm{b}\times\bm{c}\right)
+=&\left(\begin{array}{c}b_0\\b_1\\b_2\end{array}\right)\left(\bm{a}\cdot\bm{c}\right)
+-\left(\begin{array}{c}c_0\\c_1\\c_2\end{array}\right)\left(\bm{a}\cdot\bm{b}\right)\\
+=&\bm{b}\left(\bm{a}\cdot\bm{c}\right)
+-\bm{c}\left(\bm{a}\cdot\bm{b}\right)
+\end{align}
+となる。
 
 \subsection{積分公式}
 
