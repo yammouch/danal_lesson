@@ -26,3 +26,79 @@
 =&c_k\epsilon_{ijk}a_ib_j=c_k\epsilon_{kij}a_ib_j
  =\vec{c}\cdot\left(\vec{a}\times\vec{b}\right)
 \end{align}
+
+\begin{align}
+&\nabla\times\left(f\vec{a}\right)\\
+=&\epsilon_{ijk}\partial_j\left(fa_k\right)\\
+=&\epsilon_{ijk}a_k\partial_jf+f\epsilon_{ijk}\partial_ja_k\\
+=&\left(\nabla f\right)\times\vec{a}+f\left(\nabla\times\vec{a}\right)
+\end{align}
+
+\subsection{積分公式}
+
+いくつかある積分公式もAppendixに追いやるべきなような気がしてきた。
+
+\begin{align}
+&\int_a^b\left(x-a\right)^i\left(b-x\right)^j\,dx\\
+=&\frac{\left[\left(x-a\right)^{i+1}\left(b-x\right)^j\right]_{x=a}^{b}}{i+1}
+ - \frac{j}{i+1}\int_a^b-\left(x-a\right)^{i+1}\left(b-x\right)^{j-1}\,dx\\
+=&\frac{j}{i+1}\int_a^b\left(x-a\right)^{i+1}\left(b-x\right)^{j-1}\,dx\\
+=&\frac{j\left(j-1\right)}{\left(i+1\right)\left(i+2\right)}
+  \int_a^b\left(x-a\right)^{i+2}\left(b-x\right)^{j-2}\,dx\\
+=&\frac{j\left(j-1\right)\ldots2\cdot1}
+       {\left(i+1\right)\left(i+2\right)
+        \ldots\left(i+j-1\right)\left(i+j\right)}
+  \int_a^b\left(x-a\right)^{i+j}\,dx\\
+=&\frac{i!j!}{\left(i+j\right)!}
+  \frac{\left[\left(x-a\right)^{i+j+1}\right]_{x=a}^b}
+       {i+j+1}\\
+=&\frac{i!j!}{\left(i+j+1\right)!}\left(b-a\right)^{i+j+1}
+\end{align}
+実は1/6公式の一般化なんだね。
+
+\begin{align}
+&\int_0^1\int_0^{1-N_1}\int_0^{1-N_1-N_2}
+{N_1}^k{N_2}^l{N_3}^m
+\,dN_3\,dN_2\,dN_1\\
+=&
+\int_0^1{N_1}^k\int_0^{1-N_1}{N_2}^l\int_0^{1-N_1-N_2}{N_3}^m
+\,dN_3\,dN_2\,dN_1\\
+=&
+\frac{1}{m+1}
+\int_0^1{N_1}^k\int_0^{1-N_1}
+\left[{N_3}^{m+1}\right]_{N_3=0}^{1-N_1-N_2}
+\,dN_2\,dN_1\\
+=&\frac{1}{m+1}
+\int_0^1\int_0^{1-N_1}
+{N_2}^l\left(1-N_1-N_2\right)^{m+1}
+\,dN_2\,dN_1\\
+\end{align}
+公式
+$\displaystyle\int_a^b\left(x-a\right)^i\left(b-x\right)^j\,dx
+=\frac{i!j!}{\left(i+j+1\right)!}\left(b-a\right)^{i+j+1}$
+に
+$a=0$, $b=1-N_1$, $x=N_2$, $i=l$, $j=m+1$
+を適用して
+\begin{align}
+&\frac{1}{m+1}\frac{l!\left(m+1\right)!}{\left(l+m+2\right)!}
+\int_0^1{N_1}^k
+\left(1-N_1\right)^{l+m+2}
+\,dN_1\\
+=&\frac{l!m!}{\left(l+m+2\right)!}
+\int_0^1{N_1}^k
+\left(1-N_1\right)^{l+m+2}
+\,dN_1
+\end{align}
+公式
+$\displaystyle\int_a^b\left(x-a\right)^i\left(b-x\right)^j\,dx
+=\frac{i!j!}{\left(i+j+1\right)!}\left(b-a\right)^{i+j+1}$
+に
+$a=0$, $b=1$, $x=N_1$, $i=k$, $j=l+m+2$
+を適用して
+\begin{align}
+&\frac{l!m!}{\left(l+m+2\right)!}
+\frac{k!\left(l+m+2\right)!}
+     {\left(k+l+m+3\right)}\\
+=&\frac{k!l!m!}{\left(k+l+m+3\right)!}
+\end{align}
+となる。

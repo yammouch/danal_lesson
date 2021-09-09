@@ -119,22 +119,28 @@ $\vec{a}=\mu^{-1}\left(\nabla\times\vec{E}\right),
 
 境界で無反射とすると
 \begin{align}
-\hat{n}\times\vec{E}=&\sqrt\frac{\mu}{\epsilon}\vec{H}\\
--j\omega\sqrt{\epsilon\mu}\left(\hat{n}\times\vec{E}\right)=&-j\omega\mu\vec{H}
+\vec{E}\times\hat{n}=&-\sqrt\frac{\mu}{\epsilon}\vec{H}
+\end{align}
+両辺に$j\omega\sqrt{\epsilon\mu}$をかけて
+\begin{align}
+j\omega\sqrt{\epsilon\mu}\left(\vec{E}\times\hat{n}\right)=&-j\omega\mu\vec{H}
 \end{align}
 
 境界面積分項は
 \begin{align}
-&-j\omega\iint_\Gamma
+j\omega\iint_\Gamma
 \left(\vec{v}\times\hat{n}\right)\cdot
 \left[\mu^{-1}
-\sqrt{\epsilon\mu}\left(\hat{n}\times\vec{E}\right)
-\right]\,d\Gamma\\
-=&j\omega\iint_\Gamma
-\left(\hat{n}\times\vec{v}\right)\cdot
-\left[\mu^{-1}
-\sqrt{\epsilon\mu}\left(\hat{n}\times\vec{E}\right)
+\sqrt{\epsilon\mu}\left(\vec{E}\times\hat{n}\right)
 \right]\,d\Gamma
 \end{align}
-となる。ああ、どのタイミングで
-$\epsilon$, $\mu$をテンソルからスカラにしようか。
+となる。多分、この境界積分項に現れる$\epsilon$と$\mu$
+は領域外物質のもので,
+そこでテンソルを考えると解が波動なのかどうかあやしくなくので%
+この時点でスカラとしてよいだろう。
+\begin{align}
+j\omega\iint_\Gamma\sqrt\frac{\epsilon}{\mu}
+\left(\vec{v}\times\hat{n}\right)\cdot
+\left(\vec{E}\times\hat{n}\right)
+\,d\Gamma
+\end{align}
