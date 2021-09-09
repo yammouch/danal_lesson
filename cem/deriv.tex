@@ -144,3 +144,53 @@ j\omega\iint_\Gamma\sqrt\frac{\epsilon}{\mu}
 \left(\vec{E}\times\hat{n}\right)
 \,d\Gamma
 \end{align}
+
+\subsection{回転項の積分}
+
+$v_i$とか、とにかく$v$, $V$
+は電圧のために空けておきたいので
+$\bm{W}_i$を基底関数に使用する。
+
+\begin{align}
+&\nabla\times\bm{W}_{ij}\\
+=&\nabla\times\left(N_i\nabla N_j-N_j\nabla N_i\right)\\
+=&\nabla\times\left(N_i\nabla N_j\right)
+ -\nabla\times\left(N_j\nabla N_i\right)
+\end{align}
+第一項に公式
+$\nabla\times\left(f\bm{a}\right)
+=\left(\nabla f\right)\times\bm{a}
++f\left(\nabla\times\bm{a}\right)$
+を適用し,
+$\left(f, \bm{a}\right)
+=\left(N_i, \nabla N_j\right)$
+とすると,
+\begin{align}
+\nabla N_i\times\nabla N_j
++\nabla N_i\left[\nabla\times\left(\nabla N_j\right)\right]
+\end{align}
+第二項に公式
+$\nabla\times\left(\nabla f\right)=\bm{0}$
+を適用し
+$f=N_j$とすると,
+\begin{align}
+\nabla N_i\times\nabla N_j
+\end{align}
+だけが残る。もう一方の項も同様に
+\begin{align}
+-\nabla N_j\times\nabla N_i = \nabla N_i\times\nabla N_j
+\end{align}
+となるので, 和は
+\begin{align}
+2\nabla N_i\times\nabla N_j
+\end{align}
+である。
+
+\begin{align}
+&\left(\nabla\times\bm{W}_{ij}\right)\cdot
+\left(\nabla\times\bm{W}_{kl}\right)\\
+=&4\left(\nabla N_i\times\nabla N_j\right)\cdot
+   \left(\nabla N_k\times\nabla N_l\right)
+\end{align}
+
+積分すると$\left|\Gamma\right|$倍になる。
