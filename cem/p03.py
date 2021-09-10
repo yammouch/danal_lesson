@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse
 import p01
 
 def solve(vrt, spt, edg, freq):
@@ -37,8 +38,10 @@ if __name__ == '__main__':
   ( [ [ 0, 1, 2, 3 ]
     , [ 1, 2, 3, 4 ]
     , [ 2, 3, 4, 5 ] ] )
- #print(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2))
-  print(np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0))
+  v2e = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
+  e2v = scipy.sparse.csr_matrix((np.arange(v2e.shape[0]), (v2e[:,0], v2e[:,1])))
+  print(v2e)
+  print(e2v)
  #spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
  #edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
  #freq = 1e3
