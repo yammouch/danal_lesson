@@ -8,14 +8,14 @@ def solve(vrt, spt, edg, freq):
   for p, e in zip(spt, edg):
     n, area = p01.ntri(vrt[:, p])
     b1 = p01.bound(n, area)
-    b[e[:,None],e[None,:]] += 2j*np.pi*freq*np.sqrt(u0*e0)*b1
+    b[e[:,None],e[None,:]] += 2j*np.pi*freq*np.sqrt(e0/u0)*b1
   n, vol = p01.ntet(vrt)
   stiff = p01.make_stiff(n, vol)
   mass = p01.make_mass(n, vol)
   print(stiff)
-  lhs = stiff/(4e-7*np.pi) #- (2*np.pi*freq)**2*e0*mass + b
+  lhs = stiff/(4e-7*np.pi) - (2*np.pi*freq)**2*e0*mass + b
   rhs = np.zeros(6, dtype=np.complex128)
-  rhs[2] = 2j*np.pi*freq
+  rhs[2] = -2j*np.pi*freq
   lhs[0:2, :] = 0
   lhs[3:6, :] = 0
   lhs[[0,1  ], [0,1  ]] = 1

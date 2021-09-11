@@ -18,7 +18,7 @@ def make_stiff(n, vol): # n.shape: (..., 3, 4)
   pr = n[..., [[1],[2],[0]], vp[0]] * n[..., [[2],[0],[1]], vp[1]] \
      - n[..., [[2],[0],[1]], vp[0]] * n[..., [[1],[2],[0]], vp[1]]
   ip = ( pr[..., None] * pr[..., None, :] ).sum(axis=-3)
-  ip *= np.abs(vol)[..., None, None]
+  ip *= 4*np.abs(vol)[..., None, None]
   return ip
 
 def make_mass(n, vol): # n.shape: (..., 3, 4)
@@ -82,7 +82,7 @@ def solve(vrt, spt, edg, freq):
   mass = make_mass(n, vol)
  #lhs = stiff/(4e-7*np.pi) \
  #    - (2*np.pi*freq)**2*e0*mass \
- #    - 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt)
+ #    + 2j*np.pi*freq*np.sqrt(e0/u0)*make_b(vrt)
   lhs = stiff/(4e-7*np.pi) \
       - (2*np.pi*freq)**2*e0*mass
  #lhs = - (2*np.pi*freq)**2*e0*mass
@@ -93,7 +93,7 @@ def solve(vrt, spt, edg, freq):
   print(vol)
   print(lhs)
   rhs = np.zeros(6, dtype=np.complex128)
-  rhs[2] = 2j*np.pi*freq
+  rhs[2] = -2j*np.pi*freq
   print(rhs)
   #print(lhs)
   #print(rhs)
