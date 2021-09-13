@@ -322,5 +322,142 @@ $\bm{a}=\bm{q}_3\times\bm{q}_1$, $\bm{b}=\bm{q}_1$, $\bm{c}=\bm{q}_2$
  +N_3\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_3\\
 &=N_1\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_1\\
 \nabla\left[\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}\right]
-&=\left(\bm{q}_2\times\bm{q}_3\right)\cdot\nabla\bm{q}
+&=\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_1\nabla N_1
 \end{align}
+
+公式
+$\nabla\left(\bm{a}\cdot\bm{b}\right)
+=\left(\bm{a}^T\nabla\bm{b}^T\right)^T
++\left(\bm{b}^T\nabla\bm{a}^T\right)^T$
+を
+$\bm{a}=\left(\bm{q}_2\times\bm{q}_3\right)$,
+$\bm{b}=\bm{q}$
+として左辺に適用する。
+
+\begin{align}
+\nabla\left[\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}\right]=
+&\left[
+\left(\bm{q}_2\times\bm{q}_3\right)^T\nabla\bm{q}^T
+\right]^T
++\left[
+\bm{q}^T\nabla\left(\bm{q}_2\times\bm{q}_3\right)^T
+\right]^T\\
+=
+&\left[
+\left(\bm{q}_2\times\bm{q}_3\right)^TI
+\right]^T
++\left[
+\bm{q}^TO
+\right]^T\\
+=&\bm{q}_2\times\bm{q}_3
+\end{align}
+
+ここで
+\begin{align}
+\nabla\bm{q}^T=&
+\left(
+\begin{array}{c}
+\strut\frac{\partial}{\partial x}\\
+\strut\frac{\partial}{\partial y}\\
+\strut\frac{\partial}{\partial z}
+\end{array}
+\right)
+\left(
+\begin{array}{ccc}
+x-x_0 & y-y_0 & z-z_0
+\end{array}
+\right)\\
+=&
+\left(
+\begin{array}{ccc}
+\strut
+\frac{\partial}{\partial x} \left(x-x_0\right) &
+\frac{\partial}{\partial x} \left(y-y_0\right) &
+\frac{\partial}{\partial x} \left(z-z_0\right) \\
+\strut
+\frac{\partial}{\partial y} \left(x-x_0\right) &
+\frac{\partial}{\partial y} \left(y-y_0\right) &
+\frac{\partial}{\partial y} \left(z-z_0\right) \\
+\strut
+\frac{\partial}{\partial z} \left(x-x_0\right) &
+\frac{\partial}{\partial z} \left(y-y_0\right) &
+\frac{\partial}{\partial z} \left(z-z_0\right)
+\end{array}
+\right)\\
+=&
+\left(
+\begin{array}{ccc}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{array}
+\right)\\
+=&I
+\end{align}
+
+\begin{align}
+\nabla\left(\bm{q}_2\times\bm{q}_3\right)^T=&
+\left(
+\begin{array}{c}
+\strut\frac{\partial}{\partial x}\\
+\strut\frac{\partial}{\partial y}\\
+\strut\frac{\partial}{\partial z}
+\end{array}
+\right)
+\left(
+\begin{array}{ccc}
+\left(\bm{q}_2\times\bm{q}_3\right)_x &
+\left(\bm{q}_2\times\bm{q}_3\right)_y &
+\left(\bm{q}_2\times\bm{q}_3\right)_z
+\end{array}
+\right)\\
+=&
+\left(
+\begin{array}{ccc}
+\strut
+\frac{\partial}{\partial x} \left(\bm{q}_2\times\bm{q}_3\right)_x &
+\frac{\partial}{\partial x} \left(\bm{q}_2\times\bm{q}_3\right)_y &
+\frac{\partial}{\partial x} \left(\bm{q}_2\times\bm{q}_3\right)_z \\
+\strut
+\frac{\partial}{\partial y} \left(\bm{q}_2\times\bm{q}_3\right)_x &
+\frac{\partial}{\partial y} \left(\bm{q}_2\times\bm{q}_3\right)_y &
+\frac{\partial}{\partial y} \left(\bm{q}_2\times\bm{q}_3\right)_z \\
+\strut
+\frac{\partial}{\partial z} \left(\bm{q}_2\times\bm{q}_3\right)_x &
+\frac{\partial}{\partial z} \left(\bm{q}_2\times\bm{q}_3\right)_y &
+\frac{\partial}{\partial z} \left(\bm{q}_2\times\bm{q}_3\right)_z
+\end{array}
+\right)\\
+=&
+\left(
+\begin{array}{ccc}
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+0 & 0 & 0
+\end{array}
+\right)\\
+=&O
+\end{align}
+である。
+
+結局
+\begin{align}
+\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_1\nabla N_1
+=\bm{q}_2\times\bm{q}_3
+\end{align}
+である。同様に
+\begin{align}
+\left(\bm{q}_3\times\bm{q}_1\right)\cdot\bm{q}_2\nabla N_2
+&=\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_1\nabla N_2\\
+&=\bm{q}_3\times\bm{q}_1\\
+\left(\bm{q}_1\times\bm{q}_2\right)\cdot\bm{q}_3\nabla N_3
+&=\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_1\nabla N_3\\
+&=\bm{q}_1\times\bm{q}_2
+\end{align}
+
+である。今後の計算には直接使用しないが, 参考までに
+\begin{align}
+N_0&=1-N_1-N_2-N_3\\
+\nabla N_0&=-\nabla N_1-\nabla N_2-\nabla N_3
+\end{align}
+である。
