@@ -194,3 +194,41 @@ $f=N_j$とすると,
 \end{align}
 
 積分すると$\left|\Gamma\right|$倍になる。
+
+\subsection{境界積分項}
+
+\begin{align}
+\hat{n}&=\frac{
+\bm{q}_1\times\bm{q}_2
+}{
+\left|\bm{q}_1\times\bm{q}_2\right|
+}\\
+&=\frac{\bm{q}_1\times\bm{q}_2}{2\left|\Gamma_3\right|}
+\end{align}
+
+\begin{align}
+&\bm{W}_{ij}\times\hat{n}\\
+=&\left(N_i\nabla N_j-N_j\nabla N_i\right)\times\hat{n}\\
+=&N_i\left[\left(\nabla N_j\right)\times\hat{n}\right]
+ -N_j\left[\left(\nabla N_i\right)\times\hat{n}\right]
+\end{align}
+
+\begin{align}
+\nabla N_1 = \frac{\bm{q}_2\times\bm{q}_3}{6\left|\Sigma_m\right|}
+\end{align}
+
+\begin{align}
+12\left|\Sigma_m\right|\left|\Gamma_3\right|\nabla N_1\times\hat{n}
+&=\left(\bm{q}_2\times\bm{q}_3\right)\times\left(\bm{q}_1\times\bm{q}_2\right)
+\end{align}
+
+公式
+$\bm{a}\times\left(\bm{b}\times\bm{c}\right)
+=\bm{b}\left(\bm{a}\cdot\bm{c}\right)
+-\bm{c}\left(\bm{a}\cdot\bm{b}\right)$
+で
+$\bm{a}=\bm{q}_2\times\bm{q}_3$, $\bm{b}=\bm{q}_1$, $\bm{c}=\bm{q}_2$
+と考えて
+\begin{align}
+12\left|\Sigma_m\right|\left|\Gamma_3\right|\nabla N_1\times\hat{n}
+\end{align}
