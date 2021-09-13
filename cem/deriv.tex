@@ -214,11 +214,11 @@ $f=N_j$とすると,
 \end{align}
 
 \begin{align}
-\nabla N_1 = \frac{\bm{q}_2\times\bm{q}_3}{6\left|\Sigma_m\right|}
+\nabla N_1 = \frac{\bm{q}_2\times\bm{q}_3}{6\left|\Omega_m\right|}
 \end{align}
 
 \begin{align}
-12\left|\Sigma_m\right|\left|\Gamma_3\right|\nabla N_1\times\hat{n}
+12\left|\Omega_m\right|\left|\Gamma_3\right|\nabla N_1\times\hat{n}
 &=\left(\bm{q}_2\times\bm{q}_3\right)\times\left(\bm{q}_1\times\bm{q}_2\right)
 \end{align}
 
@@ -230,5 +230,79 @@ $\bm{a}\times\left(\bm{b}\times\bm{c}\right)
 $\bm{a}=\bm{q}_2\times\bm{q}_3$, $\bm{b}=\bm{q}_1$, $\bm{c}=\bm{q}_2$
 と考えて
 \begin{align}
-12\left|\Sigma_m\right|\left|\Gamma_3\right|\nabla N_1\times\hat{n}
+12\left|\Omega_m\right|\left|\Gamma_3\right|\nabla N_1\times\hat{n}
+&=\bm{q}_1\left[\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_2\right]
+ -\bm{q}_2\left[\left(\bm{q}_2\times\bm{q}_3\right)\cdot\bm{q}_1\right]\\
+&=-\bm{q}_2\cdot6\left|\Omega_m\right|\\
+2\left|\Gamma_3\right|\nabla N_1\times\hat{n}
+&=-\bm{q}_2
+\end{align}
+
+\begin{align}
+\nabla N_2 = \frac{\bm{q}_3\times\bm{q}_1}{6\left|\Omega_m\right|}
+\end{align}
+
+\begin{align}
+12\left|\Omega_m\right|\left|\Gamma_3\right|\nabla N_2\times\hat{n}
+&=\left(\bm{q}_3\times\bm{q}_1\right)\times\left(\bm{q}_1\times\bm{q}_2\right)
+\end{align}
+
+公式
+$\bm{a}\times\left(\bm{b}\times\bm{c}\right)
+=\bm{b}\left(\bm{a}\cdot\bm{c}\right)
+-\bm{c}\left(\bm{a}\cdot\bm{b}\right)$
+で
+$\bm{a}=\bm{q}_3\times\bm{q}_1$, $\bm{b}=\bm{q}_1$, $\bm{c}=\bm{q}_2$
+と考えて
+\begin{align}
+12\left|\Omega_m\right|\left|\Gamma_3\right|\nabla N_2\times\hat{n}
+&=\bm{q}_1\left[\left(\bm{q}_3\times\bm{q}_1\right)\cdot\bm{q}_2\right]
+ -\bm{q}_2\left[\left(\bm{q}_3\times\bm{q}_1\right)\cdot\bm{q}_1\right]\\
+&=\bm{q}_1\cdot6\left|\Omega_m\right|\\
+2\left|\Gamma_3\right|\nabla N_2\times\hat{n}
+&=\bm{q}_1
+\end{align}
+
+明らかに
+\begin{align}
+12\left|\Omega_m\right|\left|\Gamma_3\right|\nabla N_3\times\hat{n}
+&=\left(\bm{q}_1\times\bm{q}_2\right)\times\left(\bm{q}_1\times\bm{q}_2\right)\\
+&=\bm{0}
+\end{align}
+
+\begin{align}
+2\left|\Gamma_3\right|\nabla N_0\times\hat{n}
+&=2\left|\Gamma_3\right|
+ \left(1-\nabla N_1-\nabla N_2-\nabla N_3\right)\times\hat{n}\\
+&=2\left|\Gamma_3\right|+\bm{q}_2-\bm{q}_1
+\end{align}
+
+これは結局2次元の三角形上に定義した $N_0$, $N_1$, $N_2$
+をから求めた $\nabla N_0$, $\nabla N_1$, $\nabla N_2$
+を $90^\circ$ 回転させたものになっている。
+ということで, 乱暴に2次元励起を書く。
+きれいな論理展開にするのは後回し。
+
+\subsection{2次元励起}
+
+\begin{align}
+\iint\bm{i}\cdot\bm{W}\,dS
+\end{align}
+
+\begin{align}
+\bm{i}\cdot\left(N_k\nabla N_l-N_l\nabla N_k\right)
+\end{align}
+
+\begin{align}
+2\left|\Gamma_3\right|\bm{i}\cdot\nabla N_0
+&=\bm{i}\cdot\left(2\left|\Gamma_3\right|+\bm{q}_2-\bm{q}_1\right)\\
+2\left|\Gamma_3\right|\bm{i}\cdot\nabla N_1
+&=-\bm{i}\cdot\bm{q}_2\\
+2\left|\Gamma_3\right|\bm{i}\cdot\nabla N_2
+&=\bm{i}\cdot\bm{q}_1
+\end{align}
+
+あとは。メッシュ内で $\bm{i}$ 一定とする。
+\begin{align}
+\iint N_k\,dS = \left|\Gamma_3\right|
 \end{align}
