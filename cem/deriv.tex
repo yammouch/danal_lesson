@@ -482,3 +482,65 @@ N_0&=1-N_1-N_2-N_3\\
 \cdot\bm{i}
 \end{align}
 となる。
+
+\subsection{面電流励起}
+
+\begin{align}
+\bm{W}_{ij}&=N_i\nabla N_j-N_j\nabla N_i\\
+\iint\bm{W}_{ij}\cdot\bm{i}\,dS
+&=\nabla N_j\cdot\bm{i}\iint N_i\,dS
+-\nabla N_i\cdot\bm{i}\iint N_j\,dS\\
+&=\frac{1}{6}
+\left(\nabla N_j-\nabla N_i\right)\cdot\bm{i}
+\end{align}
+となるから, $\bm{W}_{01}$, $\bm{W}_{02}$, $\bm{W}_{12}$
+に対して縦に並べて
+\begin{align}
+\frac{1}{6}
+\left(
+\begin{array}{c}
+\left(\nabla N_1-\nabla N_0\right)\cdot\bm{i}\\
+\left(\nabla N_2-\nabla N_0\right)\cdot\bm{i}\\
+\left(\nabla N_2-\nabla N_1\right)\cdot\bm{i}
+\end{array}
+\right)
+\end{align}
+とすればよい。と思ったが,
+上に書いてある2次元励起とつじつまを合わせるのになんかしないと。
+$q_1$, $q_2$と接続するためには,
+全体を$90^\circ$回さないといけないんだよね。
+
+\subsection{通常の3次元有限電流密度による励起}
+
+\begin{align}
+\bm{W}_{ij}&=N_i\nabla N_j-N_j\nabla N_i\\
+\iiint\bm{W}_{ij}\cdot\bm{i}\,d\Omega_m
+&=\nabla N_j\cdot\bm{i}\iiint N_i\,d\Omega_m
+-\nabla N_i\cdot\bm{i}\iiint N_j\,d\Omega_m\\
+&=\frac{1}{24}
+\left(\nabla N_j-\nabla N_i\right)\cdot\bm{i}
+\end{align}
+となるから, $\bm{W}_{ij}$,
+$\left(i,j\right)=
+\left(0,1\right)
+\left(0,2\right)
+\left(0,3\right)
+\left(1,2\right)
+\left(1,3\right)
+\left(2,3\right)$
+に対して縦に並べて
+\begin{align}
+\frac{1}{24}
+\left(
+\begin{array}{c}
+\left(\nabla N_1-\nabla N_0\right)\cdot\bm{i}\\
+\left(\nabla N_2-\nabla N_0\right)\cdot\bm{i}\\
+\left(\nabla N_3-\nabla N_0\right)\cdot\bm{i}\\
+\left(\nabla N_2-\nabla N_1\right)\cdot\bm{i}\\
+\left(\nabla N_3-\nabla N_2\right)\cdot\bm{i}\\
+\left(\nabla N_3-\nabla N_2\right)\cdot\bm{i}
+\end{array}
+\right)
+\end{align}
+とすればよい。こちらは$\bm{q}_2\times\bm{q}_3$
+とかを使うので回転させなくてもよいはず。
