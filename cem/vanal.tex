@@ -155,179 +155,33 @@ $a=0$, $b=1$, $x=N_1$, $i=k$, $j=l+m+2$
 \end{align}
 となる。
 
-次。$\bm{a}\cdot\nabla$をどこに書くかは迷いどころ。
+2次元三角形の場合
+
 \begin{align}
-&\nabla\left(\bm{a}\cdot\bm{b}\right)\\
-=&\partial_i\left(a_jb_j\right)\\
-=&b_j\partial_ia_j+a_j\partial_ib_j\\
+&\int_0^1\int_0^{1-N_1}
+{N_1}^k{N_2}^l
+\,dN_2\,dN_1\\
 =&
-\left[
-\left(
-\begin{array}{ccc}b_0 & b_1 & b_2\end{array}
-\right)
-\left(
-\begin{array}{c}
-\partial_0\\\partial_1\\\partial_2
-\end{array}
-\right)
-\left(
-\begin{array}{ccc}a_0 & a_1 & a_2\end{array}
-\right)
-\right]^T\\
-+&\left[
-\left(
-\begin{array}{ccc}a_0 & a_1 & a_2\end{array}
-\right)
-\left(
-\begin{array}{c}
-\partial_0\\\partial_1\\\partial_2
-\end{array}
-\right)
-\left(
-\begin{array}{ccc}b_0 & b_1 & b_2\end{array}
-\right)
-\right]^T\\
-=&\left(\bm{b}^T\nabla\bm{a}^T\right)^T
- +\left(\bm{a}^T\nabla\bm{b}^T\right)^T\\
-=&\left(\bm{b}\cdot\nabla\right)\bm{a}
- +\left(\bm{a}\cdot\nabla\right)\bm{b}
+\int_0^1{N_1}^k\int_0^{1-N_1}{N_2}^l
+\,dN_2\,dN_1\\
+=&
+\frac{1}{l+1}
+\int_0^1{N_1}^k
+\left[{N_2}^{l+1}\right]_{N_2=0}^{1-N_1}
+\,dN_1\\
+=&\frac{1}{l+1}
+\int_0^1
+{N_1}^k\left(1-N_1\right)^{l+1}
+\,dN_1\\
 \end{align}
-
+公式
+$\displaystyle\int_a^b\left(x-a\right)^i\left(b-x\right)^j\,dx
+=\frac{i!j!}{\left(i+j+1\right)!}\left(b-a\right)^{i+j+1}$
+に
+$a=0$, $b=1$, $x=N_1$, $i=k$, $j=l+1$
+を適用して
 \begin{align}
-\left(\bm{a}\cdot\nabla\right)\bm{b}
-&=a_j\nabla b_j\\
-&=a_j\partial_i b_j\\
-&=
-\left(
-\begin{array}{c}
-a_0\partial_0 b_0 +
-a_1\partial_0 b_1 +
-a_2\partial_0 b_2 \\
-a_0\partial_1 b_0 +
-a_1\partial_1 b_1 +
-a_2\partial_1 b_2 \\
-a_0\partial_1 b_0 +
-a_1\partial_1 b_1 +
-a_2\partial_1 b_2
-\end{array}
-\right)\\
-&=
-\left(
-\begin{array}{ccc}
-\partial_0 b_0 &
-\partial_0 b_1 &
-\partial_0 b_2 \\
-\partial_1 b_0 &
-\partial_1 b_1 &
-\partial_1 b_2 \\
-\partial_2 b_0 &
-\partial_2 b_1 &
-\partial_2 b_2
-\end{array}
-\right)
-\left(
-\begin{array}{c}
-a_0\\a_1\\a_2\end{array}
-\right)\\
-&=
-\left[
-\left(
-\begin{array}{ccc}a_0 & a_1 & a_2\end{array}
-\right)
-\left(
-\begin{array}{ccc}
-\partial_0 b_0 &
-\partial_1 b_0 &
-\partial_2 b_0 \\
-\partial_0 b_1 &
-\partial_1 b_1 &
-\partial_2 b_1 \\
-\partial_0 b_2 &
-\partial_1 b_2 &
-\partial_2 b_2
-\end{array}
-\right)
-\right]^T\\
-&=
-\left[
-\left(
-\begin{array}{ccc}a_0 & a_1 & a_2\end{array}
-\right)
-\left(
-\begin{array}{c}
-\partial_0 \\
-\partial_1 \\
-\partial_2
-\end{array}
-\right)
-\left(
-\begin{array}{ccc}b_0 & b_1 & b_2\end{array}
-\right)
-\right]^T\\
-&=\left(\bm{a}^T\nabla\bm{b}^T\right)^T
+&\frac{1}{l+1}\frac{k!\left(l+1\right)!}{\left(k+l+2\right)!}\\
+=&\frac{k!l!}{\left(k+l+2\right)!}
 \end{align}
-
-こーれーだー! 必要あらばこんな感じに色々書くことができる,
-として引用しよう。
-
-%\begin{align}
-%\left(\bm{a}\cdot\nabla\right)\bm{b}
-%&=a_j\nabla b_j\\
-%&=a_j\partial_i b_j\\
-%&=
-%\left[
-%\left(
-%\begin{array}{ccc}
-%a_0 & a_1 & a_2
-%\end{array}
-%\right)
-%\left(
-%\begin{array}{c}
-%\partial_i b_0\\
-%\partial_i b_1\\
-%\partial_i b_2
-%\end{array}
-%\right)
-%\right]^T\\
-%&=
-%\left[
-%\left(
-%\begin{array}{ccc}
-%a_0 & a_1 & a_2
-%\end{array}
-%\right)
-%\left(
-%\begin{array}{ccc}
-%\partial_0 b_0 &
-%\partial_1 b_0 &
-%\partial_2 b_0 \\
-%\partial_0 b_1 &
-%\partial_1 b_1 &
-%\partial_2 b_1 \\
-%\partial_0 b_2 &
-%\partial_1 b_2 &
-%\partial_2 b_2
-%\end{array}
-%\right)
-%\right]^T
-%\end{align}
-
-%いまいちだな。$a_j\partial_i b_j$を一度展開したほうがよさそう。
-
-%なんか違う。
-%いや, 合っている。
-%\begin{align}
-%b_j\partial_ia_j=
-%\left[
-%\left(
-%\begin{array}{c}
-%\partial_i a_0\\\partial_i a_1\\\partial_i a_2
-%\end{array}
-%\right)
-%\left(
-%\begin{array}{ccc}
-%b_0 & b_1 & b_2\end{array}
-%\right)
-%\right]^T\\
-% +\left(\bm{a}\cdot\nabla\right)\bm{b}
-%\end{align}
+となる。

@@ -461,3 +461,24 @@ N_0&=1-N_1-N_2-N_3\\
 \nabla N_0&=-\nabla N_1-\nabla N_2-\nabla N_3
 \end{align}
 である。
+
+\subsection{線電流励起}
+
+基底関数$\bm{W}_{ij}$の大きさはその長さに反比例する。
+また, 積分線$P_jP_i$の接線方向だけを考えるので
+\begin{align}
+\bm{W}_{ij}=
+\frac{\overrightarrow{P_jP_i}}
+     {\left|\overrightarrow{P_jP_i}\right|^2}
+\end{align}
+とする。要素内で電流$\bm{i}$を一定とするので積分すると
+\begin{align}
+\int
+\frac{\overrightarrow{P_jP_i}}
+     {\left|\overrightarrow{P_jP_i}\right|^2}
+\cdot\bm{i}\,dl
+=\frac{\overrightarrow{P_jP_i}}
+      {\left|\overrightarrow{P_jP_i}\right|}
+\cdot\bm{i}
+\end{align}
+となる。
