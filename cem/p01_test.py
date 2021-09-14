@@ -1,6 +1,8 @@
 import numpy as np
 import p01 as dut
 
+np.set_printoptions(precision=3)
+
 p = np.array \
 ( [ [ [0, 1, 0, 0]
     , [0, 0, 1, 0]
@@ -38,6 +40,24 @@ if True:
     else:
         print("[ER]")
         print(vol)
+
+if True:
+    n, vol = dut.ntet(p)
+    exp = np.array \
+    ( [ [ [1/12, 1/24, 1/24,  0    , 0    ,  0    ]
+        , [1/24, 1/12, 1/24,  0    , 0    ,  0    ]
+        , [1/24, 1/24, 1/12,  0    , 0    ,  0    ]
+        , [0   , 0   , 0   ,  1/30 , 1/120, -1/120]
+        , [0   , 0   , 0   ,  1/120, 1/30 ,  1/120]
+        , [0   , 0   , 0   , -1/120, 1/120,  1/30 ] ] ] )
+    n, vol = dut.ntet(p)
+    m = dut.make_mass(n, vol)
+    print('make_mass ', end='')
+    if (np.abs(m[0]-exp[0]) < 1e-3).all():
+        print("[OK]")
+    else:
+        print("[ER]")
+        print(m)
 
 
 #if __name__ == '__main__':
