@@ -1,7 +1,47 @@
 import numpy as np
 import p01 as dut
 
-if __name__ == '__main__':
+p = np.array \
+( [ [ [0, 1, 0, 0]
+    , [0, 0, 1, 0]
+    , [0, 0, 0, 1] ]
+  , [ [ 0, 2**(1/2),  2**(1/2), 0]
+    , [ 0,        1,        -1, 0]
+    , [-1,        0,         0, 1] ]
+  , [ [ 0, 7,  7, 0]
+    , [ 0, 7, -7, 0]
+    , [-1, 0,  0, 1] ] ] )
+
+if True:
+    exp_n = np.array \
+    ( [ [ [-1, 1, 0, 0]
+        , [-1, 0, 1, 0]
+        , [-1, 0, 0, 1] ]
+      , [ [ -2**(1/2)/4, 2**(1/2)/4, 2**(1/2)/4, -2**(1/2)/4]
+        , [         0  ,        1/2,       -1/2,         0  ]
+        , [        -1/2,        0  ,        0  ,         1/2] ]
+      , [ [ -1/14, 1/14,  1/14, -1/14]
+        , [  0   , 1/14, -1/14,  0   ]
+        , [ -1/2 , 0   ,  0   ,  1/2 ] ] ] )
+    exp_vol = np.array \
+    ( [ 1, -4*2**(1/2), -196 ] )
+    n, vol = dut.ntet(p)
+    print('n of ntet ', end='')
+    if (np.abs(n-exp_n) < 1e-3).all():
+        print("[OK]")
+    else:
+        print("[ER]")
+        print(n)
+    print('vol of ntet ', end='')
+    if (np.abs(vol-exp_vol) < 1e-3).all():
+        print("[OK]")
+    else:
+        print("[ER]")
+        print(vol)
+
+
+#if __name__ == '__main__':
+if False:
   np.set_printoptions(3)
   p = np.array \
   ( [ [ [  1,  2,  1,  1 ]
