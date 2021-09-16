@@ -11,25 +11,26 @@ def make_geom():
   c = [gmsh.model.occ.addCurveLoop([l[i] for i in a])
        for a in [(0,1,2), (3,4,5)] ]
   print(c)
-  s = [gmsh.model.occ.addPlaneSurface([i]) for i in c]
+  s = [gmsh.model.occ.addPlaneSurface([i]) for i in c+[c[0]] ]
   print(s)
-  v = gmsh.model.occ.extrude([(2,s[0])], 0, 0, 1)
+  v = gmsh.model.occ.extrude([(2,s[2])], 0, 0, 1)
   print(v)
   f = gmsh.model.occ.fragment([v[1], (2,s[0]), (2,s[1]), (1,l[6])], [])
   print(f)
-  return v[1], s[0], s[1], l[6]
+  return v[1][1], (s[0], s[1]), l[6]
 
-#gmsh.model.occ.synchronize()
-#isrc = gmsh.model.addPhysicalGroup(1, [f[1][1][0][1]])
-#radi = gmsh.model.addPhysicalGroup(2, [l[1], l[2]])
-#pec  = gmsh.model.addPhysicalGroup(2, [l[0], l[3]])
-#vg = gmsh.model.addPhysicalGroup(3, [f[1][0][0][1]])
-#gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
-##gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 1.5)
-#gmsh.model.mesh.generate(3)
-#print(gmsh.model.mesh.getNodes())
-#for dim, ptag in gmsh.model.getPhysicalGroups():
-#  for ntag in gmsh.model.getEntitiesForPhysicalGroup(dim, ptag):
-#    print(gmsh.model.mesh.getElements(dim, ntag))
-##gmsh.write("g02.msh2")
-#gmsh.fltk.run()
+def assign_physicals(air_tag, pec_tags, isrc_tag):
+  isrc = gmsh.model.addPhysicalGroup(1, [isrc_tag])
+  pec  = gmsh.model.addPhysicalGroup(2, pec_tags)
+  air  = gmsh.model.addPhysicalGroup(3, [air_tag])
+  return isrc, pec, air
+
+def gen_mesh():
+  gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
+  gmsh.model.mesh.generate(3)
+  nodes = gmsh.model.mesh.getNodes()
+  elems = []
+  for dim, ptag in gmsh.model.getPhysicalGroups():
+    for ntag in gmsh.model.getEntitiesForPhysicalGroup(dim, ptag):
+      elems.append(gmsh.model.mesh.getElements(dim, ntag))
+  return nodes, elems
