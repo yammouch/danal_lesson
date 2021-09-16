@@ -7,15 +7,16 @@ def pp_nodes(n):
   print(n[2])
 
 def pp_elem(e):
-  print('type: ', e[0])
+  print('physical group: ', e[0])
+  print('type: ', e[1])
   print('tags:')
-  for x in e[1]:
+  for x in e[2]:
     print(x)
   print('nodes:')
-  for x in e[2]:
-    if e[0][0] == 4:
+  for x in e[3]:
+    if e[1][0] == 4:
       print(x.reshape(-1, 4))
-    elif e[0][0] == 2:
+    elif e[1][0] == 2:
       print(x.reshape(-1, 3))
     else:
       print(x)

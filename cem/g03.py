@@ -27,10 +27,11 @@ def assign_physicals(air_tag, pec_tags, isrc_tag):
 
 def gen_mesh():
   gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
+  gmsh.option.setNumber("Mesh.Algorithm", 8)
   gmsh.model.mesh.generate(3)
   nodes = gmsh.model.mesh.getNodes()
   elems = []
   for dim, ptag in gmsh.model.getPhysicalGroups():
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(dim, ptag):
-      elems.append(gmsh.model.mesh.getElements(dim, ntag))
+      elems.append((ptag,) + gmsh.model.mesh.getElements(dim, ntag))
   return nodes, elems
