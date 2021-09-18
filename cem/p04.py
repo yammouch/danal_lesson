@@ -32,6 +32,20 @@ def freq1(freq, tet, tri, lin, stiff, mass, e2v, v2e):
     del rhs
     return sol
 
+def solve_geom(vrt, tet, tri, lin):
+    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
+    v2e = scipy.sparse.csr_matrix \
+    ( ( np.arange(e2v.shape[0])
+      , (e2v[:,0], e2v[:,1]) ) )
+    coords = np.moveaxis(vrt[:,tet], 0, 1)
+    n, vol = p01.ntet(coords)
+    stiff = p01.make_stiff(n, vol)
+    mass = p01.make_mass(n, vol)
+    for freq in [10e3, 100e3, 1e6]:
+        sol = freq1(freq, tet, tri, lin, stiff, mass, e2v, v2e)
+        print(sol)
+        print(1/(e0*0.5*2*np.pi*freq))
+
 def main():
     np.set_printoptions(precision=3)
     vrt = np.array \
@@ -46,18 +60,7 @@ def main():
     ( [ [0, 1, 2]
       , [3, 4, 5] ] )
     lin = np.array( [ [0, 3] ] )
-    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
-    v2e = scipy.sparse.csr_matrix \
-    ( ( np.arange(e2v.shape[0])
-      , (e2v[:,0], e2v[:,1]) ) )
-    coords = np.moveaxis(vrt[:,tet], 0, 1)
-    n, vol = p01.ntet(coords)
-    stiff = p01.make_stiff(n, vol)
-    mass = p01.make_mass(n, vol)
-    for freq in [10e3, 100e3, 1e6]:
-        sol = freq1(freq, tet, tri, lin, stiff, mass, e2v, v2e)
-        print(sol)
-        print(1/(e0*0.5*2*np.pi*freq))
+    solve_geom(vrt, tet, tri, lin)
 
 if __name__ == '__main__':
     main()
