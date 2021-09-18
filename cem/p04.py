@@ -7,6 +7,7 @@ u0 = 4e-7*np.pi
 e0 = 1/(u0*c**2)
 
 vp = np.array([[0,0,0,1,1,2],[1,2,3,2,3,3]])
+vs = np.array([[0,0,1],[1,2,2]])
 
 def local2global(glo, tet, v2e, loc): # inplace
     for i, l in zip(tet, loc):
@@ -14,8 +15,11 @@ def local2global(glo, tet, v2e, loc): # inplace
         glo[dst, dst.T] += l
 
 def pec(glo, v2e):
-    edge0 = np.array(v2e[ [0,0,1,3,3,4]
-                        , [1,2,2,4,5,5] ])[0]
+    tri = np.array \
+    ( [ [0, 1, 2]
+      , [3, 4, 5] ] )
+    vpairs = np.moveaxis(tri[...,vs],-2,0).reshape(2,-1)
+    edge0 = np.array(v2e[vpairs[0], vpairs[1]])[0]
     glo[edge0       ] = 0
     glo[edge0, edge0] = 1
 
