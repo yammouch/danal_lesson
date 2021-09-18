@@ -20,13 +20,13 @@ def pec(glo, v2e, tri):
     glo[edge0       ] = 0
     glo[edge0, edge0] = 1
 
-def freq1(freq, tet, tri, stiff, mass, e2v, v2e):
+def freq1(freq, tet, tri, lin, stiff, mass, e2v, v2e):
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
     local2global(lhs, tet, v2e, stiff/u0)
     local2global(lhs, tet, v2e, -(2*np.pi*freq)**2*e0*mass)
     pec(lhs, v2e, tri)
-    rhs[v2e[0,3]] = -2j*np.pi*freq
+    rhs[v2e[lin[:,0],lin[:,1]]] = -2j*np.pi*freq
     sol = np.linalg.solve(lhs, rhs)
     del lhs
     del rhs
@@ -45,6 +45,7 @@ def main():
     tri = np.array \
     ( [ [0, 1, 2]
       , [3, 4, 5] ] )
+    lin = np.array( [ [0, 3] ] )
     e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
@@ -54,7 +55,7 @@ def main():
     stiff = p01.make_stiff(n, vol)
     mass = p01.make_mass(n, vol)
     for freq in [10e3, 100e3, 1e6]:
-        sol = freq1(freq, tet, tri, stiff, mass, e2v, v2e)
+        sol = freq1(freq, tet, tri, lin, stiff, mass, e2v, v2e)
         print(sol)
         print(1/(e0*0.5*2*np.pi*freq))
 
