@@ -13,20 +13,19 @@ def local2global(glo, tet, v2e, loc): # inplace
         dst = v2e[tuple(i[vp])]
         glo[dst, dst.T] += l
 
+def pec(glo, v2e):
+    edge0 = np.array(v2e[ [0,0,1,3,3,4]
+                        , [1,2,2,4,5,5] ])[0]
+    glo[edge0       ] = 0
+    glo[edge0, edge0] = 1
+
 def freq1(freq, tet, stiff, mass, e2v, v2e):
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
     local2global(lhs, tet, v2e, stiff/u0)
     local2global(lhs, tet, v2e, -(2*np.pi*freq)**2*e0*mass)
-    edge0 = np.array(v2e[ [0,0,1,    3,3,4]
-                        , [1,2,2,    4,5,5] ])[0]
-   #edge0 = np.array(v2e[ [0,0,1,1,2,3,3,4]
-   #                    , [1,2,2,4,5,4,5,5] ])[0]
-    lhs[edge0       ] = 0
-    lhs[edge0, edge0] = 1
-   #print(lhs)
+    pec(lhs, v2e)
     rhs[v2e[0,3]] = -2j*np.pi*freq
-   #print(rhs)
     sol = np.linalg.solve(lhs, rhs)
     return sol
 
@@ -44,7 +43,6 @@ def main():
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-   #print(v2e)
     coords = np.moveaxis(vrt[:,tet], 0, 1)
     n, vol = p01.ntet(coords)
     stiff = p01.make_stiff(n, vol)
