@@ -56,11 +56,12 @@ def get_mesh():
     ret_elems = []
     for e in elems:
         if e[0] == isrc:
-            x = e[3].reshape(-1, 2) - 1
+            x = e[3][0].reshape(-1, 2) - 1
         elif e[0] == pec:
-            x = e[3].reshape(-1, 3) - 1
+            x = e[3][0].reshape(-1, 3) - 1
         elif e[0] == air:
-            x = e[3].reshape(-1, 4) - 1
+            x = e[3][0].reshape(-1, 4) - 1
+        x.sort()
         ret_elems.append((e[0], x))
     return isrc, pec, air, nodes[1].reshape(-1,3), ret_elems
 
@@ -72,11 +73,10 @@ def main():
         if ptype == ptair:
             tet.append(nodes)
     tet = np.concatenate(tuple(tet))
-    e2v = np.unique(np.concatenate(tuple(tet)), axis=0)
+    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-    pgroups = [(3, tet), (2, tri), (1, lin)]
     for freq in [10e3, 100e3, 1e6]:
         solve_geom(freq, np.moveaxis(vrt,0,1), pgroups, e2v, v2e)
 
