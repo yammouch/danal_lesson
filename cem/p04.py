@@ -20,19 +20,22 @@ def pec(glo, v2e, tri):
     glo[edge0       ] = 0
     glo[edge0, edge0] = 1
 
+def air(glo, freq, vrt, tet, v2e):
+    coords = np.moveaxis(vrt[:,tet], 0, 1)
+    n, vol = p01.ntet(coords)
+    stiff = p01.make_stiff(n, vol)
+    mass = p01.make_mass(n, vol)
+    local2global(glo, tet, v2e, stiff/u0)
+    local2global(glo, tet, v2e, -(2*np.pi*freq)**2*e0*mass)
+
 def solve_geom(freq, vrt, tet, tri, lin):
     e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-    coords = np.moveaxis(vrt[:,tet], 0, 1)
-    n, vol = p01.ntet(coords)
-    stiff = p01.make_stiff(n, vol)
-    mass = p01.make_mass(n, vol)
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
-    local2global(lhs, tet, v2e, stiff/u0)
-    local2global(lhs, tet, v2e, -(2*np.pi*freq)**2*e0*mass)
+    air(lhs, freq, vrt, tet, v2e)
     pec(lhs, v2e, tri)
     rhs[v2e[lin[:,0],lin[:,1]]] = -2j*np.pi*freq
     sol = np.linalg.solve(lhs, rhs)
