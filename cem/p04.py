@@ -28,16 +28,16 @@ def air(glo, freq, vrt, tet, v2e):
     local2global(glo, tet, v2e, stiff/u0)
     local2global(glo, tet, v2e, -(2*np.pi*freq)**2*e0*mass)
 
-def solve_geom(freq, vrt, tet, tri, lin):
-    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
-    v2e = scipy.sparse.csr_matrix \
-    ( ( np.arange(e2v.shape[0])
-      , (e2v[:,0], e2v[:,1]) ) )
+def solve_geom(freq, vrt, pgroups, e2v, v2e):
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
-    air(lhs, freq, vrt, tet, v2e)
-    pec(lhs, v2e, tri)
-    rhs[v2e[lin[:,0],lin[:,1]]] = -2j*np.pi*freq
+    for ptype, nodes in pgroups:
+        if ptype == 3:
+            air(lhs, freq, vrt, nodes, v2e)
+        elif ptype == 2:
+            pec(lhs, v2e, nodes)
+        elif ptype == 1:
+            rhs[v2e[nodes[:,0],nodes[:,1]]] = -2j*np.pi*freq
     sol = np.linalg.solve(lhs, rhs)
     del lhs
     del rhs
@@ -58,8 +58,13 @@ def main():
     ( [ [0, 1, 2]
       , [3, 4, 5] ] )
     lin = np.array( [ [0, 3] ] )
+    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
+    v2e = scipy.sparse.csr_matrix \
+    ( ( np.arange(e2v.shape[0])
+      , (e2v[:,0], e2v[:,1]) ) )
+    pgroups = [(3, tet), (2, tri), (1, lin)]
     for freq in [10e3, 100e3, 1e6]:
-        solve_geom(freq, vrt, tet, tri, lin)
+        solve_geom(freq, vrt, pgroups, e2v, v2e)
 
 if __name__ == '__main__':
     main()
