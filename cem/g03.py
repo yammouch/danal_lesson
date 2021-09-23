@@ -26,8 +26,6 @@ def assign_physicals(air_tag, pec_tags, isrc_tag):
   return isrc, pec, air
 
 def gen_mesh():
-  gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
-  gmsh.option.setNumber("Mesh.Algorithm", 8)
   gmsh.model.mesh.generate(3)
   nodes = gmsh.model.mesh.getNodes()
   elems = []

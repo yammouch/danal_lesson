@@ -10,6 +10,9 @@ def get_mesh():
     air_tag, pec_tags, isrc_tag = g03.make_geom()
     gmsh.model.occ.synchronize()
     isrc, pec, air = g03.assign_physicals(air_tag, pec_tags, isrc_tag)
+   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
+    gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.7)
+    gmsh.option.setNumber("Mesh.Algorithm", 8)
     nodes, elems = g03.gen_mesh()
     gmsh.finalize()
     ret_elems = []
@@ -31,11 +34,13 @@ def main():
     for ptype, nodes in pgroups:
         if ptype == ptair:
             tet.append(nodes)
+    print(pgroups)
     tet = np.concatenate(tuple(tet))
     e2v = np.unique(tet[:, np.moveaxis(p04.vp,0,1)].reshape(-1,2), axis=0)
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
+    print(v2e)
     for freq in [100, 1e3, 10e3, 100e3, 1e6]:
         p04.solve_geom(freq, np.moveaxis(vrt,0,1), pgroups, e2v, v2e)
 
