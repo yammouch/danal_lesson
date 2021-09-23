@@ -36,7 +36,7 @@ def main():
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-    for freq in [10e3, 100e3, 1e6]:
+    for freq in [100, 1e3, 10e3, 100e3, 1e6]:
         p04.solve_geom(freq, np.moveaxis(vrt,0,1), pgroups, e2v, v2e)
 
 if __name__ == '__main__':
