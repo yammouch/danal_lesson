@@ -22,6 +22,14 @@ def isrc(rhs, freq, vrt, nodes, v2e):
     ip = (dirc*np.array([0,0,1])).sum(axis=-1)
     rhs[v2e[nodes[:,0],nodes[:,1]]] = -2j*np.pi*freq*ip
 
+def isrc_v(sol, vrt, nodes, v2e):
+    diff = vrt[:,nodes[:,1]] - vrt[:,nodes[:,0]]
+    diff = diff.T
+    mag = (diff**2).sum(axis=-1)**0.5
+    dirc = diff/mag[:,None]
+    ip = (dirc*np.array([0,0,1])).sum(axis=-1)
+    return (sol[v2e[nodes[:,0],nodes[:,1]][0]] * ip).sum()
+
 def pec(glo, v2e, tri):
     vpairs = np.moveaxis(tri[...,vs],-2,0).reshape(2,-1)
     edge0 = np.array(v2e[vpairs[0], vpairs[1]])[0]
@@ -50,6 +58,9 @@ def solve_geom(freq, vrt, pgroups, e2v, v2e):
     del lhs
     del rhs
     print(sol)
+    for ptype, nodes in pgroups:
+        if ptype == 1:
+            print(isrc_v(sol, vrt, nodes, v2e))
     print(1/(e0*0.5*2*np.pi*freq))
 
 def main():

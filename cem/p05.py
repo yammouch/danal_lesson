@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.sparse
 import gmsh
-import p01
 import p04
 import g03
 
