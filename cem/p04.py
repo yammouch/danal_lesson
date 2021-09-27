@@ -47,13 +47,16 @@ def air(glo, freq, vrt, tet, v2e):
 def solve_geom(freq, vrt, pgroups, e2v, v2e):
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
+    dirichlet = []
     for ptype, nodes in pgroups:
         if ptype == 3:
             air(lhs, freq, vrt, nodes, v2e)
         elif ptype == 2:
-            pec(lhs, v2e, nodes)
+            dirichlet.append(nodes)
         elif ptype == 1:
             isrc(rhs, freq, vrt, nodes, v2e)
+    for nodes in dirichlet:
+        pec(lhs, v2e, nodes)
     sol = np.linalg.solve(lhs, rhs)
     del lhs
     del rhs
