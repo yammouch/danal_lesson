@@ -48,21 +48,23 @@ def solve_geom(freq, vrt, pgroups, e2v, v2e):
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
     dirichlet = []
-    for ptype, nodes in pgroups:
-        if ptype == 3:
+    for ptype, attr, nodes in pgroups:
+        if ptype == 'v': # volume
             air(lhs, freq, vrt, nodes, v2e)
-        elif ptype == 2:
-            dirichlet.append(nodes)
-        elif ptype == 1:
+        elif ptype == 'b': # boundary condition
+            dirichlet.append((attr, nodes))
+        elif ptype == 'e': # excitation
             isrc(rhs, freq, vrt, nodes, v2e)
-    for nodes in dirichlet:
+        else:
+            raise Exception("Unsupported physical type {}".format(ptype))
+    for _, nodes in dirichlet:
         pec(lhs, v2e, nodes)
     sol = np.linalg.solve(lhs, rhs)
     del lhs
     del rhs
     print(sol)
-    for ptype, nodes in pgroups:
-        if ptype == 1:
+    for ptype, attr, nodes in pgroups:
+        if ptype == 'e':
             print(isrc_v(sol, vrt, nodes, v2e))
     print(1/(e0*0.5*2*np.pi*freq))
 
@@ -84,7 +86,7 @@ def main():
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-    pgroups = [(3, tet), (2, tri), (1, lin)]
+    pgroups = [('e', (), lin), ('b', (), tri), ('v', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
         solve_geom(freq, vrt, pgroups, e2v, v2e)
 

@@ -17,21 +17,24 @@ def get_mesh():
     ret_elems = []
     for e in elems:
         if e[0] == isrc:
+            ptype = 'e'
             x = e[3][0].reshape(-1, 2) - 1
         elif e[0] == pec:
+            ptype = 'b'
             x = e[3][0].reshape(-1, 3) - 1
         elif e[0] == air:
+            ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
         x.sort()
-        ret_elems.append((e[0], x))
-    return isrc, pec, air, nodes[1].reshape(-1,3), ret_elems
+        ret_elems.append((ptype, (), x))
+    return nodes[1].reshape(-1,3), ret_elems
 
 def main():
     np.set_printoptions(precision=3)
-    ptisrc, ptpec, ptair, vrt, pgroups = get_mesh()
+    vrt, pgroups = get_mesh()
     tet = []
-    for ptype, nodes in pgroups:
-        if ptype == ptair:
+    for ptype, _, nodes in pgroups:
+        if ptype == 'v':
             tet.append(nodes)
     print(pgroups)
     tet = np.concatenate(tuple(tet))
