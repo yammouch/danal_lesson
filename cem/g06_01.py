@@ -68,8 +68,9 @@ def main():
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-    for freq in [1e9, 2e9, 5e9, 10e9, 20e9]:
-        p04.solve_geom(freq, np.moveaxis(vrt,0,1), pgroups, e2v, v2e)
+    for freq in [1e9, 2e9]:
+        p04.solve_geom \
+        ( freq, np.moveaxis(vrt,0,1), pgroups, e2v.shape[0], v2e, None )
 
 if __name__ == '__main__':
     main()

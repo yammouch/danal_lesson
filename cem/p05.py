@@ -44,7 +44,8 @@ def main():
       , (e2v[:,0], e2v[:,1]) ) )
     print(v2e)
     for freq in [100, 1e3, 10e3, 100e3, 1e6]:
-        p04.solve_geom(freq, np.moveaxis(vrt,0,1), pgroups, e2v, v2e)
+        p04.solve_geom \
+        ( freq, np.moveaxis(vrt,0,1), pgroups, e2v.shape[0], v2e, None )
 
 if __name__ == '__main__':
     main()
