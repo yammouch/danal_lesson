@@ -14,6 +14,12 @@ def local2global(glo, tet, v2e, loc): # inplace
         dst = v2e[tuple(i[vp])]
         glo[dst, dst.T] += l
 
+def local2global2d(glo, tri, v2e, loc): # inplace
+    print(glo.shape)
+    for i, l in zip(tri, loc):
+        dst = v2e[tuple(i[vs])]
+        glo[dst, dst.T] += l
+
 def isrc(rhs, freq, vrt, nodes, v2e):
     diff = vrt[:,nodes[:,1]] - vrt[:,nodes[:,0]]
     diff = diff.T
@@ -44,6 +50,13 @@ def air(glo, freq, vrt, tet, v2e):
     local2global(glo, tet, v2e, stiff/u0)
     local2global(glo, tet, v2e, -(2*np.pi*freq)**2*e0*mass)
 
+def absorb(lhs, freq, vrt, nodes, v2e):
+    coords = np.moveaxis(vrt[:,nodes], 0, 1)
+    n, area = p01.ntri(coords)
+    ab = p01.bound(n, area)
+    local2global2d(lhs, nodes, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab)
+   #local2global2d(lhs, nodes, v2e, -2j*np.pi*freq*np.sqrt(e0/u0)*ab)
+
 def solve_geom(freq, vrt, pgroups, e2v, v2e):
     lhs = np.zeros((e2v.shape[0], e2v.shape[0]), dtype=np.complex128)
     rhs = np.zeros((e2v.shape[0],), dtype=np.complex128)
@@ -53,6 +66,8 @@ def solve_geom(freq, vrt, pgroups, e2v, v2e):
             air(lhs, freq, vrt, nodes, v2e)
         elif ptype == 'b': # boundary condition
             dirichlet.append((attr, nodes))
+        elif ptype == 'a': # absorbing boundary
+            absorb(lhs, freq, vrt, nodes, v2e)
         elif ptype == 'e': # excitation
             isrc(rhs, freq, vrt, nodes, v2e)
         else:

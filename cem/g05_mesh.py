@@ -23,15 +23,15 @@ def pp_elem(e):
 
 gmsh.initialize()
 
-air_tag, pec_tags, isrc_tag = dut.make_geom(1, 0.01)
+air_tag, pec_tags, isrc_tag = dut.make_geom(3, 0.001)
 print(air_tag, pec_tags, isrc_tag)
 
 gmsh.model.occ.synchronize()
 isrc, pec, air = dut.assign_physicals(air_tag, pec_tags, isrc_tag)
 print(isrc, pec, air)
 
-gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
-gmsh.option.setNumber("Mesh.Algorithm", 8)
+#gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
+#gmsh.option.setNumber("Mesh.Algorithm", 8)
 nodes, elems = dut.gen_mesh()
 print('-' * 40)
 pp_nodes(nodes)
