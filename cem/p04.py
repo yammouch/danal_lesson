@@ -99,13 +99,17 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             print(isrc_v(sol, vrt, nodes, v2e))
     print(1/(e0*0.5*2*np.pi*freq))
 
-def edge_num(tet):
+def edge_num_naive(tet):
     e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
+    return v2e, e2v
+
+def edge_num_banded(tet):
+    v2e, e2v = edge_num_naive(tet)
     lil = scipy.sparse.lil_matrix \
-    ( (e2v.shape[0], e2v.shape[0]), dtype=np.int64 )
+    ( (v2e.nnz, v2e.nnz), dtype=np.int64 )
     print(tet[:,vp[0]])
     print(tet[:,vp[1]])
     tet_e = v2e[tet[:,vp[0]], tet[:,vp[1]]].toarray()
@@ -116,6 +120,12 @@ def edge_num(tet):
     perm = scipy.sparse.csgraph.reverse_cuthill_mckee(lil.tocsr())
     print(perm)
     print(lil[perm[:,None], perm].toarray())
+    e2v = e2v[perm]
+    v2e = scipy.sparse.csr_matrix \
+    ( ( np.arange(e2v.shape[0])
+      , (e2v[:,0], e2v[:,1]) ) )
+    print(e2v)
+    print(v2e)
 
 def main():
     np.set_printoptions(precision=3)

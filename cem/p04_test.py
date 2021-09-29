@@ -6,4 +6,4 @@ tet = np.array \
   , [1, 2, 3, 4]
   , [0, 1, 4, 5] ] )
 
-dut.edge_num(tet)
+dut.edge_num_banded(tet)
