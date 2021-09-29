@@ -100,8 +100,22 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     print(1/(e0*0.5*2*np.pi*freq))
 
 def edge_num(tet):
-    e2v = np.unique(tet[:, np.moveaxis(p04.vp,0,1)].reshape(-1,2), axis=0)
-    v2e = scipy.sparse.csr_matrix
+    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
+    v2e = scipy.sparse.csr_matrix \
+    ( ( np.arange(e2v.shape[0])
+      , (e2v[:,0], e2v[:,1]) ) )
+    lil = scipy.sparse.lil_matrix \
+    ( (e2v.shape[0], e2v.shape[0]), dtype=np.int64 )
+    print(tet[:,vp[0]])
+    print(tet[:,vp[1]])
+    tet_e = v2e[tet[:,vp[0]], tet[:,vp[1]]].toarray()
+    print(tet_e)
+    for v in tet_e:
+        lil[v[:, None], v] = 1
+    print(lil.toarray())
+    perm = scipy.sparse.csgraph.reverse_cuthill_mckee(lil.tocsr())
+    print(perm)
+    print(lil[perm[:,None], perm].toarray())
 
 def main():
     np.set_printoptions(precision=3)
