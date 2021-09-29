@@ -126,6 +126,18 @@ def edge_num_banded(tet):
       , (e2v[:,0], e2v[:,1]) ) )
     print(e2v)
     print(v2e)
+    bwh = 0
+    for x in tet[:, vp]:
+        print(x)
+        y = v2e[x[0], x[1]]
+        print(y)
+        ymax = np.max(y)
+        ymin = np.min(y)
+        print(ymax, ymin)
+        diff = ymax - ymin
+        if bwh < diff:
+            bwh = diff
+    print(bwh)
 
 def main():
     np.set_printoptions(precision=3)
