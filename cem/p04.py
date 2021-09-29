@@ -110,34 +110,23 @@ def edge_num_banded(tet):
     v2e, e2v = edge_num_naive(tet)
     lil = scipy.sparse.lil_matrix \
     ( (v2e.nnz, v2e.nnz), dtype=np.int64 )
-    print(tet[:,vp[0]])
-    print(tet[:,vp[1]])
     tet_e = v2e[tet[:,vp[0]], tet[:,vp[1]]].toarray()
-    print(tet_e)
     for v in tet_e:
         lil[v[:, None], v] = 1
-    print(lil.toarray())
     perm = scipy.sparse.csgraph.reverse_cuthill_mckee(lil.tocsr())
-    print(perm)
-    print(lil[perm[:,None], perm].toarray())
     e2v = e2v[perm]
     v2e = scipy.sparse.csr_matrix \
     ( ( np.arange(e2v.shape[0])
       , (e2v[:,0], e2v[:,1]) ) )
-    print(e2v)
-    print(v2e)
     bwh = 0
     for x in tet[:, vp]:
-        print(x)
         y = v2e[x[0], x[1]]
-        print(y)
         ymax = np.max(y)
         ymin = np.min(y)
-        print(ymax, ymin)
         diff = ymax - ymin
         if bwh < diff:
             bwh = diff
-    print(bwh)
+    return v2e, bwh
 
 def main():
     np.set_printoptions(precision=3)
@@ -153,13 +142,10 @@ def main():
     ( [ [0, 1, 2]
       , [3, 4, 5] ] )
     lin = np.array( [ [0, 3] ] )
-    e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
-    v2e = scipy.sparse.csr_matrix \
-    ( ( np.arange(e2v.shape[0])
-      , (e2v[:,0], e2v[:,1]) ) )
+    v2e, _ = edge_num_banded(tet)
     pgroups = [('e', (), lin), ('b', (), tri), ('v', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
-        solve_geom(freq, vrt, pgroups, e2v.shape[0], v2e, None)
+        solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, None)
 
 if __name__ == '__main__':
     main()

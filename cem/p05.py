@@ -38,14 +38,10 @@ def main():
             tet.append(nodes)
     print(pgroups)
     tet = np.concatenate(tuple(tet))
-    e2v = np.unique(tet[:, np.moveaxis(p04.vp,0,1)].reshape(-1,2), axis=0)
-    v2e = scipy.sparse.csr_matrix \
-    ( ( np.arange(e2v.shape[0])
-      , (e2v[:,0], e2v[:,1]) ) )
-    print(v2e)
+    v2e, _ = p04.edge_num_banded(tet)
     for freq in [100, 1e3, 10e3, 100e3, 1e6]:
         p04.solve_geom \
-        ( freq, np.moveaxis(vrt,0,1), pgroups, e2v.shape[0], v2e, None )
+        ( freq, np.moveaxis(vrt,0,1), pgroups, v2e.nnz, v2e, None )
 
 if __name__ == '__main__':
     main()
