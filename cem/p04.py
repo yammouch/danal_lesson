@@ -14,18 +14,18 @@ def local2global(glo, tet, v2e, loc, bwh): # inplace
     for i, l in zip(tet, loc):
         dst = v2e[tuple(i[vp])]
         if bwh:
-            pass
+            glo[dst.T + bwh - dst, dst] += l
         else:
-            glo[dst, dst.T] += l
+            glo[dst.T, dst] += l
 
 def local2global2d(glo, tri, v2e, loc, bwh): # inplace
     print(glo.shape)
     for i, l in zip(tri, loc):
         dst = v2e[tuple(i[vs])]
         if bwh:
-            pass
+            glo[dst.T + bwh - dst, dst] += 1
         else:
-            glo[dst, dst.T] += l
+            glo[dst.T, dst] += l
 
 def isrc(rhs, freq, vrt, nodes, v2e):
     diff = vrt[:,nodes[:,1]] - vrt[:,nodes[:,0]]
@@ -87,6 +87,8 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
         pec(lhs, v2e, nodes, bwh)
+   #print(lhs)
+   #print(rhs)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
@@ -142,10 +144,11 @@ def main():
     ( [ [0, 1, 2]
       , [3, 4, 5] ] )
     lin = np.array( [ [0, 3] ] )
-    v2e, _ = edge_num_banded(tet)
+    v2e, bwh = edge_num_banded(tet)
     pgroups = [('e', (), lin), ('b', (), tri), ('v', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
         solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, None)
+       #solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
 
 if __name__ == '__main__':
     main()
