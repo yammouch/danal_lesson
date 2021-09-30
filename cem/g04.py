@@ -72,7 +72,7 @@ def main():
     print(v2e.nnz, bwh)
     for freq in [100, 1e3, 10e3, 100e3, 1e6]:
         p04.solve_geom \
-        ( freq, np.moveaxis(vrt,0,1), pgroups, v2e.nnz, v2e, None )
+        ( freq, np.moveaxis(vrt,0,1), pgroups, v2e.nnz, v2e, bwh )
 
 if __name__ == '__main__':
     main()

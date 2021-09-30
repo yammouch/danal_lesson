@@ -23,7 +23,7 @@ def local2global2d(glo, tri, v2e, loc, bwh): # inplace
     for i, l in zip(tri, loc):
         dst = v2e[tuple(i[vs])]
         if bwh:
-            glo[dst.T + bwh - dst, dst] += 1
+            glo[dst.T + bwh - dst, dst] += l
         else:
             glo[dst.T, dst] += l
 
@@ -47,7 +47,10 @@ def pec(glo, v2e, tri, bwh):
     vpairs = np.moveaxis(tri[...,vs],-2,0).reshape(2,-1)
     edge0 = np.array(v2e[vpairs[0], vpairs[1]])[0]
     if bwh:
-        pass
+        for e in edge0:
+            glo[ range(glo.shape[0])
+               , np.arange(e+bwh, e-bwh-1, -1)%(glo.shape[1]) ] = 0
+            glo[bwh, e] = 1
     else:
         glo[edge0       ] = 0
         glo[edge0, edge0] = 1
@@ -147,8 +150,8 @@ def main():
     v2e, bwh = edge_num_banded(tet)
     pgroups = [('e', (), lin), ('b', (), tri), ('v', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
-        solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, None)
-       #solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+       #solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, None)
+        solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
 
 if __name__ == '__main__':
     main()
