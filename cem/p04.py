@@ -63,6 +63,15 @@ def air(glo, freq, vrt, tet, v2e, bwh):
     local2global(glo, tet, v2e, stiff/u0, bwh)
     local2global(glo, tet, v2e, -(2*np.pi*freq)**2*e0*mass, bwh)
 
+def cond(glo, freq, vrt, tet, v2e, bwh):
+    coords = np.moveaxis(vrt[:,tet], 0, 1)
+    n, vol = p01.ntet(coords)
+    stiff = p01.make_stiff(n, vol)
+    mass = p01.make_mass(n, vol)
+    local2global(glo, tet, v2e, stiff/u0, bwh)
+    w = 2*np.pi*freq
+    local2global(glo, tet, v2e, -w*(w*e0+1j*(1/140e-8))*mass, bwh)
+
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
     n, area = p01.ntri(coords)
@@ -78,8 +87,10 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     rhs = np.zeros((nedge,), dtype=np.complex128)
     dirichlet = []
     for ptype, attr, nodes in pgroups:
-        if ptype == 'v': # volume
+        if ptype == 'v': # air
             air(lhs, freq, vrt, nodes, v2e, bwh)
+        elif ptype == 'c': # conductor
+            cond(lhs, freq, vrt, nodes, v2e, bwh)
         elif ptype == 'b': # boundary condition
             dirichlet.append((attr, nodes))
         elif ptype == 'a': # absorbing boundary

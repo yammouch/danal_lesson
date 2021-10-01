@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.sparse
 import gmsh
 import p04
@@ -20,11 +21,11 @@ def make_geom():
   ( [ (3, air), cond[0][0], (1, isrc) ]
   , [] )
   print(f)
-  return air, cond[0][0][1], isrc
+  return f[1][0][0][1], cond[0][0][1], isrc
 
 def assign_physicals(air_tag, cond_tag, isrc_tag):
   isrc = gmsh.model.addPhysicalGroup(1, [isrc_tag])
-  cond = gmsh.model.addPhysicalGroup(2, [cond_tag])
+  cond = gmsh.model.addPhysicalGroup(3, [cond_tag])
   air  = gmsh.model.addPhysicalGroup(3, [air_tag])
   return isrc, cond, air
 
@@ -39,12 +40,10 @@ def gen_mesh():
 
 def get_mesh():
     gmsh.initialize()
-    air_tag, pec_tags, isrc_tag = make_geom(1, 0.01)
+    air_tag, cond_tag, isrc_tag = make_geom()
+    print(air_tag, cond_tag, isrc_tag)
     gmsh.model.occ.synchronize()
-    isrc, pec, air = assign_physicals(air_tag, pec_tags, isrc_tag)
-    gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.1)
-   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.7)
-   #gmsh.option.setNumber("Mesh.Algorithm", 8)
+    isrc, cond, air = assign_physicals(air_tag, cond_tag, isrc_tag)
     nodes, elems = gen_mesh()
     gmsh.finalize()
     ret_elems = []
@@ -52,9 +51,9 @@ def get_mesh():
         if e[0] == isrc:
             ptype = 'e'
             x = e[3][0].reshape(-1, 2) - 1
-        elif e[0] == pec:
-            ptype = 'a'
-            x = e[3][0].reshape(-1, 3) - 1
+        elif e[0] == cond:
+            ptype = 'c'
+            x = e[3][0].reshape(-1, 4) - 1
         elif e[0] == air:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
@@ -65,14 +64,15 @@ def get_mesh():
 def main():
     np.set_printoptions(precision=3)
     vrt, pgroups = get_mesh()
+    vrt *= 1e-3 # [m] -> [mm]
     tet = []
     for ptype, _, nodes in pgroups:
-        if ptype == 'v':
+        if ptype in ['v', 'c']:
             tet.append(nodes)
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e.nnz, bwh)
-    for freq in [1e9, 2e9]:
+    for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
         p04.solve_geom \
         ( freq, np.moveaxis(vrt,0,1), pgroups, v2e.nnz, v2e, bwh )
 
