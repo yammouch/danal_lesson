@@ -48,9 +48,11 @@ def get_mesh():
     gmsh.finalize()
     ret_elems = []
     for e in elems:
+        attr = ()
         if e[0] == isrc:
             ptype = 'e'
             x = e[3][0].reshape(-1, 2) - 1
+            attr = ([0,1,0],)
         elif e[0] == cond:
             ptype = 'c'
             x = e[3][0].reshape(-1, 4) - 1
@@ -58,7 +60,7 @@ def get_mesh():
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
         x.sort()
-        ret_elems.append((ptype, (), x))
+        ret_elems.append((ptype, attr, x))
     return nodes[1].reshape(-1,3), ret_elems
 
 def main():

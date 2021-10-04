@@ -27,20 +27,20 @@ def local2global2d(glo, tri, v2e, loc, bwh): # inplace
         else:
             glo[dst.T, dst] += l
 
-def isrc(rhs, freq, vrt, nodes, v2e):
+def isrc(rhs, freq, vrt, nodes, v2e, isrc_dir):
     diff = vrt[:,nodes[:,1]] - vrt[:,nodes[:,0]]
     diff = diff.T
     mag = (diff**2).sum(axis=-1)**0.5
     dirc = diff/mag[:,None]
-    ip = (dirc*np.array([0,0,1])).sum(axis=-1)
+    ip = (dirc*isrc_dir).sum(axis=-1)
     rhs[v2e[nodes[:,0],nodes[:,1]]] = -2j*np.pi*freq*ip
 
-def isrc_v(sol, vrt, nodes, v2e):
+def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     diff = vrt[:,nodes[:,1]] - vrt[:,nodes[:,0]]
     diff = diff.T
     mag = (diff**2).sum(axis=-1)**0.5
     dirc = diff/mag[:,None]
-    ip = (dirc*np.array([0,0,1])).sum(axis=-1)
+    ip = (dirc*isrc_dir).sum(axis=-1)
     return (sol[v2e[nodes[:,0],nodes[:,1]][0]] * ip).sum()
 
 def pec(glo, v2e, tri, bwh):
@@ -96,7 +96,7 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
         elif ptype == 'a': # absorbing boundary
             absorb(lhs, freq, vrt, nodes, v2e, bwh)
         elif ptype == 'e': # excitation
-            isrc(rhs, freq, vrt, nodes, v2e)
+            isrc(rhs, freq, vrt, nodes, v2e, attr[0])
         else:
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
@@ -112,7 +112,7 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     print(sol)
     for ptype, attr, nodes in pgroups:
         if ptype == 'e':
-            print(isrc_v(sol, vrt, nodes, v2e))
+            print(isrc_v(sol, vrt, nodes, v2e, attr[0]))
     print(1/(e0*0.5*2*np.pi*freq))
 
 def edge_num_naive(tet):
@@ -159,7 +159,7 @@ def main():
       , [3, 4, 5] ] )
     lin = np.array( [ [0, 3] ] )
     v2e, bwh = edge_num_banded(tet)
-    pgroups = [('e', (), lin), ('b', (), tri), ('v', (), tet)]
+    pgroups = [('e', ([0,0,1],), lin), ('b', (), tri), ('v', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
        #solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, None)
         solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
