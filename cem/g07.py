@@ -82,6 +82,8 @@ def main():
             if ptype == 'e':
                 print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
         print(140e-8*2*np.pi*0.1/(0.01**2*np.pi))
+        print(p04.u0*0.1*(np.log(8*0.1/0.01)-2)*2*np.pi*freq)
+        # https://www.emisoftware.com/calculator/circular-loop/
 
 if __name__ == '__main__':
     main()
