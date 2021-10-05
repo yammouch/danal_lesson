@@ -34,14 +34,14 @@ def gen_mesh():
             elems.append((ptag,) + gmsh.model.mesh.getElements(dim, ntag))
     return nodes, elems
 
-def get_mesh():
+def get_mesh(w, l, h):
     gmsh.initialize()
-    air_tag, pec_tags, isrc_tag = make_geom(1, 1, 1)
+    air_tag, pec_tags, isrc_tag = make_geom(w, l, h)
     gmsh.model.occ.synchronize()
     isrc, pec, air = assign_physicals(air_tag, pec_tags, isrc_tag)
    #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
-    gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.7)
-    gmsh.option.setNumber("Mesh.Algorithm", 8)
+    gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.4)
+   #gmsh.option.setNumber("Mesh.Algorithm", 8)
     nodes, elems = gen_mesh()
     gmsh.finalize()
     ret_elems = []
@@ -62,8 +62,9 @@ def get_mesh():
     return nodes[1].reshape(-1,3), ret_elems
 
 def main():
+    w, l, h = 1, 10, 1
     np.set_printoptions(precision=3)
-    vrt, pgroups = get_mesh()
+    vrt, pgroups = get_mesh(w, l, h)
     vrt = np.moveaxis(vrt, 0, 1)
     tet = []
     for ptype, _, nodes in pgroups:
@@ -79,6 +80,7 @@ def main():
         for ptype, attr, nodes in pgroups:
             if ptype == 'e':
                 print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
+        print(2*np.pi*freq*p04.u0*(l*h)/w)
 
 if __name__ == '__main__':
     main()
