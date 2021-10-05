@@ -70,7 +70,7 @@ def cond(glo, freq, vrt, tet, v2e, bwh):
     mass = p01.make_mass(n, vol)
     local2global(glo, tet, v2e, stiff/u0, bwh)
     w = 2*np.pi*freq
-    local2global(glo, tet, v2e, -w*(w*e0+1j*(1/140e-8))*mass, bwh)
+    local2global(glo, tet, v2e, -w*(w*e0-1j*(1/140e-8))*mass, bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
