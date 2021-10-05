@@ -81,6 +81,7 @@ def main():
         for ptype, attr, nodes in pgroups:
             if ptype == 'e':
                 print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
+        print(140e-8*2*np.pi*0.1/(0.01**2*np.pi))
 
 if __name__ == '__main__':
     main()
