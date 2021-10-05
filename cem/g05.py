@@ -4,32 +4,32 @@ import gmsh
 import p04
 
 def make_geom(size, isize):
-  b = gmsh.model.occ.addBox(-size/2, -size/2, -size/2, size, size, size)
-  isrcl = gmsh.model.occ.addPoint(0, 0, -isize/2)
-  isrcu = gmsh.model.occ.addPoint(0, 0,  isize/2)
-  isrc  = gmsh.model.occ.addLine(isrcl, isrcu)
-  f = gmsh.model.occ.fragment \
-  ( [ (3, b), (1, isrc) ]
-  , [] )
-  print(f)
-  gmsh.model.occ.synchronize()
-  bd = gmsh.model.getBoundary([(3, b)])
-  return b, [x[1] for x in bd], isrc
+    b = gmsh.model.occ.addBox(-size/2, -size/2, -size/2, size, size, size)
+    isrcl = gmsh.model.occ.addPoint(0, 0, -isize/2)
+    isrcu = gmsh.model.occ.addPoint(0, 0,  isize/2)
+    isrc  = gmsh.model.occ.addLine(isrcl, isrcu)
+    f = gmsh.model.occ.fragment \
+    ( [ (3, b), (1, isrc) ]
+    , [] )
+    print(f)
+    gmsh.model.occ.synchronize()
+    bd = gmsh.model.getBoundary([(3, b)])
+    return b, [x[1] for x in bd], isrc
 
 def assign_physicals(air_tag, pec_tags, isrc_tag):
-  isrc = gmsh.model.addPhysicalGroup(1, [isrc_tag])
-  pec  = gmsh.model.addPhysicalGroup(2, pec_tags)
-  air  = gmsh.model.addPhysicalGroup(3, [air_tag])
-  return isrc, pec, air
+    isrc = gmsh.model.addPhysicalGroup(1, [isrc_tag])
+    pec  = gmsh.model.addPhysicalGroup(2, pec_tags)
+    air  = gmsh.model.addPhysicalGroup(3, [air_tag])
+    return isrc, pec, air
 
 def gen_mesh():
-  gmsh.model.mesh.generate(3)
-  nodes = gmsh.model.mesh.getNodes()
-  elems = []
-  for dim, ptag in gmsh.model.getPhysicalGroups():
-    for ntag in gmsh.model.getEntitiesForPhysicalGroup(dim, ptag):
-      elems.append((ptag,) + gmsh.model.mesh.getElements(dim, ntag))
-  return nodes, elems
+    gmsh.model.mesh.generate(3)
+    nodes = gmsh.model.mesh.getNodes()
+    elems = []
+    for dim, ptag in gmsh.model.getPhysicalGroups():
+        for ntag in gmsh.model.getEntitiesForPhysicalGroup(dim, ptag):
+            elems.append((ptag,) + gmsh.model.mesh.getElements(dim, ntag))
+    return nodes, elems
 
 def get_mesh():
     gmsh.initialize()
@@ -61,6 +61,7 @@ def get_mesh():
 def main():
     np.set_printoptions(precision=3)
     vrt, pgroups = get_mesh()
+    vrt = np.moveaxis(vrt, 0, 1)
     tet = []
     for ptype, _, nodes in pgroups:
         if ptype == 'v':
@@ -69,8 +70,11 @@ def main():
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e.nnz, bwh)
     for freq in [1e9, 2e9, 5e9, 10e9, 20e9]:
-        p04.solve_geom \
-        ( freq, np.moveaxis(vrt,0,1), pgroups, v2e.nnz, v2e, bwh )
+        sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+        print(sol)
+        for ptype, attr, nodes in pgroups:
+            if ptype == 'e':
+                print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
 
 if __name__ == '__main__':
     main()

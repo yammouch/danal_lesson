@@ -109,11 +109,7 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     else:
         sol = np.linalg.solve(lhs, rhs)
     del lhs
-    print(sol)
-    for ptype, attr, nodes in pgroups:
-        if ptype == 'e':
-            print(isrc_v(sol, vrt, nodes, v2e, attr[0]))
-    print(1/(e0*0.5*2*np.pi*freq))
+    return sol
 
 def edge_num_naive(tet):
     e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
@@ -161,8 +157,12 @@ def main():
     v2e, bwh = edge_num_banded(tet)
     pgroups = [('e', ([0,0,1],), lin), ('b', (), tri), ('v', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
-       #solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, None)
-        solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+        sol = solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+        print(sol)
+        for ptype, attr, nodes in pgroups:
+            if ptype == 'e':
+                print(isrc_v(sol, vrt, nodes, v2e, attr[0]))
+        print(1/(e0*0.5*2*np.pi*freq))
 
 if __name__ == '__main__':
     main()
