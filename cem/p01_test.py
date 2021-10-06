@@ -99,9 +99,9 @@ if True:
         , [ 97,  1,-98, -2, 99, -1]
         , [  1, 97,-98,  2, -1, 99] ] ]
     , dtype=np.float64 )
-    exp[0] *= 4
-    exp[1] *= 2**0.5
-    exp[2] /= 49
+    exp[0] *= 4/6
+    exp[1] *= 2**0.5/6
+    exp[2] /= 49*6
     n, vol = dut.ntet(p)
     m = dut.make_stiff(n, vol)
    #print(m)

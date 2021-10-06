@@ -18,7 +18,7 @@ def make_stiff(n, vol): # n.shape: (..., 3, 4)
   pr = n[..., [[1],[2],[0]], vp[0]] * n[..., [[2],[0],[1]], vp[1]] \
      - n[..., [[2],[0],[1]], vp[0]] * n[..., [[1],[2],[0]], vp[1]]
   ip = ( pr[..., None] * pr[..., None, :] ).sum(axis=-3)
-  ip *= 4*np.abs(vol)[..., None, None]
+  ip *= 4/6*np.abs(vol)[..., None, None]
   return ip
 
 def make_mass(n, vol): # n.shape: (..., 3, 4)
