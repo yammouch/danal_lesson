@@ -33,11 +33,12 @@ def gen_mesh():
 
 def get_mesh():
     gmsh.initialize()
-    air_tag, pec_tags, isrc_tag = make_geom(3, 0.001)
+    air_tag, pec_tags, isrc_tag = make_geom(1, 0.01)
     gmsh.model.occ.synchronize()
     isrc, pec, air = assign_physicals(air_tag, pec_tags, isrc_tag)
    #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
    #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.7)
+    gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 0.1)
    #gmsh.option.setNumber("Mesh.Algorithm", 8)
     nodes, elems = gen_mesh()
     gmsh.finalize()
@@ -69,12 +70,13 @@ def main():
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e.nnz, bwh)
-    for freq in [1e9, 2e9, 5e9, 10e9, 20e9]:
+    for freq in [1e9, 2e9]:
         sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
         print(sol)
         for ptype, attr, nodes in pgroups:
             if ptype == 'e':
                 print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
+        print(2*np.pi/3*(p04.u0/p04.e0)**0.5*(0.01/(p04.c/freq))**2)
 
 if __name__ == '__main__':
     main()
