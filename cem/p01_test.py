@@ -114,6 +114,29 @@ if True:
         print(exp)
         print(np.abs(m-exp))
 
+if True:
+    n, jacob = dut.ntri2(np.moveaxis(2*p[0, :, [[0, 1, 2], [0, 1, 3]]], -1, -2))
+    exp_n = np.array \
+    ( [ [ [ -0.5,  0.5, 0   ]
+        , [ -0.5,  0  , 0.5 ]
+        , [ -0  ,  0  , 0   ] ]
+      , [ [ -0.5,  0.5, 0   ]
+        , [  0  ,  0  , 0   ]
+        , [ -0.5,  0  , 0.5 ] ] ] )
+    exp_jacob = np.array([4, 4])
+    print('n of ntri2 ', end='')
+    if (np.abs(n-exp_n) < 1e-3).all():
+        print("[OK]")
+    else:
+        print("[ER]")
+        print(n)
+    print('jacob of ntri2 ', end='')
+    if (np.abs(jacob-exp_jacob) < 1e-3).all():
+        print("[OK]")
+    else:
+        print("[ER]")
+        print(jacob)
+
 #if __name__ == '__main__':
 if False:
   np.set_printoptions(3)
