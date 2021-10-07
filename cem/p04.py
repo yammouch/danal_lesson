@@ -43,7 +43,7 @@ def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     ip = (dirc*isrc_dir).sum(axis=-1)
     return (sol[v2e[nodes[:,0],nodes[:,1]][0]] * ip).sum()
 
-def pec(glo, v2e, tri, bwh):
+def pec(glo, rhs, v2e, tri, bwh):
     vpairs = np.moveaxis(tri[...,vs],-2,0).reshape(2,-1)
     edge0 = np.array(v2e[vpairs[0], vpairs[1]])[0]
     if bwh:
@@ -54,6 +54,7 @@ def pec(glo, v2e, tri, bwh):
     else:
         glo[edge0       ] = 0
         glo[edge0, edge0] = 1
+    rhs[edge0] = 0
 
 def air(glo, freq, vrt, tet, v2e, bwh):
     coords = np.moveaxis(vrt[:,tet], 0, 1)
@@ -79,6 +80,19 @@ def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     local2global2d(lhs, nodes, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
    #local2global2d(lhs, nodes, v2e, -2j*np.pi*freq*np.sqrt(e0/u0)*ab)
 
+def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
+    coords = np.moveaxis(vrt[:,nodes], 0, 1)
+    n, jacob = p01.ntri(coords)
+    x  = n[..., vs[1]] - n[..., vs[0]]
+    x *= np.array(i_density)[..., None]
+    x  = x.sum(axis=-2)
+    x *= jacob[..., None]/2
+    x /= 6
+    x = -2j*np.pi*freq*x
+    for i, y in zip(nodes, x):
+        dst = v2e[tuple(i[vs])]
+        rhs[dst[0]] += y
+
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     if bwh:
         lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
@@ -97,10 +111,12 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             absorb(lhs, freq, vrt, nodes, v2e, bwh)
         elif ptype == 'e': # excitation
             isrc(rhs, freq, vrt, nodes, v2e, attr[0])
+        elif ptype == 'e2': # excitation 2D
+            isrc_2d(rhs, freq, vrt, nodes, v2e, attr[0])
         else:
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
-        pec(lhs, v2e, nodes, bwh)
+        pec(lhs, rhs, v2e, nodes, bwh)
    #print(lhs)
    #print(rhs)
     if bwh:
