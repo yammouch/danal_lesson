@@ -71,7 +71,7 @@ def cond(glo, freq, vrt, tet, v2e, bwh):
     mass = p01.make_mass(n, vol)
     local2global(glo, tet, v2e, stiff/u0, bwh)
     w = 2*np.pi*freq
-    local2global(glo, tet, v2e, -w*(w*e0-1j*(1/140e-8))*mass, bwh)
+    local2global(glo, tet, v2e, -w*(w*e0-1j/140e-8)*mass, bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
@@ -123,6 +123,8 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             isrc(rhs, freq, vrt, nodes, v2e, attr[0])
         elif ptype == 'e2': # excitation 2D
             isrc_2d(rhs, freq, vrt, nodes, v2e, attr[0])
+        elif ptype == 'p': # probe
+            pass
         else:
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
