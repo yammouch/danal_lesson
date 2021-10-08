@@ -10,6 +10,8 @@ def make_geom():
     d = 1
     air = gmsh.model.occ.addBox \
     ( -asize/2, -asize/2, -asize/2, asize, asize, asize )
+   #print(gmsh.model.getBoundary([(3, air)]))
+   #print(gmsh.model.getAdjacencies(3, air))
     cond = gmsh.model.occ.addTorus(0, 0, 0, r1, r2)
     cond_cut = gmsh.model.occ.addBox(0, -d/2, -r2, asize/2, d, 2*r2)
     cond = gmsh.model.occ.cut([(3, cond)], [(3, cond_cut)])
@@ -21,6 +23,11 @@ def make_geom():
     f = gmsh.model.occ.fragment \
     ( [ (3, air), cond[0][0], (2, isrc), (1, probe) ]
     , [] )
+    gmsh.model.occ.synchronize()
+    print(gmsh.model.getBoundary([(3, cond[0][0][1])], recursive=True))
+    gmsh.model.mesh.setSize \
+    ( gmsh.model.getBoundary([(3, cond[0][0][1])], recursive=True)
+    , 8)
     print(f)
     return f[1][0][0][1], cond[0][0][1], [x[1] for x in f[1][2]], probe
 
@@ -47,6 +54,7 @@ def get_mesh():
     print(probe_tag, air_tag, cond_tag, isrc_tags)
     gmsh.model.occ.synchronize()
     probe, isrc, cond, air = assign_physicals(air_tag, cond_tag, isrc_tags, probe_tag)
+   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 20)
     nodes, elems = gen_mesh()
     gmsh.finalize()
     ret_elems = []
@@ -82,7 +90,9 @@ def main():
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e.nnz, bwh)
-    for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
+   #for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
+    for freq in [1e3]:
+   #for freq in []:
         sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
         print(sol)
         for ptype, attr, nodes in pgroups:
