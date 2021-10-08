@@ -82,16 +82,26 @@ def absorb(lhs, freq, vrt, nodes, v2e, bwh):
 
 def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
-    n, jacob = p01.ntri(coords)
+   #print(nodes)
+    n, jacob = p01.ntri2(coords)
+   #print(n)
+   #print(jacob)
     x  = n[..., vs[1]] - n[..., vs[0]]
+   #print(x)
     x *= np.array(i_density)[..., None]
+   #print(x)
     x  = x.sum(axis=-2)
-    x *= jacob[..., None]/2
+   #print(x)
+    x *= jacob[..., None]
+   #print(x)
     x /= 6
+   #print(x)
     x = -2j*np.pi*freq*x
     for i, y in zip(nodes, x):
         dst = v2e[tuple(i[vs])]
         rhs[dst[0]] += y
+       #print(dst)
+   #print(rhs)
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     if bwh:
