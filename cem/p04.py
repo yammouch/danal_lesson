@@ -117,6 +117,8 @@ def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
    #print(rhs)
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
+    np.save('pgroups', pgroups)
+    np.save('vrt', vrt)
     if bwh:
         lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
     else:
@@ -144,8 +146,8 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
         pec(lhs, rhs, v2e, nodes, bwh)
-   #print(lhs)
-   #print(rhs)
+    np.save('lhs', lhs)
+    np.save('rhs', rhs)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )

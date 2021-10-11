@@ -57,8 +57,10 @@ def get_mesh():
     print(probe_tag, air_tag, cond_tag, isrc_tag)
     gmsh.model.occ.synchronize()
     probe, isrc, cond, air = assign_physicals(air_tag, cond_tag, isrc_tag, probe_tag)
-   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 20)
+   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 100000)
+   #gmsh.option.setNumber("Mesh.Algorithm", 8)
     nodes, elems = gen_mesh()
+    gmsh.write('g09.msh2')
     gmsh.finalize()
     ret_elems = []
     for e in elems:
@@ -88,7 +90,7 @@ def main():
     vrt = np.moveaxis(vrt, 0, 1)
     tet = []
     for ptype, _, nodes in pgroups:
-        if ptype in ['v', 'c']:
+        if ptype in ['v', 'c', 'e3']:
             tet.append(nodes)
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
