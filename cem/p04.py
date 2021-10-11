@@ -82,25 +82,38 @@ def absorb(lhs, freq, vrt, nodes, v2e, bwh):
 
 def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
-   #print(nodes)
     n, jacob = p01.ntri2(coords)
+    x  = n[..., vs[1]] - n[..., vs[0]]
+    x *= np.array(i_density)[..., None]
+    x  = x.sum(axis=-2)
+    x *= jacob[..., None]
+    x /= 6
+    x = -2j*np.pi*freq*x
+    for i, y in zip(nodes, x):
+        dst = v2e[tuple(i[vs])]
+        rhs[dst[0]] += y
+
+def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
+    coords = np.moveaxis(vrt[:,nodes], 0, 1)
+   #print(coords)
+    n, jacob = p01.ntet(coords)
    #print(n)
    #print(jacob)
-    x  = n[..., vs[1]] - n[..., vs[0]]
+    x  = n[..., vp[1]] - n[..., vp[0]]
    #print(x)
     x *= np.array(i_density)[..., None]
    #print(x)
     x  = x.sum(axis=-2)
    #print(x)
-    x *= jacob[..., None]
+    x *= np.abs(jacob[..., None])
    #print(x)
-    x /= 6
+    x /= 24
    #print(x)
     x = -2j*np.pi*freq*x
+   #print(x)
     for i, y in zip(nodes, x):
-        dst = v2e[tuple(i[vs])]
+        dst = v2e[tuple(i[vp])]
         rhs[dst[0]] += y
-       #print(dst)
    #print(rhs)
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
@@ -123,6 +136,8 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             isrc(rhs, freq, vrt, nodes, v2e, attr[0])
         elif ptype == 'e2': # excitation 2D
             isrc_2d(rhs, freq, vrt, nodes, v2e, attr[0])
+        elif ptype == 'e3': # excitation 3D
+            isrc_3d(rhs, freq, vrt, nodes, v2e, attr[0])
         elif ptype == 'p': # probe
             pass
         else:

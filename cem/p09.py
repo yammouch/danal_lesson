@@ -3,8 +3,8 @@ import p04
 
 def main():
     np.set_printoptions(precision=3)
-    w = 5
-    l = 1
+    w = 1
+    l = 3
     h = 1
     vrt = np.array \
     ( [ [ -w/2, -w/2, w/2,  w/2, -w/2, w/2 ]
@@ -17,13 +17,11 @@ def main():
     tri = np.array \
     ( [ [0, 1, 4]
       , [2, 3, 5] ] )
-    isrc = np.array \
-    ( [ [0, 1, 3]
-      , [1, 2, 3] ])
     lin = np.array( [ [0, 3] ] )
     v2e, bwh = p04.edge_num_banded(tet)
    #print(v2e)
-    pgroups = [('e2', ([1/h,0,0],), isrc), ('b', (), tri), ('c', (), tet)]
+   #pgroups = [('e3', ([1/(0.5*h*l),0,0],), tet), ('b', (), tri), ('c', (), tet)]
+    pgroups = [('e3', ([1/(0.5*h*l),0,0],), tet), ('c', (), tet)]
     for freq in [10e3, 100e3, 1e6]:
    #for freq in [1/(2*np.pi)]:
         sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
