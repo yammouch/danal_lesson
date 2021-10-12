@@ -26,11 +26,11 @@ def make_geom():
     f = gmsh.model.occ.fragment \
     ( [ (3, air), cond[0][0], isrc[0][0], (1, probe) ]
     , [] )
-   #gmsh.model.occ.synchronize()
-   #print(gmsh.model.getBoundary([(3, cond[0][0][1])], recursive=True))
-   #gmsh.model.mesh.setSize \
-   #( gmsh.model.getBoundary([(3, cond[0][0][1])], recursive=True)
-   #, 8)
+    gmsh.model.occ.synchronize()
+    print(gmsh.model.getBoundary([(3, cond[0][0][1])], recursive=True))
+    gmsh.model.mesh.setSize \
+    ( gmsh.model.getBoundary([(3, cond[0][0][1])], recursive=True)
+    , 12)
     print(f)
     return f[1][0][0][1], cond[0][0][1], isrc[0][0][1], probe
 
@@ -57,7 +57,7 @@ def get_mesh():
     print(probe_tag, air_tag, cond_tag, isrc_tag)
     gmsh.model.occ.synchronize()
     probe, isrc, cond, air = assign_physicals(air_tag, cond_tag, isrc_tag, probe_tag)
-   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 100000)
+   #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 10)
    #gmsh.option.setNumber("Mesh.Algorithm", 8)
     nodes, elems = gen_mesh()
     gmsh.write('g09.msh2')
@@ -65,22 +65,38 @@ def get_mesh():
     ret_elems = []
     for e in elems:
         attr = ()
+        interest = False
         if e[0] == isrc:
-            ptype = 'e3'
+            ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
-            attr = ([0,1/(0.01**2*np.pi),0],)
+            interest = True
         elif e[0] == probe:
             ptype = 'p'
             x = e[3][0].reshape(-1, 2) - 1
             attr = ([0,1,0],)
+            interest = True
         elif e[0] == cond:
             ptype = 'c'
             x = e[3][0].reshape(-1, 4) - 1
+            interest = True
         elif e[0] == air:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
-        x.sort()
-        ret_elems.append((ptype, attr, x))
+            interest = True
+        if interest:
+            x.sort()
+            ret_elems.append((ptype, attr, x))
+    for e in elems:
+        attr = ()
+        interest = False
+        if e[0] == isrc:
+            ptype = 'e3'
+            x = e[3][0].reshape(-1, 4) - 1
+            attr = ([0,1/(0.01**2*np.pi),0],)
+            interest = True
+        if interest:
+            x.sort()
+            ret_elems.append((ptype, attr, x))
     return nodes[1].reshape(-1,3), ret_elems
 
 def main():
@@ -90,7 +106,7 @@ def main():
     vrt = np.moveaxis(vrt, 0, 1)
     tet = []
     for ptype, _, nodes in pgroups:
-        if ptype in ['v', 'c', 'e3']:
+        if ptype in ['v', 'c']:
             tet.append(nodes)
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
