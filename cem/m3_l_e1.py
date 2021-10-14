@@ -22,13 +22,13 @@ def main():
     lin = np.array( [ [0, 1] ] )
     v2e, bwh = p04.edge_num_banded(tet)
     pgroups = [('e', ([0,0,1],), lin), ('b', (), tri), ('v', (), tet)]
-    for freq in [10e3, 100e3, 1e6]:
-        sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
-        print(sol)
-        for ptype, attr, nodes in pgroups:
-            if ptype == 'e':
-                print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
-        print(p04.u0*0.5*w*l/h*2*np.pi*freq)
+    freq = 50
+    sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+    print(sol)
+    for ptype, attr, nodes in pgroups:
+        if ptype == 'e':
+            print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
+    print(p04.u0*0.5*w*l/h*2*np.pi*freq)
 
 if __name__ == '__main__':
     main()
