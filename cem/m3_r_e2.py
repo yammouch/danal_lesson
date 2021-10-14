@@ -3,7 +3,7 @@ import p04
 
 def main():
     np.set_printoptions(precision=3)
-    w = 5
+    w = 1
     l = 1
     h = 1
     vrt = np.array \

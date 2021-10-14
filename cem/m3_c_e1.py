@@ -4,7 +4,7 @@ import p04
 def main():
     np.set_printoptions(precision=3)
     w = 1
-    l = 3
+    l = 1
     h = 1
     vrt = np.array \
     ( [ [ -w/2, -w/2, w/2,  w/2, -w/2, w/2 ]
