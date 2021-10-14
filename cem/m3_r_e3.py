@@ -3,8 +3,8 @@ import p04
 
 def main():
     np.set_printoptions(precision=3)
-    w = 1
-    l = 3
+    w = 5
+    l = 1
     h = 1
     vrt = np.array \
     ( [ [ -w/2, -w/2, w/2,  w/2, -w/2, w/2 ]
@@ -22,12 +22,11 @@ def main():
    #print(v2e)
    #pgroups = [('e3', ([1/(0.5*h*l),0,0],), tet), ('b', (), tri), ('c', (), tet)]
     pgroups = [('e3', ([1/(0.5*h*l),0,0],), tet), ('c', (), tet)]
-    for freq in [10e3, 100e3, 1e6]:
-   #for freq in [1/(2*np.pi)]:
-        sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
-        print(sol)
-        print(p04.isrc_v(sol, vrt, lin, v2e, [1,0,0]))
-        print(140e-8*w/(0.5*h*l))
+    freq = 50
+    sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+    print(sol)
+    print(p04.isrc_v(sol, vrt, lin, v2e, [1,0,0]))
+    print(140e-8*w/(0.5*h*l))
 
 if __name__ == '__main__':
     main()
