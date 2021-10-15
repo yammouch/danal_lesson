@@ -1,0 +1,15 @@
+% $ inkscape -E figtest.eps figtest.svg
+% $ platex figtest
+% $ dvips figtest.dvi
+% $ ps2pdf figtest.ps
+\documentclass[a4j]{jsbook}
+\usepackage{amsmath,bm}
+\usepackage{psfrag}
+\usepackage[dvips]{graphicx}
+\begin{document}
+日本語
+\begin{figure}
+\psfrag{P2}{$P_2$}
+\includegraphics[width=\hsize]{figtest.eps}
+\end{figure}
+\end{document}
