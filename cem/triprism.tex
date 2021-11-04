@@ -1,11 +1,21 @@
 \subsection{複数要素のシミュレーション}
 
 本節では1要素のシミュレーションを複数要素に拡張します。解くべき方程式は
-(数式)
+\begin{align}
+\left\{
+\sum_k
+\left[
+{\mu_i}^{-1} R_k
+-\omega\left(\omega\epsilon_k+j\sigma_k\right)S_k
+\right]
+\right\}
+\textbf{v}
+=\sum_k \textbf{e}_{1,k}+\sum_k\textbf{e}_{2,k}+\sum_k\textbf{e}_{3,k}
+\end{align}
 です。右辺は1要素シミュレーションと同様の電流励起です。左辺においては
 \begin{align}
-R_k,g(l),g(m) &= r_k,l,m\\
-S_k,g(l),g(m) &= s_k,l,m
+R_{k,g(l),g(m)} &= r_{k,l,m}\\
+S_{k,g(l),g(m)} &= s_{k,l,m}
 \end{align}
 です。$R_k, r_k, S_k, s_k$ とその添字(そえじ)の関係を図?に示します。
 $R_k, S_k$ はエッジ数の大きさを持つ正方行列です。
