@@ -1,9 +1,11 @@
-% $ #inkscape -E figtest.eps figtest.svg
+% $ #inkscape -E triprism_decomp.eps triprism_decomp.svg
 % $ platex triprism_test
 % $ dvips -T 188mm,263mm triprism_test.dvi
 % $ ps2pdf triprism_test.ps
 \documentclass[b5j]{jsbook}
 \usepackage{amsmath,bm}
+\usepackage{psfrag}
+\usepackage[dvips]{graphicx}
 \begin{document}
 \input{triprism}
 \end{document}
