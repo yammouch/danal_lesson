@@ -22,8 +22,9 @@ def main():
       , [1, 2, 3] ])
     lin = np.array( [ [0, 3] ] )
     v2e, bwh = p04.edge_num_banded(tet)
-   #print(v2e)
-    pgroups = [('e2', ([1/h,0,0],), isrc), ('b', (), tri), ('c', (), tet)]
+    pgroups = [ ('e2', ([1/h,0,0],), isrc)
+              , ('b', (), tri)
+              , ('v', (1/140e-8, p04.e0, p04.u0), tet)]
     freq = 50
     sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
     print(sol)

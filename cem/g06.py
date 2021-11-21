@@ -54,6 +54,7 @@ def get_mesh():
         elif e[0] == air:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (0, p04.e0, p04.u0)
         x.sort()
         ret_elems.append((ptype, attr, x))
     return nodes[1].reshape(-1,3), ret_elems

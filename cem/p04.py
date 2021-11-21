@@ -56,22 +56,17 @@ def pec(glo, rhs, v2e, tri, bwh):
         glo[edge0, edge0] = 1
     rhs[edge0] = 0
 
-def air(glo, freq, vrt, tet, v2e, bwh):
+def volume(glo, freq, vrt, tet, attr, v2e, bwh):
     coords = np.moveaxis(vrt[:,tet], 0, 1)
     n, vol = p01.ntet(coords)
     stiff = p01.make_stiff(n, vol)
     mass = p01.make_mass(n, vol)
-    local2global(glo, tet, v2e, stiff/u0, bwh)
-    local2global(glo, tet, v2e, -(2*np.pi*freq)**2*e0*mass, bwh)
-
-def cond(glo, freq, vrt, tet, v2e, bwh):
-    coords = np.moveaxis(vrt[:,tet], 0, 1)
-    n, vol = p01.ntet(coords)
-    stiff = p01.make_stiff(n, vol)
-    mass = p01.make_mass(n, vol)
-    local2global(glo, tet, v2e, stiff/u0, bwh)
+    sigma   = attr[0]
+    epsilon = attr[1]
+    mu      = attr[2]
     w = 2*np.pi*freq
-    local2global(glo, tet, v2e, -w*(w*e0-1j/140e-8)*mass, bwh)
+    local2global(glo, tet, v2e, stiff/mu, bwh)
+    local2global(glo, tet, v2e, -w*(w*epsilon-1j*sigma)*mass, bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
@@ -127,9 +122,7 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     dirichlet = []
     for ptype, attr, nodes in pgroups:
         if ptype == 'v': # air
-            air(lhs, freq, vrt, nodes, v2e, bwh)
-        elif ptype == 'c': # conductor
-            cond(lhs, freq, vrt, nodes, v2e, bwh)
+            volume(lhs, freq, vrt, nodes, attr, v2e, bwh)
         elif ptype == 'b': # boundary condition
             dirichlet.append((attr, nodes))
         elif ptype == 'a': # absorbing boundary
@@ -184,30 +177,3 @@ def edge_num_banded(tet):
         if bwh < diff:
             bwh = diff
     return v2e, bwh
-
-def main():
-    np.set_printoptions(precision=3)
-    vrt = np.array \
-    ( [ [ 0, 1, 0, 0, 1, 0 ]
-      , [ 0, 0, 1, 0, 0, 1 ]
-      , [ 0, 0, 0, 1, 1, 1 ] ] )
-    tet = np.array \
-    ( [ [ 0, 1, 2, 3 ]
-      , [ 1, 2, 3, 4 ]
-      , [ 2, 3, 4, 5 ] ] )
-    tri = np.array \
-    ( [ [0, 1, 2]
-      , [3, 4, 5] ] )
-    lin = np.array( [ [0, 3] ] )
-    v2e, bwh = edge_num_banded(tet)
-    pgroups = [('e', ([0,0,1],), lin), ('b', (), tri), ('v', (), tet)]
-    for freq in [10e3, 100e3, 1e6]:
-        sol = solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
-        print(sol)
-        for ptype, attr, nodes in pgroups:
-            if ptype == 'e':
-                print(isrc_v(sol, vrt, nodes, v2e, attr[0]))
-        print(1/(e0*0.5*2*np.pi*freq))
-
-if __name__ == '__main__':
-    main()

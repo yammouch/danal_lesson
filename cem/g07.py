@@ -54,11 +54,13 @@ def get_mesh():
             x = e[3][0].reshape(-1, 2) - 1
             attr = ([0,1,0],)
         elif e[0] == cond:
-            ptype = 'c'
+            ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (1/140e-8, p04.e0, p04.u0)
         elif e[0] == air:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (0, p04.e0, p04.u0)
         x.sort()
         ret_elems.append((ptype, attr, x))
     return nodes[1].reshape(-1,3), ret_elems

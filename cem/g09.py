@@ -69,6 +69,7 @@ def get_mesh():
         if e[0] == isrc:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (0, p04.e0, p04.u0)
             interest = True
         elif e[0] == probe:
             ptype = 'p'
@@ -76,12 +77,14 @@ def get_mesh():
             attr = ([0,1,0],)
             interest = True
         elif e[0] == cond:
-            ptype = 'c'
+            ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (1/140e-8, p04.e0, p04.u0)
             interest = True
         elif e[0] == air:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (0, p04.e0, p04.u0)
             interest = True
         if interest:
             x.sort()
