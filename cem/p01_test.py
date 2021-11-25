@@ -4,15 +4,18 @@ import p01 as dut
 #np.set_printoptions(precision=3)
 
 p = np.array \
-( [ [ [0, 1, 0, 0]
-    , [0, 0, 1, 0]
-    , [0, 0, 0, 1] ]
-  , [ [ 0, 2**(1/2),  2**(1/2), 0]
-    , [ 0,        1,        -1, 0]
-    , [-1,        0,         0, 1] ]
-  , [ [ 0, 7,  7, 0]
-    , [ 0, 7, -7, 0]
-    , [-1, 0,  0, 1] ] ] )
+( [ [ [0, 0, 0]
+    , [1, 0, 0]
+    , [0, 1, 0]
+    , [0, 0, 1] ]
+  , [ [0       ,  0, -1]
+    , [2**(1/2),  1,  0]
+    , [2**(1/2), -1,  0]
+    , [0       ,  0,  1] ]
+  , [ [0,  0, -1]
+    , [7,  7,  0]
+    , [7, -7,  0]
+    , [0,  0,  1] ] ] )
 
 if True:
     exp_n = np.array \
@@ -30,7 +33,7 @@ if True:
         , [-1/14,  0   ,  1/2] ] ] )
     exp_vol = np.array \
     ( [ 1, -4*2**(1/2), -196 ] )
-    n, vol = dut.ntet(np.moveaxis(p, -2, -1))
+    n, vol = dut.ntet(p)
     print('n of ntet ', end='')
     if (np.abs(n-exp_n) < 1e-3).all():
         print("[OK]")
@@ -68,7 +71,7 @@ if True:
     exp[0] /= 120
     exp[1] /= 120*2**0.5
     exp[2] /= 120
-    n, vol = dut.ntet(np.moveaxis(p, -2, -1))
+    n, vol = dut.ntet(p)
     m = dut.make_mass(n, vol)
     print('make_mass ', end='')
     if (np.abs(m-exp) < 1e-3).all():
@@ -103,7 +106,7 @@ if True:
     exp[0] *= 4/6
     exp[1] *= 2**0.5/6
     exp[2] /= 49*6
-    n, vol = dut.ntet(np.moveaxis(p, -2, -1))
+    n, vol = dut.ntet(p)
     m = dut.make_stiff(n, vol)
     print('make_stiff ', end='')
     if (np.abs(m-exp) < 1e-3).all():
@@ -115,7 +118,7 @@ if True:
         print(np.abs(m-exp))
 
 if True:
-    n, jacob = dut.ntri2(2*p[0, :, [[0, 1, 2], [0, 1, 3]]])
+    n, jacob = dut.ntri2(2*p[0, [[0, 1, 2], [0, 1, 3]], :])
     exp_n = np.array \
     ( [ [ [-0.5, -0.5, 0]
         , [ 0.5,  0  , 0]
