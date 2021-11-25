@@ -69,7 +69,7 @@ if True:
     exp[1] /= 120*2**0.5
     exp[2] /= 120
     n, vol = dut.ntet(np.moveaxis(p, -2, -1))
-    m = dut.make_mass(np.moveaxis(n, -2, -1), vol)
+    m = dut.make_mass(n, vol)
     print('make_mass ', end='')
     if (np.abs(m-exp) < 1e-3).all():
         print("[OK]")

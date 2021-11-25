@@ -14,24 +14,24 @@ def ntet(p): # p.shape: (..., 4, 3)
   n /= vol[..., None, None]
   return n, vol
 
-def make_stiff(n, vol): # n.shape: (..., 3, 4)
+def make_stiff(n, vol): # n.shape: (..., 4, 3)
   pr = n[..., vp[0][:, None], [1,2,0]] * n[..., vp[1][:, None], [2,0,1]] \
      - n[..., vp[0][:, None], [2,0,1]] * n[..., vp[1][:, None], [1,2,0]]
   ip = ( pr[..., None, :] * pr[..., None, :, :] ).sum(axis=-1)
   ip *= 4/6*np.abs(vol)[..., None, None]
   return ip
 
-def make_mass(n, vol): # n.shape: (..., 3, 4)
+def make_mass(n, vol): # n.shape: (..., 4, 3)
   cc = (  vp[[1,1,0]][..., None   ]
        == vp[[1,0,0]][..., None, :] ) + 1 #; print(cc)
-  ma  = ( n[..., vp[0]][..., None   ]
-        * n[..., vp[0]][..., None, :] ).sum(axis=-3) * cc[0]
-  m1  = ( n[..., vp[0]][..., None   ]
-        * n[..., vp[1]][..., None, :] ).sum(axis=-3) * cc[1]
+  ma  = ( n[..., vp[0], :][..., None, :   ]
+        * n[..., vp[0], :][..., None, :, :] ).sum(axis=-1) * cc[0]
+  m1  = ( n[..., vp[0], :][..., None, :   ]
+        * n[..., vp[1], :][..., None, :, :] ).sum(axis=-1) * cc[1]
   ma -= m1
   ma -= np.moveaxis(m1,-2,-1)
-  ma += ( n[..., vp[1]][..., None   ]
-        * n[..., vp[1]][..., None, :] ).sum(axis=-3) * cc[2]
+  ma += ( n[..., vp[1], :][..., None, :   ]
+        * n[..., vp[1], :][..., None, :, :] ).sum(axis=-1) * cc[2]
   ma *= np.abs(vol)[..., None, None]/120
   return ma
 
