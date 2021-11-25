@@ -70,17 +70,17 @@ def volume(glo, freq, vrt, tet, attr, v2e, bwh):
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
-    n, area = p01.ntri(coords)
-    ab = p01.bound(n, area)
+    n, area = p01.ntri2(np.moveaxis(coords, -2, -1))
+    ab = p01.bound(np.moveaxis(n, -2, -1), area)
     local2global2d(lhs, nodes, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
    #local2global2d(lhs, nodes, v2e, -2j*np.pi*freq*np.sqrt(e0/u0)*ab)
 
 def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
-    n, jacob = p01.ntri2(coords)
-    x  = n[..., vs[1]] - n[..., vs[0]]
-    x *= np.array(i_density)[..., None]
-    x  = x.sum(axis=-2)
+    n, jacob = p01.ntri2(np.moveaxis(coords, -2, -1))
+    x  = n[..., vs[1], :] - n[..., vs[0], :]
+    x *= np.array(i_density)
+    x  = x.sum(axis=-1)
     x *= jacob[..., None]
     x /= 6
     x = -2j*np.pi*freq*x
