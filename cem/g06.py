@@ -62,7 +62,6 @@ def get_mesh():
 def main():
     np.set_printoptions(precision=3)
     vrt, pgroups = get_mesh()
-    vrt = np.moveaxis(vrt, 0, 1)
     tet = []
     for ptype, _, nodes in pgroups:
         if ptype == 'v':

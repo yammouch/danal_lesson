@@ -57,6 +57,7 @@ def get_mesh(w, l, h):
         elif e[0] == air:
             ptype = 'v'
             x = e[3][0].reshape(-1, 4) - 1
+            attr = (0, p04.e0, p04.u0)
         x.sort()
         ret_elems.append((ptype, attr, x))
     return nodes[1].reshape(-1,3), ret_elems
@@ -65,7 +66,6 @@ def main():
     w, l, h = 1, 10, 1
     np.set_printoptions(precision=3)
     vrt, pgroups = get_mesh(w, l, h)
-    vrt = np.moveaxis(vrt, 0, 1)
     tet = []
     for ptype, _, nodes in pgroups:
         if ptype == 'v':

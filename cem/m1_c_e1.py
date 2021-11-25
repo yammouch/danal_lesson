@@ -7,11 +7,12 @@ def main():
     l = 14
     h = 2
     vrt = np.array \
-    ( [ [    0,    0, -w/2, w/2 ]
-      , [    0,    0,    l,   l ]
-      , [ -h/2,  h/2,    0,   0 ] ] )
+    ( [ [   0, 0, -h/2]
+      , [   0, 0,  h/2]
+      , [-w/2, l,    0]
+      , [ w/2, l,    0] ] )
     tet = np.array \
-    ( [ [ 0, 1, 2, 3 ] ] )
+    ( [ [0, 1, 2, 3] ] )
     lin = np.array( [ [0, 1] ] )
     v2e, bwh = p04.edge_num_banded(tet)
     pgroups = [ ('e', ([0,0,1],), tet)
