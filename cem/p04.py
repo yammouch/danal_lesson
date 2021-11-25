@@ -58,9 +58,9 @@ def pec(glo, rhs, v2e, tri, bwh):
 
 def volume(glo, freq, vrt, tet, attr, v2e, bwh):
     coords = np.moveaxis(vrt[:,tet], 0, 1)
-    n, vol = p01.ntet(coords)
-    stiff = p01.make_stiff(n, vol)
-    mass = p01.make_mass(n, vol)
+    n, vol = p01.ntet(np.moveaxis(coords, -2, -1))
+    stiff = p01.make_stiff(np.moveaxis(n, -2, -1), vol)
+    mass = p01.make_mass(np.moveaxis(n, -2, -1), vol)
     sigma   = attr[0]
     epsilon = attr[1]
     mu      = attr[2]
@@ -91,14 +91,14 @@ def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
 def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
    #print(coords)
-    n, jacob = p01.ntet(coords)
+    n, jacob = p01.ntet(np.moveaxis(coords, -2, -1))
    #print(n)
    #print(jacob)
-    x  = n[..., vp[1]] - n[..., vp[0]]
+    x  = n[..., vp[1], :] - n[..., vp[0], :]
    #print(x)
-    x *= np.array(i_density)[..., None]
+    x *= np.array(i_density)
    #print(x)
-    x  = x.sum(axis=-2)
+    x  = x.sum(axis=-1)
    #print(x)
     x *= np.abs(jacob[..., None])
    #print(x)

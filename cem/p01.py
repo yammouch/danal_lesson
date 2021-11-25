@@ -3,14 +3,14 @@ import numpy as np
 vp = np.array( [ [0,0,0,1,1,2]
                , [1,2,3,2,3,3] ], dtype=np.int64 )
 
-def ntet(p): # p.shape: (..., 3, 4)
-  q = p[..., 1:] - p[..., 0][..., None] #; print(q)
+def ntet(p): # p.shape: (..., 4, 3)
+  q = p[..., 1:, :] - p[..., 0, :][..., None, :] #; print(q)
   n = np.empty_like(p, dtype=np.float64)
-  n[..., 1:] \
+  n[..., 1:, :] \
   = q[..., [[1],[2],[0]], [1,2,0]] * q[..., [[2],[0],[1]], [2,0,1]] \
-  - q[..., [[2],[0],[1]], [1,2,0]] * q[..., [[1],[2],[0]], [2,0,1]]
-  n[..., 0] = -n[..., 1:].sum(axis=-1) #; print(n)
-  vol = (q[..., 0]*n[..., 1]).sum(axis=-1)
+  - q[..., [[1],[2],[0]], [2,0,1]] * q[..., [[2],[0],[1]], [1,2,0]]
+  n[..., 0, :] = -n[..., 1:, :].sum(axis=-2) #; print(n)
+  vol = (q[..., 0, :]*n[..., 1, :]).sum(axis=-1)
   n /= vol[..., None, None]
   return n, vol
 
@@ -73,62 +73,3 @@ def bound(n, area): # n: (..., 3, 3), area: (...)
   a3 = (n[..., [[1],[2],[2]]] * n[..., [[1,2,2]]]).sum(axis=-3)
   a3[..., [0, 0, 1, 1, 2], [0, 1, 0, 1, 2]] *= 2
   return (a0 - a1 - a2 + a3)*(area[..., None, None]/24/2)
-
-spt = np.array([ [0,1,2], [0,1,3], [0,2,3], [1,2,3] ])
-edg = np.array([ [0,1,3], [0,2,4], [1,2,5], [3,4,5] ])
-#spt = np.array([ [0,1,2], [1,2,3] ])
-#edg = np.array([ [0,1,3], [3,4,5] ])
-
-def make_b(vrt):
-  b = np.zeros((6, 6), dtype=np.complex128)
-  for p, e in zip(spt, edg):
-    n, area = ntri(vrt[:, p])
-    b1 = bound(n, area)
-    b[e[:,None],e[None,:]] += b1
-  return b
-
-def solve(vrt, spt, edg, freq):
-  u0 = 4e-7*np.pi
-  e0 = 8.854e-12
-  n, vol = ntet(vrt)
-  stiff = make_stiff(n, vol)
-  mass = make_mass(n, vol)
- #lhs = stiff/(4e-7*np.pi) \
- #    - (2*np.pi*freq)**2*e0*mass \
- #    + 2j*np.pi*freq*np.sqrt(e0/u0)*make_b(vrt)
-  lhs = stiff/(4e-7*np.pi) \
-      - (2*np.pi*freq)**2*e0*mass
- #lhs = - (2*np.pi*freq)**2*e0*mass
-  print(stiff)
-  print(mass)
-  print(- 2j*np.pi*freq*np.sqrt(u0*e0)*make_b(vrt))
-  print(make_b(vrt))
-  print(vol)
-  print(lhs)
-  rhs = np.zeros(6, dtype=np.complex128)
-  rhs[2] = -2j*np.pi*freq
-  print(rhs)
-  #print(lhs)
-  #print(rhs)
-  sol = np.linalg.solve(lhs, rhs)
-  return sol
-
-if __name__ == '__main__':
-  vrt = np.array \
-  ( [ [  0,   7 ,    7 , 0 ]
-    , [  0,   7 , -  7 , 0 ]
-    , [ -1,   0,    0, 1 ] ] )
- #( [ [ 0, 2*3**0.5, 0, 3**0.5   ]
- #  , [ 0, 0       , 3, 1        ]
- #  , [ 0, 0       , 0, 2*2**0.5 ] ] )
- #( [ [  0, 2**0.5,  2**0.5, 0 ]
- #  , [  0, 1     , -1     , 0 ]
- #  , [ -1, 0     ,  0     , 1 ] ] )
-  np.set_printoptions(3)
-  e0 = 8.854e-12
- #for freq in [1e3, 10e3, 100e3, 1e6, 10e6, 100e6, 1e9, 10e9, 100e9]:
-  for freq in [1e3, 10e3, 100e3, 1e6, 10e6]:
-    sol = solve(vrt, spt, edg, freq)
-    print(sol)
-    print(sol[2] * 2)
-    print(2*(1/freq)/4*(2/np.pi)/(4*np.pi*e0))

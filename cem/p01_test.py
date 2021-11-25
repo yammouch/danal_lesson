@@ -16,18 +16,21 @@ p = np.array \
 
 if True:
     exp_n = np.array \
-    ( [ [ [-1, 1, 0, 0]
-        , [-1, 0, 1, 0]
-        , [-1, 0, 0, 1] ]
-      , [ [ -2**(1/2)/4, 2**(1/2)/4, 2**(1/2)/4, -2**(1/2)/4]
-        , [         0  ,        1/2,       -1/2,         0  ]
-        , [        -1/2,        0  ,        0  ,         1/2] ]
-      , [ [ -1/14, 1/14,  1/14, -1/14]
-        , [  0   , 1/14, -1/14,  0   ]
-        , [ -1/2 , 0   ,  0   ,  1/2 ] ] ] )
+    ( [ [ [-1, -1, -1]
+        , [ 1,  0,  0]
+        , [ 0,  1,  0]
+        , [ 0,  0,  1] ]
+      , [ [-2**(1/2)/4,  0  , -1/2]
+        , [ 2**(1/2)/4,  1/2,  0  ]
+        , [ 2**(1/2)/4, -1/2,  0  ]
+        , [-2**(1/2)/4,  0  ,  1/2] ]
+      , [ [-1/14,  0   , -1/2]
+        , [ 1/14,  1/14,  0  ]
+        , [ 1/14, -1/14,  0  ]
+        , [-1/14,  0   ,  1/2] ] ] )
     exp_vol = np.array \
     ( [ 1, -4*2**(1/2), -196 ] )
-    n, vol = dut.ntet(p)
+    n, vol = dut.ntet(np.moveaxis(p, -2, -1))
     print('n of ntet ', end='')
     if (np.abs(n-exp_n) < 1e-3).all():
         print("[OK]")
@@ -42,7 +45,6 @@ if True:
         print(vol)
 
 if True:
-    n, vol = dut.ntet(p)
     exp = np.array \
     ( [ [ [ 10,  5,  5,  0,  0,  0]
         , [  5, 10,  5,  0,  0,  0]
@@ -66,8 +68,8 @@ if True:
     exp[0] /= 120
     exp[1] /= 120*2**0.5
     exp[2] /= 120
-    n, vol = dut.ntet(p)
-    m = dut.make_mass(n, vol)
+    n, vol = dut.ntet(np.moveaxis(p, -2, -1))
+    m = dut.make_mass(np.moveaxis(n, -2, -1), vol)
     print('make_mass ', end='')
     if (np.abs(m-exp) < 1e-3).all():
         print("[OK]")
@@ -78,7 +80,6 @@ if True:
         print(np.abs(m-exp))
 
 if True:
-    n, vol = dut.ntet(p)
     exp = np.array \
     ( [ [ [  2, -1, -1,  1,  1,  0]
         , [ -1,  2, -1, -1,  0,  1]
@@ -102,8 +103,8 @@ if True:
     exp[0] *= 4/6
     exp[1] *= 2**0.5/6
     exp[2] /= 49*6
-    n, vol = dut.ntet(p)
-    m = dut.make_stiff(n, vol)
+    n, vol = dut.ntet(np.moveaxis(p, -2, -1))
+    m = dut.make_stiff(np.moveaxis(n, -2, -1), vol)
    #print(m)
     print('make_stiff ', end='')
     if (np.abs(m-exp) < 1e-3).all():
@@ -151,8 +152,8 @@ if False:
       , [  0, 1     , -1     , 0 ]
       , [ -1, 0     ,  0     , 1 ] ] ]
   , dtype=np.float64 )
-  n, vol = dut.ntet(p)
-  m = dut.make_mass(n, vol)
+  n, vol = dut.ntet(np.moveaxis(p, -2, -1))
+  m = dut.make_mass(np.moveaxis(n, -2, -1), vol)
   print(vol)
   print(n)
   print(m / vol[..., None, None] * 120)
