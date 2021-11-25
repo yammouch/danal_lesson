@@ -59,7 +59,7 @@ def pec(glo, rhs, v2e, tri, bwh):
 def volume(glo, freq, vrt, tet, attr, v2e, bwh):
     coords = np.moveaxis(vrt[:,tet], 0, 1)
     n, vol = p01.ntet(np.moveaxis(coords, -2, -1))
-    stiff = p01.make_stiff(np.moveaxis(n, -2, -1), vol)
+    stiff = p01.make_stiff(n, vol)
     mass = p01.make_mass(np.moveaxis(n, -2, -1), vol)
     sigma   = attr[0]
     epsilon = attr[1]

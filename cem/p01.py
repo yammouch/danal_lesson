@@ -15,9 +15,9 @@ def ntet(p): # p.shape: (..., 4, 3)
   return n, vol
 
 def make_stiff(n, vol): # n.shape: (..., 3, 4)
-  pr = n[..., [[1],[2],[0]], vp[0]] * n[..., [[2],[0],[1]], vp[1]] \
-     - n[..., [[2],[0],[1]], vp[0]] * n[..., [[1],[2],[0]], vp[1]]
-  ip = ( pr[..., None] * pr[..., None, :] ).sum(axis=-3)
+  pr = n[..., vp[0][:, None], [1,2,0]] * n[..., vp[1][:, None], [2,0,1]] \
+     - n[..., vp[0][:, None], [2,0,1]] * n[..., vp[1][:, None], [1,2,0]]
+  ip = ( pr[..., None, :] * pr[..., None, :, :] ).sum(axis=-1)
   ip *= 4/6*np.abs(vol)[..., None, None]
   return ip
 
