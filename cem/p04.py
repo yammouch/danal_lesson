@@ -71,7 +71,7 @@ def volume(glo, freq, vrt, tet, attr, v2e, bwh):
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     coords = np.moveaxis(vrt[:,nodes], 0, 1)
     n, area = p01.ntri2(np.moveaxis(coords, -2, -1))
-    ab = p01.bound(np.moveaxis(n, -2, -1), area)
+    ab = p01.bound(n, area)
     local2global2d(lhs, nodes, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
    #local2global2d(lhs, nodes, v2e, -2j*np.pi*freq*np.sqrt(e0/u0)*ab)
 
