@@ -2,6 +2,7 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 import p01
+import datetime
 
 c  = 299792458.0
 u0 = 4e-7*np.pi
@@ -55,15 +56,16 @@ def pec(glo, rhs, v2e, tri, bwh):
     rhs[edge0] = 0
 
 def volume(glo, freq, vrt, tet, attr, v2e, bwh):
-    n, vol = p01.ntet(vrt[tet])
-    stiff = p01.make_stiff(n, vol)
-    mass = p01.make_mass(n, vol)
-    sigma   = attr[0]
-    epsilon = attr[1]
-    mu      = attr[2]
-    w = 2*np.pi*freq
-    local2global(glo, tet, v2e, stiff/mu, bwh)
-    local2global(glo, tet, v2e, -w*(w*epsilon-1j*sigma)*mass, bwh)
+    for t in tet:
+      n, vol = p01.ntet(vrt[t])
+      stiff = p01.make_stiff(n, vol)
+      mass = p01.make_mass(n, vol)
+      sigma   = attr[0]
+      epsilon = attr[1]
+      mu      = attr[2]
+      w = 2*np.pi*freq
+      local2global(glo, [t], v2e, [stiff/mu], bwh)
+      local2global(glo, [t], v2e, [-w*(w*epsilon-1j*sigma)*mass], bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     n, area = p01.ntri2(vrt[nodes])
@@ -96,8 +98,8 @@ def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
         rhs[dst[0]] += y
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
-    np.save('pgroups', pgroups)
-    np.save('vrt', vrt)
+   #np.save('pgroups', pgroups)
+   #np.save('vrt', vrt)
     if bwh:
         lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
     else:
@@ -123,8 +125,8 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
         pec(lhs, rhs, v2e, nodes, bwh)
-    np.save('lhs', lhs)
-    np.save('rhs', rhs)
+   #np.save('lhs', lhs)
+   #np.save('rhs', rhs)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
