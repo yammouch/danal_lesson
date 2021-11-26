@@ -3,36 +3,32 @@ import numpy as np
 vp = np.array( [ [0,0,0,1,1,2]
                , [1,2,3,2,3,3] ], dtype=np.int64 )
 
-def ntet(p): # p.shape: (..., 4, 3)
-  q = p[..., 1:, :] - p[..., 0, :][..., None, :] #; print(q)
+def ntet(p): # p.shape: (4, 3)
+  q = p[1:] - p[0] #; print(q)
   n = np.empty_like(p, dtype=np.float64)
-  n[..., 1:, :] \
-  = q[..., [[1],[2],[0]], [1,2,0]] * q[..., [[2],[0],[1]], [2,0,1]] \
-  - q[..., [[1],[2],[0]], [2,0,1]] * q[..., [[2],[0],[1]], [1,2,0]]
-  n[..., 0, :] = -n[..., 1:, :].sum(axis=-2) #; print(n)
-  vol = (q[..., 0, :]*n[..., 1, :]).sum(axis=-1)
-  n /= vol[..., None, None]
+  n[1:] \
+  = q[[[1],[2],[0]], [1,2,0]] * q[[[2],[0],[1]], [2,0,1]] \
+  - q[[[1],[2],[0]], [2,0,1]] * q[[[2],[0],[1]], [1,2,0]]
+  n[0] = -n[1:].sum(axis=0) #; print(n)
+  vol = (q[0]*n[1]).sum(axis=-1)
+  n /= vol
   return n, vol
 
-def make_stiff(n, vol): # n.shape: (..., 4, 3)
-  pr = n[..., vp[0][:, None], [1,2,0]] * n[..., vp[1][:, None], [2,0,1]] \
-     - n[..., vp[0][:, None], [2,0,1]] * n[..., vp[1][:, None], [1,2,0]]
-  ip = ( pr[..., None, :] * pr[..., None, :, :] ).sum(axis=-1)
-  ip *= 4/6*np.abs(vol)[..., None, None]
+def make_stiff(n, vol): # n.shape: (4, 3)
+  pr = n[vp[0][:, np.newaxis], [1,2,0]] * n[vp[1][:, np.newaxis], [2,0,1]] \
+     - n[vp[0][:, np.newaxis], [2,0,1]] * n[vp[1][:, np.newaxis], [1,2,0]]
+  ip = (pr * pr[:, np.newaxis]).sum(axis=-1)
+  ip *= 4/6*np.abs(vol)
   return ip
 
-def make_mass(n, vol): # n.shape: (..., 4, 3)
-  cc = (  vp[[1,1,0]][..., None   ]
-       == vp[[1,0,0]][..., None, :] ) + 1 #; print(cc)
-  ma  = ( n[..., vp[0], :][..., None, :   ]
-        * n[..., vp[0], :][..., None, :, :] ).sum(axis=-1) * cc[0]
-  m1  = ( n[..., vp[0], :][..., None, :   ]
-        * n[..., vp[1], :][..., None, :, :] ).sum(axis=-1) * cc[1]
+def make_mass(n, vol): # n.shape: (4, 3)
+  cc = (vp[[1,1,0]][..., np.newaxis, :] == vp[[1,0,0]][..., np.newaxis]) + 1
+  ma  = (n[vp[0]]*n[vp[0]][..., np.newaxis, :]).sum(axis=-1)*cc[0]
+  m1  = (n[vp[0]]*n[vp[1]][..., np.newaxis, :]).sum(axis=-1)*cc[1]
   ma -= m1
-  ma -= np.moveaxis(m1,-2,-1)
-  ma += ( n[..., vp[1], :][..., None, :   ]
-        * n[..., vp[1], :][..., None, :, :] ).sum(axis=-1) * cc[2]
-  ma *= np.abs(vol)[..., None, None]/120
+  ma -= m1.T
+  ma += (n[vp[1]]*n[vp[1]][..., np.newaxis, :]).sum(axis=-1)*cc[2]
+  ma *= np.abs(vol)/120
   return ma
 
 def ntri2(p): # p: (..., 3, 3)

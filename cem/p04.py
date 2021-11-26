@@ -12,12 +12,11 @@ vp = np.array([[0,0,0,1,1,2],[1,2,3,2,3,3]])
 vs = np.array([[0,0,1],[1,2,2]])
 
 def local2global(glo, tet, v2e, loc, bwh): # inplace
-    for i, l in zip(tet, loc):
-        dst = v2e[tuple(i[vp])]
-        if bwh:
-            glo[dst.T + bwh - dst, dst] += l
-        else:
-            glo[dst.T, dst] += l
+    dst = v2e[tuple(tet[vp])]
+    if bwh:
+        glo[dst.T + bwh - dst, dst] += loc
+    else:
+        glo[dst.T, dst] += loc
 
 def local2global2d(glo, tri, v2e, loc, bwh): # inplace
     print(glo.shape)
@@ -56,22 +55,21 @@ def pec(glo, rhs, v2e, tri, bwh):
     rhs[edge0] = 0
 
 def volume(glo, freq, vrt, tet, attr, v2e, bwh):
+    sigma   = attr[0]
+    epsilon = attr[1]
+    mu      = attr[2]
     for t in tet:
-      n, vol = p01.ntet(vrt[t])
-      stiff = p01.make_stiff(n, vol)
-      mass = p01.make_mass(n, vol)
-      sigma   = attr[0]
-      epsilon = attr[1]
-      mu      = attr[2]
-      w = 2*np.pi*freq
-      local2global(glo, [t], v2e, [stiff/mu], bwh)
-      local2global(glo, [t], v2e, [-w*(w*epsilon-1j*sigma)*mass], bwh)
+        n, vol = p01.ntet(vrt[t])
+        stiff = p01.make_stiff(n, vol)
+        mass = p01.make_mass(n, vol)
+        w = 2*np.pi*freq
+        local2global(glo, t, v2e, stiff/mu, bwh)
+        local2global(glo, t, v2e, -w*(w*epsilon-1j*sigma)*mass, bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     n, area = p01.ntri2(vrt[nodes])
     ab = p01.bound(n, area)
     local2global2d(lhs, nodes, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
-   #local2global2d(lhs, nodes, v2e, -2j*np.pi*freq*np.sqrt(e0/u0)*ab)
 
 def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
     n, jacob = p01.ntri2(vrt[nodes])
@@ -98,8 +96,6 @@ def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
         rhs[dst[0]] += y
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
-   #np.save('pgroups', pgroups)
-   #np.save('vrt', vrt)
     if bwh:
         lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
     else:
@@ -125,8 +121,6 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
         pec(lhs, rhs, v2e, nodes, bwh)
-   #np.save('lhs', lhs)
-   #np.save('rhs', rhs)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )

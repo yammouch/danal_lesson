@@ -33,19 +33,20 @@ if True:
         , [-1/14,  0   ,  1/2] ] ] )
     exp_vol = np.array \
     ( [ 1, -4*2**(1/2), -196 ] )
-    n, vol = dut.ntet(p)
-    print('n of ntet ', end='')
-    if (np.abs(n-exp_n) < 1e-3).all():
-        print("[OK]")
-    else:
-        print("[ER]")
-        print(n)
-    print('vol of ntet ', end='')
-    if (np.abs(vol-exp_vol) < 1e-3).all():
-        print("[OK]")
-    else:
-        print("[ER]")
-        print(vol)
+    for i in range(len(p)):
+      n, vol = dut.ntet(p[i])
+      print('n of ntet ', i, ' ', end='')
+      if (np.abs(n-exp_n[i]) < 1e-3).all():
+          print("[OK]")
+      else:
+          print("[ER]")
+          print(n)
+      print('vol of ntet ', i, ' ', end='')
+      if (np.abs(vol-exp_vol[i]) < 1e-3).all():
+          print("[OK]")
+      else:
+          print("[ER]")
+          print(vol)
 
 if True:
     exp = np.array \
@@ -71,16 +72,17 @@ if True:
     exp[0] /= 120
     exp[1] /= 120*2**0.5
     exp[2] /= 120
-    n, vol = dut.ntet(p)
-    m = dut.make_mass(n, vol)
-    print('make_mass ', end='')
-    if (np.abs(m-exp) < 1e-3).all():
-        print("[OK]")
-    else:
-        print("[ER]")
-        print(m)
-        print(exp)
-        print(np.abs(m-exp))
+    for i in range(len(p)):
+      n, vol = dut.ntet(p[i])
+      m = dut.make_mass(n, vol)
+      print('make_mass', i, ' ', end='')
+      if (np.abs(m-exp[i]) < 1e-3).all():
+          print("[OK]")
+      else:
+          print("[ER]")
+          print(m)
+          print(exp[i])
+          print(np.abs(m-exp[i]))
 
 if True:
     exp = np.array \
@@ -106,16 +108,17 @@ if True:
     exp[0] *= 4/6
     exp[1] *= 2**0.5/6
     exp[2] /= 49*6
-    n, vol = dut.ntet(p)
-    m = dut.make_stiff(n, vol)
-    print('make_stiff ', end='')
-    if (np.abs(m-exp) < 1e-3).all():
-        print("[OK]")
-    else:
-        print("[ER]")
-        print(m)
-        print(exp)
-        print(np.abs(m-exp))
+    for i in range(len(p)):
+      n, vol = dut.ntet(p[i])
+      m = dut.make_stiff(n, vol)
+      print('make_stiff ', i, ' ', end='')
+      if (np.abs(m-exp[i]) < 1e-3).all():
+          print("[OK]")
+      else:
+          print("[ER]")
+          print(m)
+          print(exp[i])
+          print(np.abs(m-exp[i]))
 
 if True:
     n, jacob = dut.ntri2(2*p[0, [[0, 1, 2], [0, 1, 3]], :])
