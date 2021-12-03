@@ -5,8 +5,8 @@
 
 マクスウェル方程式
 \begin{align}
-\nabla\times\vec{H}&=\vec{i}+j\omega\epsilon\vec{E}\label{fml:maxh}\\
-\nabla\times\vec{E}&=-j\omega\mu\vec{H}\label{fml:maxe}
+\nabla\times\bm{H}&=\bm{i}+j\omega\epsilon\bm{E}\label{fml:maxh}\\
+\nabla\times\bm{E}&=-j\omega\mu\bm{H}\label{fml:maxe}
 \end{align}
 
 ここでマクスウェルの方程式の解説をしようか。
@@ -20,43 +20,43 @@ $\mu$は透磁率という値で,
 鉄などの磁性を持つ物質ではその数千倍以上となる。
 また, 方向によって値が異なる場合があり,
 一般には場所の関数である$3\times3$行列であらわされるテンソルとなる。
-$\vec{i}$は電流減, とか, グダグダ書いているが, 表か箇条書きにすべきだな。
+$\bm{i}$は電流減, とか, グダグダ書いているが, 表か箇条書きにすべきだな。
 
 式(\ref{fml:maxh})の両辺に$-j\omega$,
 式(\ref{fml:maxe})の両辺に$\mu^{-1}$ をかけて
 \begin{align}
-\nabla\times\left(-j\omega\vec{H}\right)
-&=-j\omega\vec{i}+\omega^2\epsilon\vec{E}\\
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-&=-j\omega\vec{H}
+\nabla\times\left(-j\omega\bm{H}\right)
+&=-j\omega\bm{i}+\omega^2\epsilon\bm{E}\\
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+&=-j\omega\bm{H}
 \end{align}
-上の2式において$-j\omega\vec{H}$が共通なので
+上の2式において$-j\omega\bm{H}$が共通なので
 \begin{align}
 \nabla\times\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
+\mu^{-1}\left(\nabla\times\bm{E}\right)
 \right]
-&=-j\omega\vec{i}+\omega^2\epsilon\vec{E}\\
+&=-j\omega\bm{i}+\omega^2\epsilon\bm{E}\\
 \nabla\times\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-\right]-\omega^2\epsilon\vec{E}
-&=-j\omega\vec{i}
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+\right]-\omega^2\epsilon\bm{E}
+&=-j\omega\bm{i}
 \end{align}
 となる。さらに, 媒質が導電率$\sigma$[S/m]を持つ場合,
-$\vec{i}$を$\vec{i}+\sigma\vec{E}$とおいて,
+$\bm{i}$を$\bm{i}+\sigma\bm{E}$とおいて,
 \begin{align}
 \nabla\times\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-\right]-\omega^2\epsilon\vec{E}
-&=-j\omega\left(\vec{i}+\sigma\vec{E}\right)\\
-&=-j\omega\vec{i}-j\omega\sigma\vec{E}\\
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+\right]-\omega^2\epsilon\bm{E}
+&=-j\omega\left(\bm{i}+\sigma\bm{E}\right)\\
+&=-j\omega\bm{i}-j\omega\sigma\bm{E}\\
 \nabla\times\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-\right]-\omega^2\epsilon\vec{E}+j\omega\sigma\vec{E}
-&=-j\omega\vec{i}\\
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+\right]-\omega^2\epsilon\bm{E}+j\omega\sigma\bm{E}
+&=-j\omega\bm{i}\\
 \nabla\times\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-\right]-\omega\left(\omega\epsilon-j\sigma\right)\vec{E}
-&=-j\omega\vec{i}
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+\right]-\omega\left(\omega\epsilon-j\sigma\right)\bm{E}
+&=-j\omega\bm{i}
 \end{align}
 と考えればよい。鉄損を考える場合は$\mu$を複素数とすればよい。
 
@@ -70,68 +70,68 @@ $N_i$ というか文献 Nasa 内では shape function と書いているが,
 分けて書くか。
 \begin{align}
 \iiint_\Omega\nabla\times\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-\right]\cdot\vec{v}\,dx\,dy\,dz
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+\right]\cdot\bm{v}\,dx\,dy\,dz
 \end{align}
 ベクトル解析の公式
-$\left(\nabla\times\vec{a}\right)\cdot\vec{b}
-=\nabla\cdot\left(\vec{a}\times\vec{b}\right)
-+\left(\nabla\times\vec{b}\right)\cdot\vec{a}$
-に$\vec{a}=\mu^{-1}\left(\nabla\times\vec{E}\right)$, $\vec{b}=\vec{v}$
+$\left(\nabla\times\bm{a}\right)\cdot\bm{b}
+=\nabla\cdot\left(\bm{a}\times\bm{b}\right)
++\left(\nabla\times\bm{b}\right)\cdot\bm{a}$
+に$\bm{a}=\mu^{-1}\left(\nabla\times\bm{E}\right)$, $\bm{b}=\bm{v}$
 を適用して
 \begin{align}
 (\textrm{与式})&=
 \iiint_\Omega\nabla\cdot
 \left\{\left[\mu^{-1}
-\left(\nabla\times\vec{E}\right)
-\right]\times\vec{v}\right\}\,dx\,dy\,dz\\
-&+\iiint_\Omega\left[\mu^{-1}\left(\nabla\times\vec{E}\right)\right]\cdot
-\left(\nabla\times\vec{v}\right)\,dx\,dy\,dz
+\left(\nabla\times\bm{E}\right)
+\right]\times\bm{v}\right\}\,dx\,dy\,dz\\
+&+\iiint_\Omega\left[\mu^{-1}\left(\nabla\times\bm{E}\right)\right]\cdot
+\left(\nabla\times\bm{v}\right)\,dx\,dy\,dz
 \end{align}
 第1項にガウスの発散定理を適用して
 \begin{align}
 &\iiint_{\Omega}\nabla\cdot
-\left\{\left[\mu^{-1}\left(\nabla\times\vec{E}\right)\right]\times\vec{v}\right\}
+\left\{\left[\mu^{-1}\left(\nabla\times\bm{E}\right)\right]\times\bm{v}\right\}
 \,dx\,dy\,dz\\
 =&\iint_\Gamma
 \left\{\left[
-\mu^{-1}\left(\nabla\times\vec{E}\right)
-\right]\times\vec{v}\right\}\cdot\hat{n}
+\mu^{-1}\left(\nabla\times\bm{E}\right)
+\right]\times\bm{v}\right\}\cdot\hat{n}
 \,d\Gamma
 \end{align}
 ベクトル解析の公式
-$\left(\vec{a}\times\vec{b}\right)\cdot\vec{c}
-=\left(\vec{b}\times\vec{c}\right)\cdot\vec{a}$
+$\left(\bm{a}\times\bm{b}\right)\cdot\bm{c}
+=\left(\bm{b}\times\bm{c}\right)\cdot\bm{a}$
 に
-$\vec{a}=\mu^{-1}\left(\nabla\times\vec{E}\right),
- \vec{b}=\vec{v}, \vec{c}=\hat{n}$
+$\bm{a}=\mu^{-1}\left(\nabla\times\bm{E}\right),
+ \bm{b}=\bm{v}, \bm{c}=\hat{n}$
 を適用して
 \begin{align}
 \iint_\Gamma
-\left(\vec{v}\times\hat{n}\right)\cdot
-\left[\mu^{-1}\left(\nabla\times\vec{E}\right)
+\left(\bm{v}\times\hat{n}\right)\cdot
+\left[\mu^{-1}\left(\nabla\times\bm{E}\right)
 \right]\,d\Gamma
 \end{align}
 
 \begin{align}
-\nabla\times\vec{E}=-j\omega\mu\vec{H}
+\nabla\times\bm{E}=-j\omega\mu\bm{H}
 \end{align}
 
 境界で無反射とすると
 \begin{align}
-\vec{E}\times\hat{n}=&-\sqrt\frac{\mu}{\epsilon}\vec{H}
+\bm{E}\times\hat{n}=&-\sqrt\frac{\mu}{\epsilon}\bm{H}
 \end{align}
 両辺に$j\omega\sqrt{\epsilon\mu}$をかけて
 \begin{align}
-j\omega\sqrt{\epsilon\mu}\left(\vec{E}\times\hat{n}\right)=&-j\omega\mu\vec{H}
+j\omega\sqrt{\epsilon\mu}\left(\bm{E}\times\hat{n}\right)=&-j\omega\mu\bm{H}
 \end{align}
 
 境界面積分項は
 \begin{align}
 j\omega\iint_\Gamma
-\left(\vec{v}\times\hat{n}\right)\cdot
+\left(\bm{v}\times\hat{n}\right)\cdot
 \left[\mu^{-1}
-\sqrt{\epsilon\mu}\left(\vec{E}\times\hat{n}\right)
+\sqrt{\epsilon\mu}\left(\bm{E}\times\hat{n}\right)
 \right]\,d\Gamma
 \end{align}
 となる。多分、この境界積分項に現れる$\epsilon$と$\mu$
@@ -140,8 +140,8 @@ j\omega\iint_\Gamma
 この時点でスカラとしてよいだろう。
 \begin{align}
 j\omega\iint_\Gamma\sqrt\frac{\epsilon}{\mu}
-\left(\vec{v}\times\hat{n}\right)\cdot
-\left(\vec{E}\times\hat{n}\right)
+\left(\bm{v}\times\hat{n}\right)\cdot
+\left(\bm{E}\times\hat{n}\right)
 \,d\Gamma
 \end{align}
 
