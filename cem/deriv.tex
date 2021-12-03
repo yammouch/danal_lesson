@@ -62,7 +62,7 @@ $\bm{i}$を$\bm{i}+\sigma\bm{E}$とおいて,
 
 \subsection{弱形式の導出}
 
-基底関数$v$をかけて体積分
+基底関数$W$をかけて体積分
 文献 Nasa では edge basis function とあるので,
 「基底関数」でよいだろう。「辺基底関数」とか言うか?
 $N_i$ というか文献 Nasa 内では shape function と書いているが,
@@ -71,32 +71,32 @@ $N_i$ というか文献 Nasa 内では shape function と書いているが,
 \begin{align}
 \iiint_\Omega\nabla\times\left[
 \mu^{-1}\left(\nabla\times\bm{E}\right)
-\right]\cdot\bm{v}\,dx\,dy\,dz
+\right]\cdot\bm{W}\,dx\,dy\,dz
 \end{align}
 ベクトル解析の公式
 $\left(\nabla\times\bm{a}\right)\cdot\bm{b}
 =\nabla\cdot\left(\bm{a}\times\bm{b}\right)
 +\left(\nabla\times\bm{b}\right)\cdot\bm{a}$
-に$\bm{a}=\mu^{-1}\left(\nabla\times\bm{E}\right)$, $\bm{b}=\bm{v}$
+に$\bm{a}=\mu^{-1}\left(\nabla\times\bm{E}\right)$, $\bm{b}=\bm{W}$
 を適用して
 \begin{align}
 (\textrm{与式})&=
 \iiint_\Omega\nabla\cdot
 \left\{\left[\mu^{-1}
 \left(\nabla\times\bm{E}\right)
-\right]\times\bm{v}\right\}\,dx\,dy\,dz\\
+\right]\times\bm{W}\right\}\,dx\,dy\,dz\\
 &+\iiint_\Omega\left[\mu^{-1}\left(\nabla\times\bm{E}\right)\right]\cdot
-\left(\nabla\times\bm{v}\right)\,dx\,dy\,dz
+\left(\nabla\times\bm{W}\right)\,dx\,dy\,dz
 \end{align}
 第1項にガウスの発散定理を適用して
 \begin{align}
 &\iiint_{\Omega}\nabla\cdot
-\left\{\left[\mu^{-1}\left(\nabla\times\bm{E}\right)\right]\times\bm{v}\right\}
+\left\{\left[\mu^{-1}\left(\nabla\times\bm{E}\right)\right]\times\bm{W}\right\}
 \,dx\,dy\,dz\\
 =&\iint_\Gamma
 \left\{\left[
 \mu^{-1}\left(\nabla\times\bm{E}\right)
-\right]\times\bm{v}\right\}\cdot\hat{n}
+\right]\times\bm{W}\right\}\cdot\hat{n}
 \,d\Gamma
 \end{align}
 ベクトル解析の公式
@@ -104,11 +104,11 @@ $\left(\bm{a}\times\bm{b}\right)\cdot\bm{c}
 =\left(\bm{b}\times\bm{c}\right)\cdot\bm{a}$
 に
 $\bm{a}=\mu^{-1}\left(\nabla\times\bm{E}\right),
- \bm{b}=\bm{v}, \bm{c}=\hat{n}$
+ \bm{b}=\bm{W}, \bm{c}=\hat{n}$
 を適用して
 \begin{align}
 \iint_\Gamma
-\left(\bm{v}\times\hat{n}\right)\cdot
+\left(\bm{W}\times\hat{n}\right)\cdot
 \left[\mu^{-1}\left(\nabla\times\bm{E}\right)
 \right]\,d\Gamma
 \end{align}
@@ -129,7 +129,7 @@ j\omega\sqrt{\epsilon\mu}\left(\bm{E}\times\hat{n}\right)=&-j\omega\mu\bm{H}
 境界面積分項は
 \begin{align}
 j\omega\iint_\Gamma
-\left(\bm{v}\times\hat{n}\right)\cdot
+\left(\bm{W}\times\hat{n}\right)\cdot
 \left[\mu^{-1}
 \sqrt{\epsilon\mu}\left(\bm{E}\times\hat{n}\right)
 \right]\,d\Gamma
@@ -140,16 +140,12 @@ j\omega\iint_\Gamma
 この時点でスカラとしてよいだろう。
 \begin{align}
 j\omega\iint_\Gamma\sqrt\frac{\epsilon}{\mu}
-\left(\bm{v}\times\hat{n}\right)\cdot
+\left(\bm{W}\times\hat{n}\right)\cdot
 \left(\bm{E}\times\hat{n}\right)
 \,d\Gamma
 \end{align}
 
 \subsection{回転項の積分}
-
-$v_i$とか、とにかく$v$, $V$
-は電圧のために空けておきたいので
-$\bm{W}_i$を基底関数に使用する。
 
 \begin{align}
 &\nabla\times\bm{W}_{ij}\\
