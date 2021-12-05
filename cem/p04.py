@@ -76,7 +76,7 @@ def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
         x  = n[vs[1]] - n[vs[0]]
         x *= np.array(i_density)
         x  = x.sum(axis=-1)
-        x *= jacob[..., None]
+        x *= jacob
         x /= 6
         x = -2j*np.pi*freq*x
         dst = v2e[tuple(i[vs])]
@@ -88,7 +88,7 @@ def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
         x  = n[vp[1]] - n[vp[0]]
         x *= np.array(i_density)
         x  = x.sum(axis=-1)
-        x *= np.abs(jacob[..., None])
+        x *= np.abs(jacob)
         x /= 24
         x = -2j*np.pi*freq*x
         dst = v2e[tuple(i[vp])]
