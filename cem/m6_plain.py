@@ -40,13 +40,18 @@ def main():
               , ('a', (), isrc)
               , ('a', (), absorb)
               , ('v', (0, p04.e0, p04.u0), tet)]
-    freq = 50
+    freq = 1e6
     sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
     print(sol)
-    print(p04.isrc_v(sol, vrt, np.array([[0, 1]]), v2e, [0,0,1]))
-    print(p04.isrc_v(sol, vrt, np.array([[2, 3]]), v2e, [0,0,1]))
-    print(p04.isrc_v(sol, vrt, np.array([[4, 5]]), v2e, [0,0,1]))
-    print(p04.isrc_v(sol, vrt, np.array([[6, 7]]), v2e, [0,0,1]))
+    print(0.5*(p04.u0/p04.e0)**0.5*h)
+    print(-2*np.pi*freq*l/p04.c*180/np.pi)
+    v_src = p04.isrc_v(sol, vrt, np.array([[0, 1]]), v2e, [0,0,1])
+    print(v_src)
+    print(np.angle(-v_src)*180/np.pi)
+    v_out = p04.isrc_v(sol, vrt, np.array([[4, 5]]), v2e, [0,0,1])
+    print(v_out)
+    print(np.abs(v_out))
+    print(np.angle(-v_out)*180/np.pi)
 
 if __name__ == '__main__':
     main()
