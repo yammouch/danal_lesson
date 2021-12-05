@@ -10,6 +10,7 @@ e0 = 1/(u0*c**2)
 
 vp = np.array([[0,0,0,1,1,2],[1,2,3,2,3,3]])
 vs = np.array([[0,0,1],[1,2,2]])
+vl = np.array([[0],[1]])
 
 def local2global(glo, tet, v2e, loc, bwh): # inplace
     dst = v2e[tuple(tet[vp])]
@@ -25,12 +26,12 @@ def local2global2d(glo, tri, v2e, loc, bwh): # inplace
     else:
         glo[dst.T, dst] += loc
 
-def isrc(rhs, freq, vrt, nodes, v2e, isrc_dir):
-    diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
-    mag = (diff**2).sum(axis=-1)**0.5
-    dirc = diff/mag[:,None]
-    ip = (dirc*isrc_dir).sum(axis=-1)
-    rhs[v2e[nodes[:,0],nodes[:,1]]] = -2j*np.pi*freq*ip
+#def isrc(rhs, freq, vrt, nodes, v2e, isrc_dir):
+#    diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
+#    mag = (diff**2).sum(axis=-1)**0.5
+#    dirc = diff/mag[:,None]
+#    ip = (dirc*isrc_dir).sum(axis=-1)
+#    rhs[v2e[nodes[:,0],nodes[:,1]]] = -2j*np.pi*freq*ip
 
 def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
@@ -70,29 +71,32 @@ def absorb(lhs, freq, vrt, nodes, v2e, bwh):
         ab = p01.bound(n, area)
         local2global2d(lhs, t, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
 
+def isrc1(v, nfn, freq, vrt, nodes, v2e, i_density):
+    n, jacob = nfn(vrt[nodes])
+    x  = n[v[1]] - n[v[0]]
+    x *= np.array(i_density)
+    x  = x.sum(axis=-1)
+    x *= np.abs(jacob)
+    x = -2j*np.pi*freq*x
+    return x
+
+def isrc(rhs, freq, vrt, nodes, v2e, i_density):
+    for i in nodes:
+        x = isrc1(vl, lambda p: (p[[1, 0]] - p[[0, 1]], 1.0), freq, vrt, i, v2e, i_density)
+        dst = v2e[tuple(i[vl])]
+        rhs[dst[0]] += x/2
+
 def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
     for i in nodes:
-        n, jacob = p01.ntri2(vrt[i])
-        x  = n[vs[1]] - n[vs[0]]
-        x *= np.array(i_density)
-        x  = x.sum(axis=-1)
-        x *= jacob
-        x /= 6
-        x = -2j*np.pi*freq*x
+        x = isrc1(vs, p01.ntri2, freq, vrt, i, v2e, i_density)
         dst = v2e[tuple(i[vs])]
-        rhs[dst[0]] += x
+        rhs[dst[0]] += x/6
 
 def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
     for i in nodes:
-        n, jacob = p01.ntet(vrt[i])
-        x  = n[vp[1]] - n[vp[0]]
-        x *= np.array(i_density)
-        x  = x.sum(axis=-1)
-        x *= np.abs(jacob)
-        x /= 24
-        x = -2j*np.pi*freq*x
+        x = isrc1(vp, p01.ntet, freq, vrt, i, v2e, i_density)
         dst = v2e[tuple(i[vp])]
-        rhs[dst[0]] += x
+        rhs[dst[0]] += x/24
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     if bwh:
