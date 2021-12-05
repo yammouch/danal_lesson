@@ -19,13 +19,11 @@ def local2global(glo, tet, v2e, loc, bwh): # inplace
         glo[dst.T, dst] += loc
 
 def local2global2d(glo, tri, v2e, loc, bwh): # inplace
-    print(glo.shape)
-    for i, l in zip(tri, loc):
-        dst = v2e[tuple(i[vs])]
-        if bwh:
-            glo[dst.T + bwh - dst, dst] += l
-        else:
-            glo[dst.T, dst] += l
+    dst = v2e[tuple(tri[vs])]
+    if bwh:
+        glo[dst.T + bwh - dst, dst] += loc
+    else:
+        glo[dst.T, dst] += loc
 
 def isrc(rhs, freq, vrt, nodes, v2e, isrc_dir):
     diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
@@ -67,9 +65,10 @@ def volume(glo, freq, vrt, tet, attr, v2e, bwh):
         local2global(glo, t, v2e, -w*(w*epsilon-1j*sigma)*mass, bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
-    n, area = p01.ntri2(vrt[nodes])
-    ab = p01.bound(n, area)
-    local2global2d(lhs, nodes, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
+    for t in nodes:
+        n, area = p01.ntri2(vrt[t])
+        ab = p01.bound(n, area)
+        local2global2d(lhs, t, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
 
 def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
     n, jacob = p01.ntri2(vrt[nodes])
