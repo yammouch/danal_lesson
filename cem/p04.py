@@ -19,6 +19,12 @@ def local2global(glo, tet, v2e, loc, bwh): # inplace
     else:
         glo[dst.T, dst] += loc
 
+def local2global_new(glo, dst, loc, bwh): # inplace
+    if bwh:
+        glo[dst[...,np.newaxis] + bwh - dst, dst] += loc
+    else:
+        glo[dst[...,np.newaxis], dst] += loc
+
 def local2global2d(glo, tri, v2e, loc, bwh): # inplace
     dst = v2e[tuple(tri[vs])]
     if bwh:
@@ -53,17 +59,17 @@ def pec(glo, rhs, v2e, tri, bwh):
         glo[edge0, edge0] = 1
     rhs[edge0] = 0
 
-def volume(glo, freq, vrt, tet, attr, v2e, bwh):
+def volume(glo, freq, p2, ie2, attr, bwh):
     sigma   = attr[0]
     epsilon = attr[1]
     mu      = attr[2]
-    for t in tet:
-        n, vol = p01.ntet(vrt[t])
+    for p1, ie1 in zip(p2, ie2.toarray()):
+        n, vol = p01.ntet(p1)
         stiff = p01.make_stiff(n, vol)
         mass = p01.make_mass(n, vol)
         w = 2*np.pi*freq
-        local2global(glo, t, v2e, stiff/mu, bwh)
-        local2global(glo, t, v2e, -w*(w*epsilon-1j*sigma)*mass, bwh)
+        local2global_new(glo, ie1, stiff/mu, bwh)
+        local2global_new(glo, ie1, -w*(w*epsilon-1j*sigma)*mass, bwh)
 
 def absorb(lhs, freq, vrt, nodes, v2e, bwh):
     for t in nodes:
@@ -107,7 +113,7 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     dirichlet = []
     for ptype, attr, nodes in pgroups:
         if ptype == 'v': # air
-            volume(lhs, freq, vrt, nodes, attr, v2e, bwh)
+            volume(lhs, freq, vrt[nodes], v2e[nodes[:,vp][:,0], nodes[:,vp][:,1]], attr, bwh)
         elif ptype == 'b': # boundary condition
             dirichlet.append((attr, nodes))
         elif ptype == 'a': # absorbing boundary
