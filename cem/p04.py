@@ -92,14 +92,14 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     else:
         lhs = np.zeros((nedge, nedge), dtype=np.complex128)
     rhs = np.zeros((nedge,), dtype=np.complex128)
-    dirichlet = []
     for ptype, attr, nodes in pgroups:
         p2 = vrt[nodes]
         if ptype == 'v': # air
             ie2 = v2e[nodes[:,vp[0]], nodes[:,vp[1]]]
             volume(lhs, freq, p2, ie2, attr, bwh)
         elif ptype == 'b': # boundary condition
-            dirichlet.append((attr, nodes))
+            ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
+            pec(lhs, rhs, ie2, bwh)
         elif ptype == 'a': # absorbing boundary
             ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
             absorb(lhs, freq, p2, ie2, bwh)
@@ -116,9 +116,6 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             pass
         else:
             raise Exception("Unsupported physical type {}".format(ptype))
-    for _, nodes in dirichlet:
-        ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
-        pec(lhs, rhs, ie2, bwh)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
