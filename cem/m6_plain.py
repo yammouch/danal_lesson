@@ -36,10 +36,10 @@ def main():
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e)
     pgroups = [ ('e2', ([0,0,1],), isrc)
-              , ('b', (), pec)
               , ('a', (), isrc)
               , ('a', (), absorb)
-              , ('v', (0, p04.e0, p04.u0), tet)]
+              , ('v', (0, p04.e0, p04.u0), tet)
+              , ('b', (), pec) ]
     freq = 1e6
     sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
     print(sol)

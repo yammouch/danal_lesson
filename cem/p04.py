@@ -92,25 +92,24 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     else:
         lhs = np.zeros((nedge, nedge), dtype=np.complex128)
     rhs = np.zeros((nedge,), dtype=np.complex128)
+    vas = {2: vl, 3: vs, 4: vp}
     for ptype, attr, nodes in pgroups:
         p2 = vrt[nodes]
+        v = vas[nodes.shape[1]]
+        ie2 = v2e[nodes[:,v[0]], nodes[:,v[1]]]
+        print(nodes.shape)
+        print(v)
         if ptype == 'v': # air
-            ie2 = v2e[nodes[:,vp[0]], nodes[:,vp[1]]]
             volume(lhs, freq, p2, ie2, attr, bwh)
         elif ptype == 'b': # boundary condition
-            ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
             pec(lhs, rhs, ie2, bwh)
         elif ptype == 'a': # absorbing boundary
-            ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
             absorb(lhs, freq, p2, ie2, bwh)
         elif ptype == 'e': # excitation
-            ie2 = v2e[nodes[:,vl[0]], nodes[:,vl[1]]]
             isrc(rhs, freq, p2, ie2, attr[0])
         elif ptype == 'e2': # excitation 2D
-            ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
             isrc_2d(rhs, freq, p2, ie2, attr[0])
         elif ptype == 'e3': # excitation 3D
-            ie2 = v2e[nodes[:,vp[0]], nodes[:,vp[1]]]
             isrc_3d(rhs, freq, p2, ie2, attr[0])
         elif ptype == 'p': # probe
             pass
