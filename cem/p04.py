@@ -21,13 +21,6 @@ def local2global(glo, dst, loc, bwh): # inplace
 def racc(glo, ie1, val):
     glo[ie1] += val
 
-#def isrc(rhs, freq, vrt, nodes, v2e, isrc_dir):
-#    diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
-#    mag = (diff**2).sum(axis=-1)**0.5
-#    dirc = diff/mag[:,None]
-#    ip = (dirc*isrc_dir).sum(axis=-1)
-#    rhs[v2e[nodes[:,0],nodes[:,1]]] = -2j*np.pi*freq*ip
-
 def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
     mag = (diff**2).sum(axis=-1)**0.5
@@ -58,8 +51,9 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
         v = vas[nodes.shape[1]]
         ie2 = v2e[nodes[:,v[0]], nodes[:,v[1]]]
         if ptype == 'v': # air
+            fn = p01.volume(attr[0], attr[1], attr[2])
             for p1, ie1 in zip(p2, ie2.toarray()):
-                val = p01.volume(freq, p1, attr[0], attr[1], attr[2])
+                val = fn(freq, p1)
                 local2global(lhs, ie1, val, bwh)
         elif ptype == 'b': # boundary condition
             for p1, ie1 in zip(p2, ie2.toarray()):
@@ -70,16 +64,19 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
                 val = p01.absorb(freq, p1)
                 local2global(lhs, ie1, val, bwh)
         elif ptype == 'e': # excitation
+            fn = p01.isrc(1, attr[0])
             for p1, ie1 in zip(p2, ie2.toarray()):
-                val = p01.isrc(freq, p1, attr[0])
+                val = fn(freq, p1)
                 racc(rhs, ie1, val)
         elif ptype == 'e2': # excitation 2D
+            fn = p01.isrc(2, attr[0])
             for p1, ie1 in zip(p2, ie2.toarray()):
-                val = p01.isrc_2d(freq, p1, attr[0])
+                val = fn(freq, p1)
                 racc(rhs, ie1, val)
         elif ptype == 'e3': # excitation 3D
+            fn = p01.isrc(3, attr[0])
             for p1, ie1 in zip(p2, ie2.toarray()):
-                val = p01.isrc_3d(freq, p1, attr[0])
+                val = fn(freq, p1)
                 racc(rhs, ie1, val)
         elif ptype == 'p': # probe
             pass

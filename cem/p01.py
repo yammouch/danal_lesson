@@ -51,35 +51,44 @@ def ntri2(p): # p: (3, 3)
   n[0] = -n[1]-n[2]
   return n/jacob, np.sqrt(jacob)
 
-def volume(freq, p1, sigma, epsilon, mu):
-  n, vol = ntet(p1)
-  stiff = make_stiff(n, vol)
-  mass = make_mass(n, vol)
-  w = 2*np.pi*freq
-  return stiff/mu - w*(w*epsilon-1j*sigma)*mass
+class volume(object):
+
+  def __init__(self, sigma, epsilon, mu):
+    super().__init__()
+    self.sigma   = sigma
+    self.epsilon = epsilon
+    self.mu      = mu
+
+  def __call__(self, freq, p1):
+    n, vol = ntet(p1)
+    stiff = make_stiff(n, vol)
+    mass = make_mass(n, vol)
+    w = 2*np.pi*freq
+    return stiff/self.mu - w*(w*self.epsilon-1j*self.sigma)*mass
 
 def absorb(freq, p1):
   n, area = ntri2(p1)
   ab = bound(n, area)
   return 2j*np.pi*freq*np.sqrt(e0/u0)*ab
 
-def isrc1(v, nfn, freq, p1, i_density):
-  n, jacob = nfn(p1)
-  x  = n[v[1]] - n[v[0]]
-  x *= np.array(i_density)
-  x  = x.sum(axis=-1)
-  x *= np.abs(jacob)
-  x = -2j*np.pi*freq*x
-  return x
+class isrc(object):
 
-def isrc(freq, p1, i_density):
-  x = isrc1(vl, lambda p: (p[[1, 0]] - p[[0, 1]], 1.0), freq, p1, i_density)
-  return x/2
+  v_table   = { 1: vl, 2: vs, 3: vp }
+  nfn_table = { 1: lambda p: (p[[1, 0]] - p[[0, 1]], 1.0)
+              , 2: ntri2, 3: ntet }
+  den_table = { 1: 2, 2: 6, 3: 24}
 
-def isrc_2d(freq, p1, i_density):
-  x = isrc1(vs, ntri2, freq, p1, i_density)
-  return x/6
+  def __init__(self, dim, i_density):
+    self.i_density = np.array(i_density)
+    self.v   = self.v_table[dim]
+    self.nfn = self.nfn_table[dim]
+    self.den = self.den_table[dim]
 
-def isrc_3d(freq, p1, i_density):
-  x = isrc1(vp, ntet, freq, p1, i_density)
-  return x/24
+  def __call__(self, freq, p1):
+    n, jacob = self.nfn(p1)
+    x  = n[self.v[1]] - n[self.v[0]]
+    x *= np.array(self.i_density)
+    x  = x.sum(axis=-1)
+    x *= np.abs(jacob)
+    x = -2j*np.pi*freq*x
+    return x/self.den
