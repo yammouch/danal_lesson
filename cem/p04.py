@@ -71,14 +71,14 @@ def volume(glo, freq, p2, ie2, attr, bwh):
         local2global_new(glo, ie1, stiff/mu, bwh)
         local2global_new(glo, ie1, -w*(w*epsilon-1j*sigma)*mass, bwh)
 
-def absorb(lhs, freq, vrt, nodes, v2e, bwh):
-    for t in nodes:
-        n, area = p01.ntri2(vrt[t])
+def absorb(lhs, freq, p2, ie2, bwh):
+    for p1, ie1 in zip(p2, ie2.toarray()):
+        n, area = p01.ntri2(p1)
         ab = p01.bound(n, area)
-        local2global2d(lhs, t, v2e, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
+        local2global_new(lhs, ie1, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
 
-def isrc1(v, nfn, freq, vrt, nodes, v2e, i_density):
-    n, jacob = nfn(vrt[nodes])
+def isrc1(v, nfn, freq, p1, i_density):
+    n, jacob = nfn(p1)
     x  = n[v[1]] - n[v[0]]
     x *= np.array(i_density)
     x  = x.sum(axis=-1)
@@ -86,23 +86,20 @@ def isrc1(v, nfn, freq, vrt, nodes, v2e, i_density):
     x = -2j*np.pi*freq*x
     return x
 
-def isrc(rhs, freq, vrt, nodes, v2e, i_density):
-    for i in nodes:
-        x = isrc1(vl, lambda p: (p[[1, 0]] - p[[0, 1]], 1.0), freq, vrt, i, v2e, i_density)
-        dst = v2e[tuple(i[vl])]
-        rhs[dst[0]] += x/2
+def isrc(rhs, freq, p2, ie2, i_density):
+    for p1, ie1 in zip(p2, ie2.toarray()):
+        x = isrc1(vl, lambda p: (p[[1, 0]] - p[[0, 1]], 1.0), freq, p1, i_density)
+        rhs[ie1] += x/2
 
-def isrc_2d(rhs, freq, vrt, nodes, v2e, i_density):
-    for i in nodes:
-        x = isrc1(vs, p01.ntri2, freq, vrt, i, v2e, i_density)
-        dst = v2e[tuple(i[vs])]
-        rhs[dst[0]] += x/6
+def isrc_2d(rhs, freq, p2, ie2, i_density):
+    for p1, ie1 in zip(p2, ie2.toarray()):
+        x = isrc1(vs, p01.ntri2, freq, p1, i_density)
+        rhs[ie1] += x/6
 
-def isrc_3d(rhs, freq, vrt, nodes, v2e, i_density):
-    for i in nodes:
-        x = isrc1(vp, p01.ntet, freq, vrt, i, v2e, i_density)
-        dst = v2e[tuple(i[vp])]
-        rhs[dst[0]] += x/24
+def isrc_3d(rhs, freq, p2, ie2, i_density):
+    for p1, ie1 in zip(p2, ie2.toarray()):
+        x = isrc1(vp, p01.ntet, freq, p1, i_density)
+        rhs[ie1] += x/24
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     if bwh:
@@ -112,18 +109,24 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
     rhs = np.zeros((nedge,), dtype=np.complex128)
     dirichlet = []
     for ptype, attr, nodes in pgroups:
+        p2 = vrt[nodes]
         if ptype == 'v': # air
-            volume(lhs, freq, vrt[nodes], v2e[nodes[:,vp][:,0], nodes[:,vp][:,1]], attr, bwh)
+            ie2 = v2e[nodes[:,vp[0]], nodes[:,vp[1]]]
+            volume(lhs, freq, p2, ie2, attr, bwh)
         elif ptype == 'b': # boundary condition
             dirichlet.append((attr, nodes))
         elif ptype == 'a': # absorbing boundary
-            absorb(lhs, freq, vrt, nodes, v2e, bwh)
+            ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
+            absorb(lhs, freq, p2, ie2, bwh)
         elif ptype == 'e': # excitation
-            isrc(rhs, freq, vrt, nodes, v2e, attr[0])
+            ie2 = v2e[nodes[:,vl[0]], nodes[:,vl[1]]]
+            isrc(rhs, freq, p2, ie2, attr[0])
         elif ptype == 'e2': # excitation 2D
-            isrc_2d(rhs, freq, vrt, nodes, v2e, attr[0])
+            ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
+            isrc_2d(rhs, freq, p2, ie2, attr[0])
         elif ptype == 'e3': # excitation 3D
-            isrc_3d(rhs, freq, vrt, nodes, v2e, attr[0])
+            ie2 = v2e[nodes[:,vp[0]], nodes[:,vp[1]]]
+            isrc_3d(rhs, freq, p2, ie2, attr[0])
         elif ptype == 'p': # probe
             pass
         else:
