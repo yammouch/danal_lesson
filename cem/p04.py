@@ -12,25 +12,11 @@ vp = np.array([[0,0,0,1,1,2],[1,2,3,2,3,3]])
 vs = np.array([[0,0,1],[1,2,2]])
 vl = np.array([[0],[1]])
 
-def local2global(glo, tet, v2e, loc, bwh): # inplace
-    dst = v2e[tuple(tet[vp])]
-    if bwh:
-        glo[dst.T + bwh - dst, dst] += loc
-    else:
-        glo[dst.T, dst] += loc
-
-def local2global_new(glo, dst, loc, bwh): # inplace
+def local2global(glo, dst, loc, bwh): # inplace
     if bwh:
         glo[dst[...,np.newaxis] + bwh - dst, dst] += loc
     else:
         glo[dst[...,np.newaxis], dst] += loc
-
-def local2global2d(glo, tri, v2e, loc, bwh): # inplace
-    dst = v2e[tuple(tri[vs])]
-    if bwh:
-        glo[dst.T + bwh - dst, dst] += loc
-    else:
-        glo[dst.T, dst] += loc
 
 #def isrc(rhs, freq, vrt, nodes, v2e, isrc_dir):
 #    diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
@@ -67,14 +53,14 @@ def volume(glo, freq, p2, ie2, attr, bwh):
         stiff = p01.make_stiff(n, vol)
         mass = p01.make_mass(n, vol)
         w = 2*np.pi*freq
-        local2global_new(glo, ie1, stiff/mu, bwh)
-        local2global_new(glo, ie1, -w*(w*epsilon-1j*sigma)*mass, bwh)
+        local2global(glo, ie1, stiff/mu, bwh)
+        local2global(glo, ie1, -w*(w*epsilon-1j*sigma)*mass, bwh)
 
 def absorb(lhs, freq, p2, ie2, bwh):
     for p1, ie1 in zip(p2, ie2.toarray()):
         n, area = p01.ntri2(p1)
         ab = p01.bound(n, area)
-        local2global_new(lhs, ie1, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
+        local2global(lhs, ie1, 2j*np.pi*freq*np.sqrt(e0/u0)*ab, bwh)
 
 def isrc1(v, nfn, freq, p1, i_density):
     n, jacob = nfn(p1)
