@@ -46,9 +46,8 @@ def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     ip = (dirc*isrc_dir).sum(axis=-1)
     return (sol[v2e[nodes[:,0],nodes[:,1]][0]] * ip).sum()
 
-def pec(glo, rhs, v2e, tri, bwh):
-    vpairs = np.moveaxis(tri[...,vs],-2,0).reshape(2,-1)
-    edge0 = np.array(v2e[vpairs[0], vpairs[1]])[0]
+def pec(glo, rhs, ie2, bwh):
+    edge0 = ie2.toarray().reshape(-1)
     if bwh:
         for e in edge0:
             glo[ range(glo.shape[0])
@@ -132,7 +131,8 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
         else:
             raise Exception("Unsupported physical type {}".format(ptype))
     for _, nodes in dirichlet:
-        pec(lhs, rhs, v2e, nodes, bwh)
+        ie2 = v2e[nodes[:,vs[0]], nodes[:,vs[1]]]
+        pec(lhs, rhs, ie2, bwh)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
