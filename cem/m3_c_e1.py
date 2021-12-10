@@ -1,4 +1,5 @@
 import numpy as np
+import p01
 import p04
 
 def main():
@@ -24,11 +25,11 @@ def main():
     v2e, bwh = p04.edge_num_banded(tet)
     pgroups = [ (p04.racc, p01.isrc(1, [1,0,0]), lin)
               , (p04.lacc, p01.volume(0, p04.e0, p04.u0), tet)
-              , (p04.pec, lambda: f, p: None, tri) ]
+              , (p04.pec, lambda f, p: None, tri) ]
     freq = 50
     sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
     print(sol)
-    print(p04.isrc_v(sol, vrt, lin, v2e, [0,0,1]))
+    print(p04.isrc_v(sol, vrt, lin, v2e, [1,0,0]))
     print(1/(p04.e0*0.5*h*l/w*2*np.pi*freq))
 
 if __name__ == '__main__':

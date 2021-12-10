@@ -50,40 +50,9 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
         p2 = vrt[nodes]
         v = vas[nodes.shape[1]]
         ie2 = v2e[nodes[:,v[0]], nodes[:,v[1]]]
-        if ptype == 'v': # air
-            fn = p01.volume(attr[0], attr[1], attr[2])
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = fn(freq, p1)
-                lacc(lhs, None, ie1, val, bwh)
-        elif ptype == 'b': # boundary condition
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = None
-                pec(lhs, rhs, ie1, None, bwh)
-        elif ptype == 'a': # absorbing boundary
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = p01.absorb(freq, p1)
-                lacc(lhs, None, ie1, val, bwh)
-        elif ptype == 'e': # excitation
-            fn = p01.isrc(1, attr[0])
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = fn(freq, p1)
-                racc(None, rhs, ie1, val, None)
-        elif ptype == 'e2': # excitation 2D
-            fn = p01.isrc(2, attr[0])
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = fn(freq, p1)
-                racc(None, rhs, ie1, val, None)
-        elif ptype == 'e3': # excitation 3D
-            fn = p01.isrc(3, attr[0])
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = fn(freq, p1)
-                racc(None, rhs, ie1, val, None)
-        elif ptype == 'p': # probe
-            pass
-        else:
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = attr(freq, p1)
-                ptype(lhs, rhs, ie1, val, bwh)
+        for p1, ie1 in zip(p2, ie2.toarray()):
+            val = attr(freq, p1)
+            ptype(lhs, rhs, ie1, val, bwh)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
