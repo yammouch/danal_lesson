@@ -12,14 +12,14 @@ vp = np.array([[0,0,0,1,1,2],[1,2,3,2,3,3]])
 vs = np.array([[0,0,1],[1,2,2]])
 vl = np.array([[0],[1]])
 
-def local2global(glo, dst, loc, bwh): # inplace
+def lacc(lhs, _, ie1, val, bwh): # inplace
     if bwh:
-        glo[dst[...,np.newaxis] + bwh - dst, dst] += loc
+        lhs[ie1[...,np.newaxis] + bwh - ie1, ie1] += val
     else:
-        glo[dst[...,np.newaxis], dst] += loc
+        lhs[ie1[...,np.newaxis], ie1] += val
 
-def racc(glo, ie1, val):
-    glo[ie1] += val
+def racc(_0, rhs, ie1, val, _1):
+    rhs[ie1] += val
 
 def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     diff = vrt[nodes[:,1]] - vrt[nodes[:,0]]
@@ -28,15 +28,15 @@ def isrc_v(sol, vrt, nodes, v2e, isrc_dir):
     ip = (dirc*isrc_dir).sum(axis=-1)
     return (sol[v2e[nodes[:,0],nodes[:,1]][0]] * ip).sum()
 
-def pec(glo, rhs, edge0, bwh):
+def pec(lhs, rhs, edge0, _, bwh):
     if bwh:
         for e in edge0:
-            glo[ range(glo.shape[0])
-               , np.arange(e+bwh, e-bwh-1, -1)%(glo.shape[1]) ] = 0
-            glo[bwh, e] = 1
+            lhs[ range(lhs.shape[0])
+               , np.arange(e+bwh, e-bwh-1, -1)%(lhs.shape[1]) ] = 0
+            lhs[bwh, e] = 1
     else:
-        glo[edge0       ] = 0
-        glo[edge0, edge0] = 1
+        lhs[edge0       ] = 0
+        lhs[edge0, edge0] = 1
     rhs[edge0] = 0
 
 def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
@@ -54,34 +54,36 @@ def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
             fn = p01.volume(attr[0], attr[1], attr[2])
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = fn(freq, p1)
-                local2global(lhs, ie1, val, bwh)
+                lacc(lhs, None, ie1, val, bwh)
         elif ptype == 'b': # boundary condition
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = None
-                pec(lhs, rhs, ie1, bwh)
+                pec(lhs, rhs, ie1, None, bwh)
         elif ptype == 'a': # absorbing boundary
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = p01.absorb(freq, p1)
-                local2global(lhs, ie1, val, bwh)
+                lacc(lhs, None, ie1, val, bwh)
         elif ptype == 'e': # excitation
             fn = p01.isrc(1, attr[0])
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = fn(freq, p1)
-                racc(rhs, ie1, val)
+                racc(None, rhs, ie1, val, None)
         elif ptype == 'e2': # excitation 2D
             fn = p01.isrc(2, attr[0])
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = fn(freq, p1)
-                racc(rhs, ie1, val)
+                racc(None, rhs, ie1, val, None)
         elif ptype == 'e3': # excitation 3D
             fn = p01.isrc(3, attr[0])
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = fn(freq, p1)
-                racc(rhs, ie1, val)
+                racc(None, rhs, ie1, val, None)
         elif ptype == 'p': # probe
             pass
         else:
-            raise Exception("Unsupported physical type {}".format(ptype))
+            for p1, ie1 in zip(p2, ie2.toarray()):
+                val = attr(freq, p1)
+                ptype(lhs, rhs, ie1, val, bwh)
     if bwh:
         sol = scipy.linalg.solve_banded \
         ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )

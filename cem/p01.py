@@ -71,12 +71,18 @@ def absorb(freq, p1):
   ab = bound(n, area)
   return 2j*np.pi*freq*np.sqrt(e0/u0)*ab
 
+def nlin(p):
+  n = np.empty_like(p, dtype=np.float64)
+  n[1] = p[1] - p[0]
+  jacob = (n[1]**2).sum(axis=-1)
+  n[0] = -n[1]
+  return n/jacob, np.sqrt(jacob)
+
 class isrc(object):
 
   v_table   = { 1: vl, 2: vs, 3: vp }
-  nfn_table = { 1: lambda p: (p[[1, 0]] - p[[0, 1]], 1.0)
-              , 2: ntri2, 3: ntet }
-  den_table = { 1: 2, 2: 6, 3: 24}
+  nfn_table = { 1: nlin, 2: ntri2, 3: ntet }
+  den_table = { 1: 2, 2: 6, 3: 24 }
 
   def __init__(self, dim, i_density):
     self.i_density = np.array(i_density)
