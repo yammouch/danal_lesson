@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse
 import gmsh
+import p01
 import p04
 
 def make_geom():
@@ -39,15 +40,6 @@ def assign_physicals(air_tag, cond_tag, isrc_tags, probe_tag):
     air   = gmsh.model.addPhysicalGroup(3, [air_tag])
     return probe, isrc, cond, air
 
-def gen_mesh():
-    gmsh.model.mesh.generate(3)
-    nodes = gmsh.model.mesh.getNodes()
-    elems = []
-    for dim, ptag in gmsh.model.getPhysicalGroups():
-        for ntag in gmsh.model.getEntitiesForPhysicalGroup(dim, ptag):
-            elems.append((ptag,) + gmsh.model.mesh.getElements(dim, ntag))
-    return nodes, elems
-
 def get_mesh():
     gmsh.initialize()
     air_tag, cond_tag, isrc_tags, probe_tag = make_geom()
@@ -55,39 +47,49 @@ def get_mesh():
     gmsh.model.occ.synchronize()
     probe, isrc, cond, air = assign_physicals(air_tag, cond_tag, isrc_tags, probe_tag)
    #gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 20)
-    nodes, elems = gen_mesh()
-    gmsh.finalize()
+    gmsh.model.mesh.generate(3)
+    nodes = gmsh.model.mesh.getNodes()
+    tet = []
     ret_elems = []
-    for e in elems:
-        attr = ()
-        if e[0] == isrc:
-            ptype = 'e2'
-            x = e[3][0].reshape(-1, 3) - 1
-            attr = ([0,1/0.02,0],)
-        elif e[0] == probe:
-            ptype = 'p'
-            x = e[3][0].reshape(-1, 2) - 1
-            attr = ([0,1,0],)
-        elif e[0] == cond:
-            ptype = 'v'
-            x = e[3][0].reshape(-1, 4) - 1
-            attr = (1/140e-8, p04.e0, p04.u0)
-        elif e[0] == air:
-            ptype = 'v'
-            x = e[3][0].reshape(-1, 4) - 1
-            attr = (0, p04.e0, p04.u0)
-        x.sort()
-        ret_elems.append((ptype, attr, x))
-    return nodes[1].reshape(-1,3), ret_elems
+    ret_probe = []
+    for ntag in gmsh.model.getEntitiesForPhysicalGroup(2, isrc):
+        es = gmsh.model.mesh.getElements(2, ntag)
+        ns = es[2][0].reshape(-1, 3) - 1
+        ns.sort()
+        ret_elems.append \
+        ( ( p04.racc
+          , p01.isrc(2, [0,1/0.02,0])
+          , ns ) )
+    for ntag in gmsh.model.getEntitiesForPhysicalGroup(1, probe):
+        es = gmsh.model.mesh.getElements(1, ntag)
+        ns = es[2][0].reshape(-1, 2) - 1
+        ns.sort()
+        ret_probe.append(ns)
+    for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, cond):
+        es = gmsh.model.mesh.getElements(3, ntag)
+        ns = es[2][0].reshape(-1, 4) - 1
+        ns.sort()
+        ret_elems.append \
+        ( ( p04.lacc
+          , p01.volume(1/140e-8, p04.e0, p04.u0)
+          , ns ) )
+        tet.append(ns)
+    for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, air):
+        es = gmsh.model.mesh.getElements(3, ntag)
+        ns = es[2][0].reshape(-1, 4) - 1
+        ns.sort()
+        ret_elems.append \
+        ( ( p04.lacc
+          , p01.volume(0, p04.e0, p04.u0)
+          , ns ) )
+        tet.append(ns)
+    gmsh.finalize()
+    return nodes[1].reshape(-1,3), ret_elems, tet, ret_probe
 
 def main():
     np.set_printoptions(precision=3)
-    vrt, pgroups = get_mesh()
+    vrt, pgroups, tet, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
-    tet = []
-    for ptype, _, nodes in pgroups:
-        if ptype in ['v', 'c']:
-            tet.append(nodes)
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e.nnz, bwh)
@@ -96,9 +98,7 @@ def main():
    #for freq in []:
         sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
         print(sol)
-        for ptype, attr, nodes in pgroups:
-            if ptype == 'p':
-                print(p04.isrc_v(sol, vrt, nodes, v2e, attr[0]))
+        print(p04.isrc_v(sol, vrt, probe[0], v2e, [0,1,0]))
         print(140e-8*2*np.pi*0.1/(0.01**2*np.pi))
         print(p04.u0*0.1*(np.log(8*0.1/0.01)-2)*2*np.pi*freq)
         # https://www.emisoftware.com/calculator/circular-loop/
