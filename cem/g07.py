@@ -68,8 +68,8 @@ def get_mesh():
           , p01.volume(0, p04.e0, p04.u0)
           , ns ) )
         tet.append(ns)
-    return nodes[1].reshape(-1,3), ret_elems, tet, probe
     gmsh.finalize()
+    return nodes[1].reshape(-1,3), ret_elems, tet, probe
 
 def main():
     np.set_printoptions(precision=3)
