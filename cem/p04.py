@@ -41,10 +41,14 @@ def pec(lhs, rhs, edge0, _, bwh):
 
 class Square(object):
 
-    def __init__(self, vrt, pgroups, tet):
+    def __init__(self, vrt, pgroups):
         super().__init__()
         self.vrt = vrt
         self.pgroups = pgroups
+        tet = []
+        for pg in pgroups:
+            if pg[2].shape[1] == 4:
+                tet.append(pg[2])
         tet = np.concatenate(tuple(tet))
         self.v2e, self.bwh = edge_num_banded(tet)
         self.nedge = self.v2e.nnz

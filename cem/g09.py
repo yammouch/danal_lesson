@@ -100,7 +100,7 @@ def main():
     np.set_printoptions(precision=3)
     vrt, pgroups, tet, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
-    solver = p04.Square(vrt, pgroups, tet)
+    solver = p04.Square(vrt, pgroups)
     print(solver.v2e.nnz, solver.bwh)
    #for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
     for freq in [1e3]:
