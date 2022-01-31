@@ -100,16 +100,14 @@ def main():
     np.set_printoptions(precision=3)
     vrt, pgroups, tet, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
-    tet = np.concatenate(tuple(tet))
-    v2e, bwh = p04.edge_num_banded(tet)
-    print(v2e.nnz, bwh)
-    solver = p04.Square(vrt, pgroups, v2e.nnz, v2e, bwh)
+    solver = p04.Square(vrt, pgroups, tet)
+    print(solver.v2e.nnz, solver.bwh)
    #for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
     for freq in [1e3]:
    #for freq in []:
         sol = solver.solve(freq)
         print(sol)
-        print(p04.isrc_v(sol, vrt, probe[0], v2e, [0,1,0]))
+        print(p04.isrc_v(sol, vrt, probe[0], solver.v2e, [0,1,0]))
         print(140e-8*2*np.pi*0.1/(0.01**2*np.pi))
         print(p04.u0*0.1*(np.log(8*0.1/0.01)-2)*2*np.pi*freq)
         # https://www.emisoftware.com/calculator/circular-loop/
