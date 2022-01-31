@@ -39,16 +39,18 @@ def pec(lhs, rhs, edge0, _, bwh):
         lhs[edge0, edge0] = 1
     rhs[edge0] = 0
 
-class Square(object):
+class Banded(object):
 
-    def __init__(self, vrt, pgroups):
+    def __init__(self, vrt, racc, lacc, pec):
         super().__init__()
         self.vrt = vrt
-        self.pgroups = pgroups
+        self.racc = racc
+        self.lacc = lacc
+        self.pec = pec
         tet = []
-        for pg in pgroups:
-            if pg[2].shape[1] == 4:
-                tet.append(pg[2])
+        for pg in sum([racc, lacc, pec], []):
+            if pg[1].shape[1] == 4:
+                tet.append(pg[1])
         tet = np.concatenate(tuple(tet))
         self.v2e, self.bwh = edge_num_banded(tet)
         self.nedge = self.v2e.nnz
@@ -60,13 +62,14 @@ class Square(object):
             lhs = np.zeros((self.nedge, self.nedge), dtype=np.complex128)
         rhs = np.zeros((self.nedge,), dtype=np.complex128)
         vas = {2: vl, 3: vs, 4: vp}
-        for ptype, attr, nodes in self.pgroups:
-            p2 = self.vrt[nodes]
-            v = vas[nodes.shape[1]]
-            ie2 = self.v2e[nodes[:,v[0]], nodes[:,v[1]]]
-            for p1, ie1 in zip(p2, ie2.toarray()):
-                val = attr(freq, p1)
-                ptype(lhs, rhs, ie1, val, self.bwh)
+        for f, l in [(racc, self.racc), (lacc, self.lacc), (pec, self.pec)]:
+            for attr, nodes in l:
+                p2 = self.vrt[nodes]
+                v = vas[nodes.shape[1]]
+                ie2 = self.v2e[nodes[:,v[0]], nodes[:,v[1]]]
+                for p1, ie1 in zip(p2, ie2.toarray()):
+                    val = attr(freq, p1)
+                    f(lhs, rhs, ie1, val, self.bwh)
         if self.bwh:
             sol = scipy.linalg.solve_banded \
             ( (self.bwh, self.bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )

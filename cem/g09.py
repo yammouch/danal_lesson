@@ -54,20 +54,16 @@ def get_mesh():
     gmsh.model.mesh.generate(3)
     nodes = gmsh.model.mesh.getNodes()
     gmsh.write('g09.msh2')
-    ret_elems = []
+    racc = []
+    lacc = []
+    pec = []
     ret_probe = []
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, isrc):
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.racc
-          , p01.isrc(3, [0,1/(0.01**2*np.pi),0])
-          , ns ) )
-        ret_elems.append \
-        ( ( p04.lacc
-          , p01.volume(0, p04.e0, p04.u0)
-          , ns ) )
+        racc.append((p01.isrc(3, [0,1/(0.01**2*np.pi),0]), ns))
+        lacc.append((p01.volume(0, p04.e0, p04.u0), ns))
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(1, probe):
         es = gmsh.model.mesh.getElements(1, ntag)
         ns = es[2][0].reshape(-1, 2) - 1
@@ -77,26 +73,20 @@ def get_mesh():
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.lacc
-          , p01.volume(1/140e-8, p04.e0, p04.u0)
-          , ns ) )
+        lacc.append((p01.volume(1/140e-8, p04.e0, p04.u0), ns ))
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, air):
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.lacc
-          , p01.volume(0, p04.e0, p04.u0)
-          , ns ) )
+        lacc.append((p01.volume(0, p04.e0, p04.u0), ns ))
     gmsh.finalize()
-    return nodes[1].reshape(-1,3), ret_elems, ret_probe
+    return nodes[1].reshape(-1,3), racc, lacc, pec, ret_probe
 
 def main():
     np.set_printoptions(precision=3)
-    vrt, pgroups, probe = get_mesh()
+    vrt, racc, lacc, pec, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
-    solver = p04.Square(vrt, pgroups)
+    solver = p04.Banded(vrt, racc, lacc, pec)
     print(solver.v2e.nnz, solver.bwh)
    #for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
     for freq in [1e3]:
