@@ -54,7 +54,6 @@ def get_mesh():
     gmsh.model.mesh.generate(3)
     nodes = gmsh.model.mesh.getNodes()
     gmsh.write('g09.msh2')
-    tet = []
     ret_elems = []
     ret_probe = []
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, isrc):
@@ -69,7 +68,6 @@ def get_mesh():
         ( ( p04.lacc
           , p01.volume(0, p04.e0, p04.u0)
           , ns ) )
-        tet.append(ns)
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(1, probe):
         es = gmsh.model.mesh.getElements(1, ntag)
         ns = es[2][0].reshape(-1, 2) - 1
@@ -83,7 +81,6 @@ def get_mesh():
         ( ( p04.lacc
           , p01.volume(1/140e-8, p04.e0, p04.u0)
           , ns ) )
-        tet.append(ns)
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, air):
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
@@ -92,13 +89,12 @@ def get_mesh():
         ( ( p04.lacc
           , p01.volume(0, p04.e0, p04.u0)
           , ns ) )
-        tet.append(ns)
     gmsh.finalize()
-    return nodes[1].reshape(-1,3), ret_elems, tet, ret_probe
+    return nodes[1].reshape(-1,3), ret_elems, ret_probe
 
 def main():
     np.set_printoptions(precision=3)
-    vrt, pgroups, tet, probe = get_mesh()
+    vrt, pgroups, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
     solver = p04.Square(vrt, pgroups)
     print(solver.v2e.nnz, solver.bwh)
