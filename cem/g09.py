@@ -103,11 +103,11 @@ def main():
     tet = np.concatenate(tuple(tet))
     v2e, bwh = p04.edge_num_banded(tet)
     print(v2e.nnz, bwh)
-    solver = p04.Square()
+    solver = p04.Square(vrt, pgroups, v2e.nnz, v2e, bwh)
    #for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
     for freq in [1e3]:
    #for freq in []:
-        sol = solver.solve(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+        sol = solver.solve(freq)
         print(sol)
         print(p04.isrc_v(sol, vrt, probe[0], v2e, [0,1,0]))
         print(140e-8*2*np.pi*0.1/(0.01**2*np.pi))

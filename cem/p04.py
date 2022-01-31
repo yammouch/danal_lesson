@@ -41,26 +41,31 @@ def pec(lhs, rhs, edge0, _, bwh):
 
 class Square(object):
 
-    def __init__(self):
+    def __init__(self, vrt, pgroups, nedge, v2e, bwh):
         super().__init__()
+        self.vrt = vrt
+        self.pgroups = pgroups
+        self.nedge = nedge
+        self.v2e = v2e
+        self.bwh = bwh
 
-    def solve(self, freq, vrt, pgroups, nedge, v2e, bwh):
-        if bwh:
-            lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
+    def solve(self, freq):
+        if self.bwh:
+            lhs = np.zeros((2*self.bwh+1, self.nedge), dtype=np.complex128)
         else:
-            lhs = np.zeros((nedge, nedge), dtype=np.complex128)
-        rhs = np.zeros((nedge,), dtype=np.complex128)
+            lhs = np.zeros((self.nedge, self.nedge), dtype=np.complex128)
+        rhs = np.zeros((self.nedge,), dtype=np.complex128)
         vas = {2: vl, 3: vs, 4: vp}
-        for ptype, attr, nodes in pgroups:
-            p2 = vrt[nodes]
+        for ptype, attr, nodes in self.pgroups:
+            p2 = self.vrt[nodes]
             v = vas[nodes.shape[1]]
-            ie2 = v2e[nodes[:,v[0]], nodes[:,v[1]]]
+            ie2 = self.v2e[nodes[:,v[0]], nodes[:,v[1]]]
             for p1, ie1 in zip(p2, ie2.toarray()):
                 val = attr(freq, p1)
-                ptype(lhs, rhs, ie1, val, bwh)
-        if bwh:
+                ptype(lhs, rhs, ie1, val, self.bwh)
+        if self.bwh:
             sol = scipy.linalg.solve_banded \
-            ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
+            ( (self.bwh, self.bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
         else:
             sol = np.linalg.solve(lhs, rhs)
         del lhs
