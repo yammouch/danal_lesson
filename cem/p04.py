@@ -39,27 +39,32 @@ def pec(lhs, rhs, edge0, _, bwh):
         lhs[edge0, edge0] = 1
     rhs[edge0] = 0
 
-def solve_geom(freq, vrt, pgroups, nedge, v2e, bwh):
-    if bwh:
-        lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
-    else:
-        lhs = np.zeros((nedge, nedge), dtype=np.complex128)
-    rhs = np.zeros((nedge,), dtype=np.complex128)
-    vas = {2: vl, 3: vs, 4: vp}
-    for ptype, attr, nodes in pgroups:
-        p2 = vrt[nodes]
-        v = vas[nodes.shape[1]]
-        ie2 = v2e[nodes[:,v[0]], nodes[:,v[1]]]
-        for p1, ie1 in zip(p2, ie2.toarray()):
-            val = attr(freq, p1)
-            ptype(lhs, rhs, ie1, val, bwh)
-    if bwh:
-        sol = scipy.linalg.solve_banded \
-        ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
-    else:
-        sol = np.linalg.solve(lhs, rhs)
-    del lhs
-    return sol
+class Square(object):
+
+    def __init__(self):
+        super().__init__()
+
+    def solve(self, freq, vrt, pgroups, nedge, v2e, bwh):
+        if bwh:
+            lhs = np.zeros((2*bwh+1, nedge), dtype=np.complex128)
+        else:
+            lhs = np.zeros((nedge, nedge), dtype=np.complex128)
+        rhs = np.zeros((nedge,), dtype=np.complex128)
+        vas = {2: vl, 3: vs, 4: vp}
+        for ptype, attr, nodes in pgroups:
+            p2 = vrt[nodes]
+            v = vas[nodes.shape[1]]
+            ie2 = v2e[nodes[:,v[0]], nodes[:,v[1]]]
+            for p1, ie1 in zip(p2, ie2.toarray()):
+                val = attr(freq, p1)
+                ptype(lhs, rhs, ie1, val, bwh)
+        if bwh:
+            sol = scipy.linalg.solve_banded \
+            ( (bwh, bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
+        else:
+            sol = np.linalg.solve(lhs, rhs)
+        del lhs
+        return sol
 
 def edge_num_naive(tet):
     e2v = np.unique(tet[:, np.moveaxis(vp,0,1)].reshape(-1,2), axis=0)
