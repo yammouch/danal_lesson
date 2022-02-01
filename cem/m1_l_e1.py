@@ -18,14 +18,14 @@ def main():
     ( [ [0, 2, 3]
       , [1, 2, 3] ] )
     lin = np.array( [ [0, 1] ] )
-    v2e, bwh = p04.edge_num_banded(tet)
-    pgroups = [ (p04.racc, p01.isrc(1, [0,0,1]), tet)
-              , (p04.lacc, p01.volume(0, p04.e0, p04.u0), tet)
-              , (p04.pec, lambda f, p: None, tri)]
+    lacc = [(p01.volume(0, p04.e0, p04.u0), tet)]
+    racc = [(p01.isrc(1, [0,0,1]), tet)]
+    pec  = [(lambda f, p: None, tri)]
+    solver = p04.Banded(vrt, lacc, racc, pec)
     freq = 50
-    sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+    sol = solver.solve(freq)
     print(sol)
-    print(p04.isrc_v(sol, vrt, lin, v2e, [0,0,1]))
+    print(p04.isrc_v(sol, vrt, lin, solver.v2e, [0,0,1]))
     print(p04.u0*0.5*w*l/h*2*np.pi*freq)
 
 if __name__ == '__main__':

@@ -36,50 +36,39 @@ def get_mesh(w, l, h):
    #gmsh.option.setNumber("Mesh.Algorithm", 8)
     gmsh.model.mesh.generate(3)
     nodes = gmsh.model.mesh.getNodes()
-    tet = []
-    ret_elems = []
+    lacc = []
+    racc = []
+    ret_pec = []
     probe = []
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(1, isrc):
         es = gmsh.model.mesh.getElements(1, ntag)
         ns = es[2][0].reshape(-1, 2) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.racc
-          , p01.isrc(1, [0,0,1])
-          , ns ) )
+        racc.append((p01.isrc(1, [0,0,1]), ns))
         probe.append(ns)
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(2, pec):
         es = gmsh.model.mesh.getElements(2, ntag)
         ns = es[2][0].reshape(-1, 3) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.pec
-          , lambda f, p: None
-          , ns ) )
+        ret_pec.append((lambda f, p: None, ns))
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, air):
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.lacc
-          , p01.volume(0, p04.e0, p04.u0)
-          , ns ) )
-        tet.append(ns)
+        lacc.append((p01.volume(0, p04.e0, p04.u0), ns))
     gmsh.finalize()
-    return nodes[1].reshape(-1,3), ret_elems, tet, probe
+    return nodes[1].reshape(-1,3), lacc, racc, ret_pec, probe
 
 def main():
     w, l, h = 1, 10, 1
     np.set_printoptions(precision=3)
-    vrt, pgroups, tet, probe = get_mesh(w, l, h)
-    print(pgroups)
-    tet = np.concatenate(tuple(tet))
-    v2e, bwh = p04.edge_num_banded(tet)
-    print(v2e.nnz, bwh)
+    vrt, lacc, racc, pec, probe = get_mesh(w, l, h)
+    solver = p04.Banded(vrt, lacc, racc, pec)
+    print(solver.v2e.nnz, solver.bwh)
     for freq in [100, 1e3, 10e3, 100e3, 1e6]:
-        sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+        sol = solver.solve(freq)
         print(sol)
-        print(p04.isrc_v(sol, vrt, probe[0], v2e, [0,0,1]))
+        print(p04.isrc_v(sol, vrt, probe[0], solver.v2e, [0,0,1]))
         print(2*np.pi*freq*p04.u0*(l*h)/w)
 
 if __name__ == '__main__':

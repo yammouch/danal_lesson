@@ -1,4 +1,5 @@
 import numpy as np
+import p01
 import p04
 
 def main():
@@ -34,21 +35,22 @@ def main():
     ( [ [4, 5, 7]
       , [5, 6, 7] ])
     v2e, bwh = p04.edge_num_banded(tet)
-    print(v2e)
-    pgroups = [ ('e2', ([0,0,1],), isrc)
-              , ('a', (), isrc)
-              , ('a', (), absorb)
-              , ('v', (0, p04.e0, p04.u0), tet)
-              , ('b', (), pec) ]
+    lacc = [ (p01.absorb, isrc)
+           , (p01.absorb, absorb)
+           , (p01.volume(0, p04.e0, p04.u0), tet) ]
+    racc = [ (p01.isrc(2, [0,0,1]), isrc) ]
+    pec  = [ (lambda f, p: None, pec) ]
+    solver = p04.Banded(vrt, lacc, racc, pec)
+    print(solver.v2e)
     freq = 1e6
-    sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+    sol = solver.solve(freq)
     print(sol)
     print(0.5*(p04.u0/p04.e0)**0.5*h)
     print(-2*np.pi*freq*l/p04.c*180/np.pi)
-    v_src = p04.isrc_v(sol, vrt, np.array([[0, 1]]), v2e, [0,0,1])
+    v_src = p04.isrc_v(sol, vrt, np.array([[0, 1]]), solver.v2e, [0,0,1])
     print(v_src)
     print(np.angle(-v_src)*180/np.pi)
-    v_out = p04.isrc_v(sol, vrt, np.array([[4, 5]]), v2e, [0,0,1])
+    v_out = p04.isrc_v(sol, vrt, np.array([[4, 5]]), solver.v2e, [0,0,1])
     print(v_out)
     print(np.abs(v_out))
     print(np.angle(-v_out)*180/np.pi)

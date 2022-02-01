@@ -54,9 +54,8 @@ def get_mesh():
     gmsh.model.mesh.generate(3)
     nodes = gmsh.model.mesh.getNodes()
     gmsh.write('g09.msh2')
-    racc = []
     lacc = []
-    pec = []
+    racc = []
     ret_probe = []
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, isrc):
         es = gmsh.model.mesh.getElements(3, ntag)
@@ -80,13 +79,13 @@ def get_mesh():
         ns.sort()
         lacc.append((p01.volume(0, p04.e0, p04.u0), ns ))
     gmsh.finalize()
-    return nodes[1].reshape(-1,3), racc, lacc, pec, ret_probe
+    return nodes[1].reshape(-1,3), lacc, racc, ret_probe
 
 def main():
     np.set_printoptions(precision=3)
-    vrt, racc, lacc, pec, probe = get_mesh()
+    vrt, lacc, racc, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
-    solver = p04.Banded(vrt, racc, lacc, pec)
+    solver = p04.Banded(vrt, lacc, racc, [])
     print(solver.v2e.nnz, solver.bwh)
    #for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
     for freq in [1e3]:

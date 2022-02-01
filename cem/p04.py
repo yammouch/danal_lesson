@@ -41,11 +41,11 @@ def pec(lhs, rhs, edge0, _, bwh):
 
 class Banded(object):
 
-    def __init__(self, vrt, racc, lacc, pec):
+    def __init__(self, vrt, lacc, racc, pec):
         super().__init__()
         self.vrt = vrt
-        self.racc = racc
         self.lacc = lacc
+        self.racc = racc
         self.pec = pec
         tet = []
         for pg in sum([racc, lacc, pec], []):
@@ -62,7 +62,7 @@ class Banded(object):
             lhs = np.zeros((self.nedge, self.nedge), dtype=np.complex128)
         rhs = np.zeros((self.nedge,), dtype=np.complex128)
         vas = {2: vl, 3: vs, 4: vp}
-        for f, l in [(racc, self.racc), (lacc, self.lacc), (pec, self.pec)]:
+        for f, l in [(lacc, self.lacc), (racc, self.racc), (pec, self.pec)]:
             for attr, nodes in l:
                 p2 = self.vrt[nodes]
                 v = vas[nodes.shape[1]]

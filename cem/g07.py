@@ -38,50 +38,38 @@ def get_mesh():
     isrc, cond, air = assign_physicals(air_tag, cond_tag, isrc_tag)
     gmsh.model.mesh.generate(3)
     nodes = gmsh.model.mesh.getNodes()
-    tet = []
-    ret_elems = []
+    lacc = []
+    racc = []
     probe = []
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(1, isrc):
         es = gmsh.model.mesh.getElements(1, ntag)
         ns = es[2][0].reshape(-1, 2) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.racc
-          , p01.isrc(1, [0,1,0])
-          , ns ) )
+        racc.append((p01.isrc(1, [0,1,0]), ns))
         probe.append(ns)
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, cond):
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.lacc
-          , p01.volume(1/140e-8, p04.e0, p04.u0)
-          , ns ) )
-        tet.append(ns)
+        lacc.append((p01.volume(1/140e-8, p04.e0, p04.u0), ns))
     for ntag in gmsh.model.getEntitiesForPhysicalGroup(3, air):
         es = gmsh.model.mesh.getElements(3, ntag)
         ns = es[2][0].reshape(-1, 4) - 1
         ns.sort()
-        ret_elems.append \
-        ( ( p04.lacc
-          , p01.volume(0, p04.e0, p04.u0)
-          , ns ) )
-        tet.append(ns)
+        lacc.append((p01.volume(0, p04.e0, p04.u0), ns))
     gmsh.finalize()
-    return nodes[1].reshape(-1,3), ret_elems, tet, probe
+    return nodes[1].reshape(-1,3), lacc, racc, probe
 
 def main():
     np.set_printoptions(precision=3)
-    vrt, pgroups, tet, probe = get_mesh()
+    vrt, lacc, racc, probe = get_mesh()
     vrt *= 1e-3 # [m] -> [mm]
-    tet = np.concatenate(tuple(tet))
-    v2e, bwh = p04.edge_num_banded(tet)
-    print(v2e.nnz, bwh)
+    solver = p04.Banded(vrt, lacc, racc, [])
+    print(solver.v2e.nnz, solver.bwh)
     for freq in [1, 10, 100, 1e3, 10e3, 100e6]:
-        sol = p04.solve_geom(freq, vrt, pgroups, v2e.nnz, v2e, bwh)
+        sol = solver.solve(freq)
         print(sol)
-        print(p04.isrc_v(sol, vrt, probe[0], v2e, [0,1,0]))
+        print(p04.isrc_v(sol, vrt, probe[0], solver.v2e, [0,1,0]))
         print(140e-8*2*np.pi*0.1/(0.01**2*np.pi))
         print(p04.u0*0.1*(np.log(8*0.1/0.01)-2)*2*np.pi*freq)
         # https://www.emisoftware.com/calculator/circular-loop/
