@@ -40,20 +40,21 @@ def main():
            , (p01.volume(0, p04.e0, p04.u0), tet) ]
     racc = [ (p01.isrc(2, [0,0,1]), isrc) ]
     pec  = [ (lambda f, p: None, pec) ]
-    solver = p04.Banded(vrt, lacc, racc, pec)
-    print(solver.v2e)
-    freq = 1e6
-    sol = solver.solve(freq)
-    print(sol)
-    print(0.5*(p04.u0/p04.e0)**0.5*h)
-    print(-2*np.pi*freq*l/p04.c*180/np.pi)
-    v_src = p04.isrc_v(sol, vrt, np.array([[0, 1]]), solver.v2e, [0,0,1])
-    print(v_src)
-    print(np.angle(-v_src)*180/np.pi)
-    v_out = p04.isrc_v(sol, vrt, np.array([[4, 5]]), solver.v2e, [0,0,1])
-    print(v_out)
-    print(np.abs(v_out))
-    print(np.angle(-v_out)*180/np.pi)
+    for s in [p04.Square, p04.Banded]:
+      solver = s(vrt, lacc, racc, pec)
+      print(solver.v2e)
+      freq = 1e6
+      sol = solver.solve(freq)
+      print(sol)
+      print(0.5*(p04.u0/p04.e0)**0.5*h)
+      print(-2*np.pi*freq*l/p04.c*180/np.pi)
+      v_src = p04.isrc_v(sol, vrt, np.array([[0, 1]]), solver.v2e, [0,0,1])
+      print(v_src)
+      print(np.angle(-v_src)*180/np.pi)
+      v_out = p04.isrc_v(sol, vrt, np.array([[4, 5]]), solver.v2e, [0,0,1])
+      print(v_out)
+      print(np.abs(v_out))
+      print(np.angle(-v_out)*180/np.pi)
 
 if __name__ == '__main__':
     main()
