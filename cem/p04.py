@@ -55,6 +55,19 @@ class Banded(object):
         self.v2e, self.bwh = edge_num_banded(tet)
         self.nedge = self.v2e.nnz
 
+    def f_lacc(self, lhs, _, ie1, val, bwh): # inplace
+        lhs[ie1[...,np.newaxis] + bwh - ie1, ie1] += val
+
+    def f_racc(self, _0, rhs, ie1, val, _1):
+        rhs[ie1] += val
+
+    def f_pec(self, lhs, rhs, edge0, _, bwh):
+        for e in edge0:
+            lhs[ range(lhs.shape[0])
+               , np.arange(e+bwh, e-bwh-1, -1)%(lhs.shape[1]) ] = 0
+            lhs[bwh, e] = 1
+        rhs[edge0] = 0
+
     def solve(self, freq):
         if self.bwh:
             lhs = np.zeros((2*self.bwh+1, self.nedge), dtype=np.complex128)
@@ -62,7 +75,9 @@ class Banded(object):
             lhs = np.zeros((self.nedge, self.nedge), dtype=np.complex128)
         rhs = np.zeros((self.nedge,), dtype=np.complex128)
         vas = {2: vl, 3: vs, 4: vp}
-        for f, l in [(lacc, self.lacc), (racc, self.racc), (pec, self.pec)]:
+        for f, l in [ (self.f_lacc, self.lacc)
+                    , (self.f_racc, self.racc)
+                    , (self.f_pec, self.pec)]:
             for attr, nodes in l:
                 p2 = self.vrt[nodes]
                 v = vas[nodes.shape[1]]
