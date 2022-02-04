@@ -55,25 +55,25 @@ class Banded(object):
         self.v2e, self.bwh = edge_num_banded(tet)
         self.nedge = self.v2e.nnz
 
-    def f_lacc(self, lhs, _, ie1, val, bwh): # inplace
-        lhs[ie1[...,np.newaxis] + bwh - ie1, ie1] += val
+    def f_lacc(self, ie1, val): # inplace
+        self.lhs[ie1[...,np.newaxis] + self.bwh - ie1, ie1] += val
 
-    def f_racc(self, _0, rhs, ie1, val, _1):
-        rhs[ie1] += val
+    def f_racc(self, ie1, val):
+        self.rhs[ie1] += val
 
-    def f_pec(self, lhs, rhs, edge0, _, bwh):
+    def f_pec(self, edge0, _):
         for e in edge0:
-            lhs[ range(lhs.shape[0])
-               , np.arange(e+bwh, e-bwh-1, -1)%(lhs.shape[1]) ] = 0
-            lhs[bwh, e] = 1
-        rhs[edge0] = 0
+            self.lhs[ range(self.lhs.shape[0])
+                    , np.arange(e+self.bwh, e-self.bwh-1, -1)%(self.lhs.shape[1]) ] = 0
+            self.lhs[self.bwh, e] = 1
+        self.rhs[edge0] = 0
 
     def solve(self, freq):
         if self.bwh:
-            lhs = np.zeros((2*self.bwh+1, self.nedge), dtype=np.complex128)
+            self.lhs = np.zeros((2*self.bwh+1, self.nedge), dtype=np.complex128)
         else:
-            lhs = np.zeros((self.nedge, self.nedge), dtype=np.complex128)
-        rhs = np.zeros((self.nedge,), dtype=np.complex128)
+            self.lhs = np.zeros((self.nedge, self.nedge), dtype=np.complex128)
+        self.rhs = np.zeros((self.nedge,), dtype=np.complex128)
         vas = {2: vl, 3: vs, 4: vp}
         for f, l in [ (self.f_lacc, self.lacc)
                     , (self.f_racc, self.racc)
@@ -84,13 +84,13 @@ class Banded(object):
                 ie2 = self.v2e[nodes[:,v[0]], nodes[:,v[1]]]
                 for p1, ie1 in zip(p2, ie2.toarray()):
                     val = attr(freq, p1)
-                    f(lhs, rhs, ie1, val, self.bwh)
+                    f(ie1, val)
         if self.bwh:
             sol = scipy.linalg.solve_banded \
-            ( (self.bwh, self.bwh), lhs, rhs, overwrite_ab=True, overwrite_b=True )
+            ( (self.bwh, self.bwh), self.lhs, self.rhs, overwrite_ab=True, overwrite_b=True )
         else:
-            sol = np.linalg.solve(lhs, rhs)
-        del lhs
+            sol = np.linalg.solve(self.lhs, self.rhs)
+        del self.lhs
         return sol
 
 def edge_num_naive(tet):
