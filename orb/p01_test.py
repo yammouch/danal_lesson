@@ -1,22 +1,28 @@
 import numpy as np
 import p01 as dut
 
+tests = []
 
+def add_test(f):
+    tests.append((f.__name__, f))
+
+@add_test
 def test_kin():
-  k_basis = np.arange(-2, 3)[:, None]
-  expc \
-  = -0.5 \
-  * np.array \
-    ( [ [  0, 1, 4, 9, 16 ]
-      , [  1, 0, 1, 4,  9 ]
-      , [  4, 1, 0, 1,  4 ]
-      , [  9, 4, 1, 0,  1 ]
-      , [ 16, 9, 4, 1,  0 ] ] )
-  result = dut.kin(k_basis, [2*np.pi])
-  if (np.abs(result - expc) < 1e-3).all():
-    print("[OK] test_kin")
-  else:
-    print('[ER] test_kin')
-    print(result)
+    k_basis = np.arange(-2, 3)[:, None]
+    expc \
+    = -0.5 \
+    * np.array \
+      ( [ [  0, 1, 4, 9, 16 ]
+        , [  1, 0, 1, 4,  9 ]
+        , [  4, 1, 0, 1,  4 ]
+        , [  9, 4, 1, 0,  1 ]
+        , [ 16, 9, 4, 1,  0 ] ] )
+    result = dut.kin(k_basis, [2*np.pi])
+    if (np.abs(result - expc) < 1e-3).all():
+        print("[OK] test_kin")
+    else:
+        print('[ER] test_kin')
+        print(result)
 
-test_kin()
+for _, f in tests:
+    f()
