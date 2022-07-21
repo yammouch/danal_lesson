@@ -1,7 +1,9 @@
 import numpy as np
 
 def kin(k_basis, lc):
-  diff = k_basis[:, None, :] - k_basis[None, :, :]
-  diff2 = diff**2
-  diff2sum = diff2.sum(axis=-1)
-  return -2*(np.pi/lc)**2*diff2sum
+    k = 2*np.pi/np.array(lc)[None, :]*k_basis
+    x = k[:, None, :] - k[None, :, :]
+    x = x**2
+    x = x.sum(axis=-1)
+    x = -0.5*x
+    return x
