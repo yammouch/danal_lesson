@@ -1,4 +1,5 @@
 import numpy as np
+import itertools
 import p01 as dut
 
 tests = []
@@ -43,6 +44,52 @@ def test_symmetrize():
     else:
         print("[ER] test_symmetrize")
         print(x)
+
+@add_test
+def test_cou_idx():
+    x = np.array([-1, 0, 1])[:, None]
+    expc = \
+    [ [ [ np.array([0, 1, 2])
+        , np.array([0, 1, 2])
+        , np.array([1, 1, 1]) ]
+      , [ np.array([1, 2])
+        , np.array([0, 1])
+        , np.array([2, 2]) ]
+      , [ np.array([], dtype=np.int64)
+        , np.array([], dtype=np.int64)
+        , np.array([], dtype=np.int64) ] ]
+    , [ [ np.array([0, 1])
+        , np.array([1, 2])
+        , np.array([0, 0]) ]
+      , [ np.array([0, 1, 2])
+        , np.array([0, 1, 2])
+        , np.array([1, 1, 1]) ]
+      , [ np.array([1, 2])
+        , np.array([0, 1])
+        , np.array([2, 2]) ] ]
+    , [ [ np.array([], dtype=np.int64)
+        , np.array([], dtype=np.int64)
+        , np.array([], dtype=np.int64) ]
+      , [ np.array([0, 1])
+        , np.array([1, 2])
+        , np.array([0, 0]) ]
+      , [ np.array([0, 1, 2])
+        , np.array([0, 1, 2])
+        , np.array([1, 1, 1]) ] ] ]
+    result = dut.cou_idx(x)
+    ok = True
+    for i, j, k in itertools.product(range(3), range(3), range(3)):
+        if (expc[i][j][k] == result[i][j][k]).all():
+            pass
+        else:
+            ok = False
+            break
+    if ok:
+        print("[OK] test_cou_idx")
+    else:
+        print("[ER] test_cou_idx")
+        print(result)
+
 
 for _, f in tests:
     f()

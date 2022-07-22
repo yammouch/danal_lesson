@@ -27,19 +27,18 @@ def cou_idx(k_basis):
             r = k_basis
             t = q - p
             if tuple(t) not in kdic:
+                row.append([np.array([], dtype=int) for _ in range(3)])
                 continue
             s = r - t[None, :]
             t = tuple(t)
             rn, sn, tn = [], [], []
             for r1, s1 in zip(r, s):
                 r1 = tuple(r1); s1 = tuple(s1)
-                if r1 not in k_basis:
-                    continue
-                if s1 not in k_basis:
+                if r1 not in k_basis or s1 not in k_basis:
                     continue
                 rn.append(kdic[r1])
                 sn.append(kdic[s1])
                 tn.append(kdic[t])
-            row.append([np.array(x) for x in [rn, sn, tn]])
+            row.append([np.array(x, dtype=int) for x in [rn, sn, tn]])
         retval.append(row)
     return retval
