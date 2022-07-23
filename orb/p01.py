@@ -15,6 +15,24 @@ def symmetrize(a):
             a[(slice(None),)*i + (l//2,)] *= 0.5
     return a
 
+def pot_idx(k_basis):
+    kdic = dict \
+    ( zip
+      ( (tuple(x) for x in k_basis)
+      , range(len(k_basis)) ) )
+    retval = []
+    for p in k_basis:
+        row = []
+        for q in k_basis:
+            t = tuple(q - p)
+            if t in kdic:
+                row.append(kdic[t])
+            else:
+                row.append(None)
+        retval.append(row)
+    return retval
+
+
 def cou_idx(k_basis):
     kdic = dict \
     ( zip

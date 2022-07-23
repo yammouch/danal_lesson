@@ -46,6 +46,17 @@ def test_symmetrize():
         print(x)
 
 @add_test
+def test_pot_idx():
+    x = np.array([-1, 0, 1])[:, None]
+    expc = [[1, 2, None], [0, 1, 2], [None, 0, 1]]
+    result = dut.pot_idx(x)
+    if result == expc:
+        print("[OK] test_pot_idx")
+    else:
+        print("[ER] test_pot_idx")
+        print(result)
+
+@add_test
 def test_cou_idx():
     x = np.array([-1, 0, 1])[:, None]
     expc = \
