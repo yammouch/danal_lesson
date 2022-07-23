@@ -42,3 +42,27 @@ def cou_idx(k_basis):
             row.append([np.array(x, dtype=int) for x in [rn, sn, tn]])
         retval.append(row)
     return retval
+
+def exc_idx(k_basis):
+    kdic = dict \
+    ( zip
+      ( (tuple(x) for x in k_basis)
+      , range(len(k_basis)) ) )
+    retval = []
+    for p in k_basis:
+        row = []
+        for q in k_basis:
+            t = k_basis
+            s = q[None, :] + t
+            r = p[None, :] + t
+            rn, sn, tn = [], [], []
+            for r1, s1, t1 in zip(r, s, t):
+                r1 = tuple(r1); s1 = tuple(s1); t1 = tuple(t1)
+                if any([x not in k_basis for x in [r1, s1, t1]]):
+                    continue
+                rn.append(kdic[r1])
+                sn.append(kdic[s1])
+                tn.append(kdic[t1])
+            row.append([np.array(x, dtype=int) for x in [rn, sn, tn]])
+        retval.append(row)
+    return retval
