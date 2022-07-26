@@ -105,5 +105,5 @@ def cou(c, d, idx, scale=1.0):
 def prep_pot(u, ll):
     x = nt.fft.rfftn(u)
     symmetrize(x)
-    x /= np.prod(ll)
+    x /= np.prod(ll) * np.prod(u.shape)
     return x
