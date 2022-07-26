@@ -94,3 +94,11 @@ def pot(u, idx):
             rv[p, q] = u[idx[p][q]]
     return rv
 
+def cou(c, d, idx, scale=1.0):
+    rv = np.empty((len(idx), len(idx)), dtype=np.complex128)
+    cc = scale*np.conj(c)
+    for p in range(len(idx)):
+        for q in range(len(idx)):
+            rv[p, q] = np.sum(cc[idx[0]]*d[idx[2]]*c[idx[1]])
+    return rv
+
