@@ -102,3 +102,8 @@ def cou(c, d, idx, scale=1.0):
             rv[p, q] = np.sum(cc[idx[0]]*d[idx[2]]*c[idx[1]])
     return rv
 
+def prep_pot(u, ll):
+    x = nt.fft.rfftn(u)
+    symmetrize(x)
+    x /= np.prod(ll)
+    return x
