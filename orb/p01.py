@@ -90,7 +90,7 @@ def pot(u, idx):
     for p in range(len(idx)):
         for q in range(len(idx)):
             if idx[p][q] == None:
-                continue:
+                continue
             rv[p, q] = u[idx[p][q]]
     return rv
 
