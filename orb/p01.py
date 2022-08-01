@@ -84,3 +84,26 @@ def exc_idx(k_basis):
             row.append([np.array(x, dtype=int) for x in [rn, sn, tn]])
         retval.append(row)
     return retval
+
+def pot(u, idx):
+    rv = np.zeros((len(idx), len(idx)), dtype=np.complex128)
+    for p in range(len(idx)):
+        for q in range(len(idx)):
+            if idx[p][q] == None:
+                continue:
+            rv[p, q] = u[idx[p][q]]
+    return rv
+
+def cou(c, d, idx, scale=1.0):
+    rv = np.empty((len(idx), len(idx)), dtype=np.complex128)
+    cc = scale*np.conj(c)
+    for p in range(len(idx)):
+        for q in range(len(idx)):
+            rv[p, q] = np.sum(cc[idx[0]]*d[idx[2]]*c[idx[1]])
+    return rv
+
+def prep_pot(u, ll):
+    x = nt.fft.rfftn(u)
+    symmetrize(x)
+    x /= np.prod(ll) * np.prod(u.shape)
+    return x
