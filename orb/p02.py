@@ -16,12 +16,12 @@ def symmetrize(a):
     return a
 
 def f_basis_nwn_cart(basis_nwn):
-    rv = np.empty((basis_nwn.shape[0]**2, 2+2*basis_nwn.shape[1]), dtype=int)
-    rv[:, :2] = \
-    np.mgrid[:basis_nwn.shape[0], :basis_nwn.shape[0]] \
-    .reshape(2, -1).T
-    rv[:, 2                   :2+  basis_nwn.shape[1]] = basis_nwn[rv[:,0]]
-    rv[:, 2+basis_nwn.shape[1]:2+2*basis_nwn.shape[1]] = basis_nwn[rv[:,1]]
+    l   = basis_nwn.shape[0]
+    dim = basis_nwn.shape[1]
+    rv = np.empty((l**2, 2+2*dim), dtype=int)
+    rv[:, :2] = np.mgrid[:l, :l].reshape(2, -1).T
+    rv[:, 2    :2+dim] = basis_nwn[rv[:,0]]
+    rv[:, 2+dim:     ] = basis_nwn[rv[:,1]]
     return rv
 
 def f_vext_nwn(basis_nwn_cart, vext):
