@@ -54,12 +54,35 @@ def test_f_basis_nwn_cart():
     ( [ [0, 0, 0, 1, 0, 1]
       , [0, 1, 0, 1, 2, 3]
       , [1, 0, 2, 3, 0, 1]
-      , [1, 1, 2, 3, 2, 3] ] )
+      , [1, 1, 2, 3, 2, 3] ]
+    , dtype=int )
     result = dut.f_basis_nwn_cart(x)
     if (result == expc).all():
         print("[OK] test_f_basis_nwn_cart")
     else:
         print("[ER] test_f_basis_nwn_cart")
+        print(result)
+
+@add_test
+def test_f_vext_nwn():
+    x = np.array \
+    ( [ [0, 0, -1, 1, -1, 1]
+      , [0, 1, -1, 1,  1, 0]
+      , [1, 0,  1, 0, -1, 1]
+      , [1, 1,  1, 0,  1, 0]
+      , [2, 0,  2, 0, -1, 1] ]
+    , dtype=int )
+    expc = np.array \
+    ( [ [0, 0,  0,  0]
+      , [0, 1, -2,  1]
+      , [1, 0,  2, -1]
+      , [1, 1,  0,  0] ]
+    , dtype=int )
+    result = dut.f_vext_nwn(x, np.zeros((4, 4)))
+    if (result == expc).all():
+        print("[OK] test_f_vext_nwn")
+    else:
+        print("[ER] test_f_vext_nwn")
         print(result)
 
 for _, f in tests:
