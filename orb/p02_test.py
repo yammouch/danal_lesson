@@ -5,6 +5,7 @@ tests = []
 
 def add_test(f):
     tests.append((f.__name__, f))
+    return f
 
 @add_test
 def test_kin():
@@ -83,6 +84,28 @@ def test_f_vext_nwn():
         print("[OK] test_f_vext_nwn")
     else:
         print("[ER] test_f_vext_nwn")
+        print(result)
+
+@add_test
+def test_f_vext_mat():
+    vext_nwn = np.array \
+    ( [ [0, 0,  0,  0]
+      , [0, 1, -2,  1]
+      , [1, 0,  2, -1]
+      , [1, 1,  0,  0] ]
+    , dtype=int )
+    expc = np.array \
+    ( [ [ 0, 9]
+      , [11, 0] ]
+    , dtype=int )
+    result = dut.f_vext_mat \
+    ( np.zeros((2, 2))
+    , np.arange(16).reshape(4, 4)
+    , vext_nwn )
+    if (result == expc).all():
+        print("[OK] test_f_vext_mat")
+    else:
+        print("[ER] test_f_vext_mat")
         print(result)
 
 for _, f in tests:

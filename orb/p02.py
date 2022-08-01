@@ -32,3 +32,9 @@ def f_vext_nwn(basis_nwn_cart, vext):
     x[:, 2:] = basis_nwn_cart[:,2:2+dim] - basis_nwn_cart[:,2+dim:]
     rv = x[(np.abs(x[:, 2:]) <= np.array(vext.shape)//2).all(axis=1)]
     return rv
+
+def f_vext_mat(basis_nwn, vext_rc, vext_nwn):
+    l = basis_nwn.shape[0]
+    rv = np.zeros((l, l), dtype=np.complex128)
+    rv[vext_nwn[:,0], vext_nwn[:,1]] = vext_rc[tuple(vext_nwn[:,2:].T)]
+    return rv
