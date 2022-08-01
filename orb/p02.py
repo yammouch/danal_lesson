@@ -1,6 +1,6 @@
 import numpy as np
 
-def kin(basis_nwn, box_size):
+def f_kin_mat(basis_nwn, box_size):
     k = 2*np.pi/np.array(box_size)[None, :]*basis_nwn
     x = k[:, None, :] - k[None, :, :]
     x = x**2

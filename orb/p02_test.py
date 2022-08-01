@@ -8,8 +8,8 @@ def add_test(f):
     return f
 
 @add_test
-def test_kin():
-    k_basis = np.arange(-2, 3)[:, None]
+def test_f_kin_mat():
+    basis_nwn = np.arange(-2, 3)[:, None]
     expc \
     = -0.5 \
     * np.array \
@@ -18,11 +18,11 @@ def test_kin():
         , [  4, 1, 0, 1,  4 ]
         , [  9, 4, 1, 0,  1 ]
         , [ 16, 9, 4, 1,  0 ] ] )
-    result = dut.kin(k_basis, [2*np.pi])
+    result = dut.f_kin_mat(basis_nwn, [2*np.pi])
     if (np.abs(result - expc) < 1e-3).all():
-        print("[OK] test_kin")
+        print("[OK] test_f_kin_mat")
     else:
-        print('[ER] test_kin')
+        print('[ER] test_f_kin_mat')
         print(result)
 
 @add_test
