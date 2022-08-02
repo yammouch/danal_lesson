@@ -11,13 +11,13 @@ def add_test(f):
 def test_f_kin_mat():
     basis_nwn = np.arange(-2, 3)[:, None]
     expc \
-    = -0.5 \
+    = 0.5 \
     * np.array \
-      ( [ [  0, 1, 4, 9, 16 ]
-        , [  1, 0, 1, 4,  9 ]
-        , [  4, 1, 0, 1,  4 ]
-        , [  9, 4, 1, 0,  1 ]
-        , [ 16, 9, 4, 1,  0 ] ] )
+      ( [ [ 4, 0, 0, 0, 0 ]
+        , [ 0, 1, 0, 0, 0 ]
+        , [ 0, 0, 0, 0, 0 ]
+        , [ 0, 0, 0, 1, 0 ]
+        , [ 0, 0, 0, 0, 4 ] ] )
     result = dut.f_kin_mat(basis_nwn, [2*np.pi])
     if (np.abs(result - expc) < 1e-3).all():
         print("[OK] test_f_kin_mat")

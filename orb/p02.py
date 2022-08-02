@@ -1,12 +1,11 @@
 import numpy as np
 
 def f_kin_mat(basis_nwn, box_size):
-    k = 2*np.pi/np.array(box_size)[None, :]*basis_nwn
-    x = k[:, None, :] - k[None, :, :]
-    x = x**2
-    x = x.sum(axis=-1)
-    x = -0.5*x
-    return x
+    box_size = np.array(box_size)
+    k = 2*np.pi/box_size*basis_nwn
+    rv = (k**2).sum(axis=-1)
+    rv *= 0.5
+    return np.diag(rv)
 
 def symmetrize(a):
     for i in range(a.ndim):
