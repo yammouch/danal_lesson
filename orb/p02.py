@@ -23,13 +23,13 @@ def f_basis_nwn_cart(basis_nwn):
     rv[:, 2+dim:     ] = basis_nwn[rv[:,1]]
     return rv
 
-def f_vext_nwn(basis_nwn_cart, vext):
+def f_vext_nwn(basis_nwn_cart, vext_rc):
     l   =  basis_nwn_cart.shape[0]
     dim = (basis_nwn_cart.shape[1] - 2)//2
     x = np.empty((l, 2+dim), dtype=int)
     x[:,:2 ] = basis_nwn_cart[:, :2    ]
     x[:, 2:] = basis_nwn_cart[:,2:2+dim] - basis_nwn_cart[:,2+dim:]
-    rv = x[(np.abs(x[:, 2:]) <= np.array(vext.shape)//2).all(axis=1)]
+    rv = x[(np.abs(x[:, 2:]) <= np.array(vext_rc.shape)//2).all(axis=1)]
     return rv
 
 def f_vext_mat(basis_nwn, vext_rc, vext_nwn):
