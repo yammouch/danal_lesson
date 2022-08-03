@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.linalg
 
 def f_kin_mat(basis_nwn, box_size):
     box_size = np.array(box_size)
@@ -46,5 +47,7 @@ def solve_1elec(basis_nwn, box_size, vext):
     vext_mat = f_vext_mat(basis_nwn, vext_rc, vext_nwn)
     kin_mat = f_kin_mat(basis_nwn, box_size)
     lhs = kin_mat + vext_mat
-    e, v = np.linalg.eigh(lhs)
+    e, v = scipy.linalg.eigh \
+    ( lhs, driver='evx'
+    , subset_by_index=[0, min(10, len(lhs))-1] )
     return e, v
