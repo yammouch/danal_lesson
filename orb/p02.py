@@ -37,3 +37,14 @@ def f_vext_mat(basis_nwn, vext_rc, vext_nwn):
     rv = np.zeros((l, l), dtype=np.complex128)
     rv[vext_nwn[:,0], vext_nwn[:,1]] = vext_rc[tuple(vext_nwn[:,2:].T)]
     return rv
+
+def solve_1elec(basis_nwn, box_size, vext):
+    vext_rc = np.fft.fftn(vext, norm="forward")
+    symmetrize(vext_rc)
+    basis_nwn_cart = f_basis_nwn_cart(basis_nwn)
+    vext_nwn = f_vext_nwn(basis_nwn_cart, vext_rc)
+    vext_mat = f_vext_mat(basis_nwn, vext_rc, vext_nwn)
+    kin_mat = f_kin_mat(basis_nwn, box_size)
+    lhs = kin_mat + vext_mat
+    e, v = np.linalg.eigh(lhs)
+    return e, v
