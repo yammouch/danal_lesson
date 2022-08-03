@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.linalg
+import datetime
 
 def f_kin_mat(basis_nwn, box_size):
     box_size = np.array(box_size)
@@ -40,14 +41,36 @@ def f_vext_mat(basis_nwn, vext_rc, vext_nwn):
     return rv
 
 def solve_1elec(basis_nwn, box_size, vext):
+    t0 = datetime.datetime.now()
     vext_rc = np.fft.fftn(vext, norm="forward")
+    t1 = datetime.datetime.now()
+    print('np.fft.fftn', t1 - t0)
+    t0 = t1
     symmetrize(vext_rc)
+    t1 = datetime.datetime.now()
+    print('symmetrize', t1 - t0)
+    t0 = t1
     basis_nwn_cart = f_basis_nwn_cart(basis_nwn)
+    t1 = datetime.datetime.now()
+    print('f_basis_nwn_cart', t1 - t0)
+    t0 = t1
     vext_nwn = f_vext_nwn(basis_nwn_cart, vext_rc)
+    t1 = datetime.datetime.now()
+    print('f_vext_nwn', t1 - t0)
+    t0 = t1
     vext_mat = f_vext_mat(basis_nwn, vext_rc, vext_nwn)
+    t1 = datetime.datetime.now()
+    print('f_vext_mat', t1 - t0)
+    t0 = t1
     kin_mat = f_kin_mat(basis_nwn, box_size)
+    t1 = datetime.datetime.now()
+    print('f_kin_mat', t1 - t0)
+    t0 = t1
     lhs = kin_mat + vext_mat
     e, v = scipy.linalg.eigh \
     ( lhs, driver='evx'
-    , subset_by_index=[0, min(10, len(lhs))-1] )
+    , subset_by_index=[0, min(6, len(lhs))-1] )
+    t1 = datetime.datetime.now()
+    print('eigh', t1 - t0)
+    t0 = t1
     return e, v

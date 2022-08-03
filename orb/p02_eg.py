@@ -37,7 +37,8 @@ def hydrogen_vext(npoint_half, size):
 def hydrogen():
     #npoint_half = 8
     #npoint_half = 12
-    npoint_half = 16
+    npoint_half = 14
+    #npoint_half = 16
     size = 8
     sl = slice(-npoint_half//2, npoint_half//2 + 1)
     basis_nwn = np.mgrid[sl, sl, sl].reshape(3, -1).T
