@@ -68,7 +68,7 @@ def solve_1elec(basis_nwn, box_size, vext):
     t0 = t1
     lhs = kin_mat + vext_mat
     e, v = scipy.linalg.eigh \
-    ( lhs, driver='evx'
+    ( lhs
     , subset_by_index=[0, min(6, len(lhs))-1] )
     t1 = datetime.datetime.now()
     print('eigh', t1 - t0)
