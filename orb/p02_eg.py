@@ -37,11 +37,12 @@ def hydrogen_vext(npoint_half, size):
 def hydrogen():
     #npoint_half = 8
     #npoint_half = 12
-    npoint_half = 14
-    #npoint_half = 16
+    #npoint_half = 14
+    npoint_half = 16
     size = 8
     sl = slice(-npoint_half//2, npoint_half//2 + 1)
     basis_nwn = np.mgrid[sl, sl, sl].reshape(3, -1).T
+    basis_nwn = basis_nwn[(basis_nwn**2).sum(axis=1) <= (npoint_half//2)**2]
     box_size = np.full(3, size, dtype=float)
     vext = hydrogen_vext(npoint_half, size)
     e, v = p02.solve_1elec(basis_nwn, box_size, vext)
