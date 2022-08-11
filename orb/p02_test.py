@@ -144,6 +144,29 @@ def test_dist2():
         print("[ER] test_dist2")
         print(result)
 
+def test_oversample_rc():
+    x = np.array \
+    ( [ [  0,  2,  2,  2,  6 ]
+      , [  8, 10,  6,  6, 14 ]
+      , [  8,  9,  5,  5, 11 ]
+      , [  8,  9,  5,  5, 11 ]
+      , [ 24, 26, 14, 14, 30 ] ] )
+    expc = np.array \
+    ( [ [  0,  2,  2,  0,  0,  0,  2,  6 ]
+      , [  8, 10,  6,  0,  0,  0,  6, 14 ]
+      , [  8,  9,  5,  0,  0,  0,  5, 11 ]
+      , [  0,  0,  0,  0,  0,  0,  0,  0 ]
+      , [  0,  0,  0,  0,  0,  0,  0,  0 ]
+      , [  0,  0,  0,  0,  0,  0,  0,  0 ]
+      , [  8,  9,  5,  0,  0,  0,  5, 11 ]
+      , [ 24, 26, 14,  0,  0,  0, 14, 30 ] ] )
+    result = dut.oversample_rc(x, [0, 1])
+    if (np.abs(result - expc) < 1e-3).all():
+        print("[OK] test_oversample_rc")
+    else:
+        print("[ER] test_oversample_rc")
+        print(result)
+
 def main():
     for _, f in tests:
         f()

@@ -94,3 +94,11 @@ def dist2(box_size, vext):
         #a = np.linspace(l/n*(-(n//2)+0.5), l/n*(-(n//2)-0.5)+l, n)
         rv = rv[..., None] + a**2
     return rv
+
+def oversample_rc(a, axis):
+    shape = list(a.shape)
+    for i, n in enumerate(a.shape):
+        if i not in axis:
+            continue
+        a = np.insert(a, np.full(n-2, n//2+1), 0, axis=i)
+    return a
