@@ -122,12 +122,27 @@ def test_symmetrize4move():
       , [  8,  9,  5,  5, 11 ]
       , [  8,  9,  5,  5, 11 ]
       , [ 24, 26, 14, 14, 30 ] ] )
-    x = dut.symmetrize4move(x)
-    if (np.abs(x - expc) < 1e-3).all():
+    result = dut.symmetrize4move(x)
+    if (np.abs(result - expc) < 1e-3).all():
         print("[OK] test_symmetrize4move")
     else:
         print("[ER] test_symmetrize4move")
         print(x)
+
+@add_test
+def test_dist2():
+    box_size = [6, 8]
+    vext = np.zeros((3, 4))
+    expc = np.array \
+    ( [ [ 10,  2,  2, 10 ]
+      , [ 10,  2,  2, 10 ]
+      , [ 18, 10, 10, 18 ] ] )
+    result = dut.dist2(box_size, vext)
+    if (np.abs(result - expc) < 1e-3).all():
+        print("[OK] test_dist2")
+    else:
+        print("[ER] test_dist2")
+        print(result)
 
 def main():
     for _, f in tests:

@@ -85,3 +85,12 @@ def symmetrize4move(a):
           ,     a[(slice(None),)*i + (slice(-(n//2)+1, None),)] ]
         , axis=i )
     return a
+
+def dist2(box_size, vext):
+    rv = np.array(0, dtype=float)
+    for l, n in zip(box_size, vext.shape):
+        a = np.arange(-(n//2), -(n//2)+n)+0.5
+        a *= l/n
+        #a = np.linspace(l/n*(-(n//2)+0.5), l/n*(-(n//2)-0.5)+l, n)
+        rv = rv[..., None] + a**2
+    return rv
