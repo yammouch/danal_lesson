@@ -144,6 +144,7 @@ def test_dist2():
         print("[ER] test_dist2")
         print(result)
 
+@add_test        
 def test_oversample_rc():
     x = np.array \
     ( [ [  0,  2,  2,  2,  6 ]
@@ -165,6 +166,21 @@ def test_oversample_rc():
         print("[OK] test_oversample_rc")
     else:
         print("[ER] test_oversample_rc")
+        print(result)
+
+@add_test
+def test_slide_half_grid():
+    x = np.arange(16).reshape(4, 4)
+    X = np.fft.fftn(x, norm='forward')
+    X2 = dut.symmetrize4move(X)
+    X3 = dut.slide_half_grid(X2)
+    X4 = dut.oversample_rc(X3, [0, 1])
+    xo = np.fft.ifftn(X4, norm='forward')
+    result = xo[1::2, 1::2]
+    if (np.abs(result - x) < 1e-3).all():
+        print("[OK] test_slide_half_grid")
+    else:
+        print("[ER] test_slide_half_grid")
         print(result)
 
 def main():

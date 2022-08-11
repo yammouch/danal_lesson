@@ -99,7 +99,6 @@ def slide_half_grid(a):
     for n in a.shape:
         v = np.roll(-np.pi/(n-1)*np.arange(-(n//2), n//2+1), -(n//2))
         p = p[..., None] + v
-    print(p)
     return a * np.exp(1j*p)
 
 def oversample_rc(a, axis):
