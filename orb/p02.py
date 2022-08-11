@@ -74,3 +74,14 @@ def solve_1elec(basis_nwn, box_size, vext):
     print('eigh', t1 - t0)
     t0 = t1
     return e, v
+
+def symmetrize4move(a):
+    for i, n in enumerate(a.shape):
+        if n % 2 != 0:
+            continue
+        a = np.concatenate \
+        ( [     a[(slice(None),)*i + (slice(0,n//2)         ,)]
+          , 0.5*a[(slice(None),)*i + ([n//2, n//2]          ,)]
+          ,     a[(slice(None),)*i + (slice(-(n//2)+1, None),)] ]
+        , axis=i )
+    return a

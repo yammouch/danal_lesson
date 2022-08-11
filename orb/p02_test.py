@@ -108,5 +108,30 @@ def test_f_vext_mat():
         print("[ER] test_f_vext_mat")
         print(result)
 
-for _, f in tests:
-    f()
+@add_test
+def test_symmetrize4move():
+    x = np.array \
+    ( [ [  0,  2,  4,  6 ]
+      , [  8, 10, 12, 14 ]
+      , [ 16, 18, 20, 22 ]
+      , [ 24, 26, 28, 30 ] ]
+    , dtype=np.float64 )
+    expc = np.array \
+    ( [ [  0,  2,  2,  2,  6 ]
+      , [  8, 10,  6,  6, 14 ]
+      , [  8,  9,  5,  5, 11 ]
+      , [  8,  9,  5,  5, 11 ]
+      , [ 24, 26, 14, 14, 30 ] ] )
+    x = dut.symmetrize4move(x)
+    if (np.abs(x - expc) < 1e-3).all():
+        print("[OK] test_symmetrize4move")
+    else:
+        print("[ER] test_symmetrize4move")
+        print(x)
+
+def main():
+    for _, f in tests:
+        f()
+
+if __name__ == '__main__':
+    main()
