@@ -91,9 +91,16 @@ def dist2(box_size, vext):
     for l, n in zip(box_size, vext.shape):
         a = np.arange(-(n//2), -(n//2)+n)+0.5
         a *= l/n
-        #a = np.linspace(l/n*(-(n//2)+0.5), l/n*(-(n//2)-0.5)+l, n)
         rv = rv[..., None] + a**2
     return rv
+
+def slide_half_grid(a):
+    p = np.array(0, dtype=a.dtype)
+    for n in a.shape:
+        v = np.roll(-np.pi/(n-1)*np.arange(-(n//2), n//2+1), -(n//2))
+        p = p[..., None] + v
+    print(p)
+    return a * np.exp(1j*p)
 
 def oversample_rc(a, axis):
     shape = list(a.shape)
