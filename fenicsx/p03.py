@@ -35,8 +35,18 @@ vmsh = dolfinx.plot.create_vtk_mesh(h1)
 #vmsh = dolfinx.plot.create_vtk_mesh(msh)
 print(vmsh)
 
+subplotter = pyvista.Plotter(shape=(1, 2))
+
 grid = pyvista.UnstructuredGrid(*vmsh)
-subplotter = pyvista.Plotter(shape=(1, 1))
 subplotter.subplot(0, 0)
 subplotter.add_mesh(grid, show_edges=True)
+subplotter.view_xy()
+
+grid1 = pyvista.UnstructuredGrid(*vmsh)
+grid1.point_data["u"] = h1_f.x.array
+grid1.set_active_scalars("u")
+subplotter.subplot(0, 1)
+subplotter.add_mesh(grid1, show_edges=True)
+subplotter.view_xy()
+
 subplotter.show()
