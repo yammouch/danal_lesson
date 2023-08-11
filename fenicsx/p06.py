@@ -28,8 +28,10 @@ for i, _ in itertools.product(range(2), range(3)):
   M[i].append(np.zeros((0, 2, 0, 1)))
 M[2].append \
 ( np.array
-  ( [ [[[4.]], [[0.]]]
-    , [[[0.]], [[4.]]] ] ) )
+  ( [ [ [ [0.], [0.] ]
+      , [ [4.], [0.] ] ]
+    , [ [ [0.], [4.] ]
+      , [ [0.], [0.] ] ] ] ) )
 
 element = basix.create_custom_element \
 ( basix.CellType.triangle
@@ -37,3 +39,20 @@ element = basix.create_custom_element \
 , basix.MapType.covariantPiola
 , basix.SobolevSpace.HCurl
 , True, 1, 2 )
+
+tab = element.tabulate \
+( 0
+, np.array \
+  ( [ [0.0    , 0.0    ]
+    , [1.0/3.0, 0.0    ]
+    , [1.0/2.0, 0.0    ]
+    , [2.0/3.0, 0.0    ]
+    , [1.0    , 0.0    ]
+    , [0.0    , 0.0    ]
+    , [0.0    , 1.0/3.0]
+    , [0.0    , 1.0/2.0]
+    , [0.0    , 2.0/3.0]
+    , [0.0    , 1.0    ]
+    , [1.0/3.0, 2.0/3.0]
+    , [1.0/2.0, 1.0/2.0]
+    , [2.0/3.0, 1.0/3.0] ] ) )
