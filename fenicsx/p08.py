@@ -1,3 +1,4 @@
+import numpy as np
 import gmsh
 
 gmsh.initialize()
@@ -23,10 +24,16 @@ gmsh.model.mesh.generate(2)
 print(gmsh.model.mesh.getElementsByType(2))
 print(gmsh.model.mesh.getNodesByElementType(2))
 print(gmsh.model.mesh.getNodes())
+td_view = gmsh.view.add("test data")
+trgs = gmsh.model.mesh.getElementsByType(2)
+gmsh.view.addModelData \
+( td_view, 0, "", "ElementData"
+, trgs[0], np.arange(trgs[0].shape[0])[..., None] )
 
 gmsh.write("p08.geo_unrolled")
 gmsh.write("p08.brep")
 gmsh.write("p08.msh2")
+gmsh.view.write(td_view, "p08.pos")
 
 # e for all elements, find the maximum edge length.
 # - prints all elements' tags.
