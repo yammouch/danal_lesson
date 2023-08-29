@@ -21,14 +21,23 @@ gmsh.model.occ.synchronize()
 gmsh.option.setNumber("Mesh.Algorithm", 8)
 gmsh.model.mesh.setSize(gmsh.model.getEntities(0), 3)
 gmsh.model.mesh.generate(2)
-print(gmsh.model.mesh.getElementsByType(2))
 print(gmsh.model.mesh.getNodesByElementType(2))
-print(gmsh.model.mesh.getNodes())
 td_view = gmsh.view.add("test data")
-trgs = gmsh.model.mesh.getElementsByType(2)
+tgl = list(gmsh.model.mesh.getElementsByType(2))
+tgl[1] = tgl[1].reshape(-1, 3)
+nod_raw = gmsh.model.mesh.getNodes()
+nod = np.full((int(nod_raw[0].max()+1), 3), np.nan, dtype=np.float64)
+nod[nod_raw[0]] = nod_raw[1].reshape(-1, 3)
+tgl_len = \
+( ( ( nod[tgl[1][..., [0, 0, 1]]]
+    - nod[tgl[1][..., [1, 2, 2]]] )
+  **2 ) 
+.sum(axis=-1).max(axis=-1)
+**0.5 )
+print(tgl_len)
 gmsh.view.addModelData \
 ( td_view, 0, "", "ElementData"
-, trgs[0], np.arange(trgs[0].shape[0])[..., None] )
+, tgl[0], tgl_len[..., None] )
 
 gmsh.write("p08.geo_unrolled")
 gmsh.write("p08.brep")
