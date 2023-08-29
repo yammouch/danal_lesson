@@ -36,24 +36,17 @@ tgl_len = \
 **0.5 )
 tgl_len[np.argmin(nod.sum(axis=-1)[tgl[1]].min(axis=-1))] *= 0.5**0.5
 print(tgl_len)
-gmsh.view.addModelData \
-( td_view, 0, "", "ElementData"
-, tgl[0], tgl_len[..., None] )
+gmsh.view.addListData \
+( td_view, "ST", tgl[0].shape[0]
+, np.hstack
+  ( ( np.moveaxis(nod[tgl[1]], -1, -2).reshape(-1, 9)
+    , tgl_len[..., None].repeat(3, axis=-1) )
+  ).reshape(-1) )
 
 gmsh.write("p08.geo_unrolled")
 gmsh.write("p08.brep")
 gmsh.write("p08.msh2")
 gmsh.view.write(td_view, "p08.pos")
-
-# e for all elements, find the maximum edge length.
-# - prints all elements' tags.
-# - for all elements, prints the vertices
-# - calculate the edge length
-# - generate the model data and write it to a file
-# find the leftmost element
-# - for all elements, find min(x), and min(y)
-# - find the tag with the minimum min(y)
-# - multiply 
 
 gmsh.fltk.run()
 
