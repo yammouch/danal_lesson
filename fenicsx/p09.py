@@ -28,27 +28,28 @@ print(l2.dofmap.dof_layout.entity_closure_dofs(2, 0))
 l2_t = ufl.TestFunction(l2)
 
 n = ufl.FacetNormal(msh)
+l2_n = []
 
-l2_npx_v = dolfinx.fem.assemble_vector \
-( dolfinx.fem.form
-  ( n("+")[0]*l2_t("+")*ufl.dS ) )
-print(l2_npx_v.array)
-l2_npx = dolfinx.fem.Function(l2)
-l2_npx.x.array[:] = l2_npx_v.array
+for i in itertools.product(*[range(i) for i in [2, 2, 2]]):
+    l2_n_v = dolfinx.fem.assemble_vector \
+    ( dolfinx.fem.form
+      ( n("+-"[i[2]])[i[1]]*l2_t("+-"[i[0]])*ufl.dS ) )
+    print(l2_n_v.array)
+    l2_n.append(dolfinx.fem.Function(l2))
+    l2_n[-1].x.array[:] = l2_n_v.array
 
-subplotter = pyvista.Plotter(shape=(2, 3))
+subplotter = pyvista.Plotter(shape=(2, 4))
 
-vmsh = [None] * 6
-grid = [None] * 6
+for i in itertools.product(*[range(i) for i in [2, 2, 2]]):
+    vmsh = dolfinx.plot.create_vtk_mesh(l2)
+    print(vmsh)
+    grid = pyvista.UnstructuredGrid(*vmsh)
+    fname = "l2_n{}{}{}".format("+-"[i[2]], "xy"[i[1]], "+-"[i[0]])
+    grid.point_data[fname] = l2_n[i[0]+2*(i[1]+2*i[2])].x.array
+    grid.set_active_scalars(fname)
 
-vmsh[0] = dolfinx.plot.create_vtk_mesh(l2)
-print(vmsh[0])
-grid[0] = pyvista.UnstructuredGrid(*vmsh[0])
-grid[0].point_data["l2_npx"] = l2_npx.x.array
-grid[0].set_active_scalars("l2_npx")
-
-subplotter.subplot(0, 0)
-subplotter.add_mesh(grid[0], show_edges=True)
-subplotter.view_xy()
+    subplotter.subplot(i[2], i[0]+2*i[1])
+    subplotter.add_mesh(grid, show_edges=True)
+    subplotter.view_xy()
 
 subplotter.show()
