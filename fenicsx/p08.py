@@ -34,6 +34,7 @@ tgl_len = \
   **2 ) 
 .sum(axis=-1).max(axis=-1)
 **0.5 )
+tgl_len[np.argmin(nod.sum(axis=-1)[tgl[1]].min(axis=-1))] *= 0.5**0.5
 print(tgl_len)
 gmsh.view.addModelData \
 ( td_view, 0, "", "ElementData"
