@@ -28,15 +28,16 @@ print(l2.dofmap.dof_layout.entity_closure_dofs(2, 0))
 l2_t = ufl.TestFunction(l2)
 
 n = ufl.FacetNormal(msh)
-l2_n = []
+l2_n = np.empty((2, 2, 2), dtype=np.object_)
 
 for i in itertools.product(*[range(i) for i in [2, 2, 2]]):
     l2_n_v = dolfinx.fem.assemble_vector \
     ( dolfinx.fem.form
+      #( l2_t("+-"[i[0]])*ufl.dS ) )
       ( n("+-"[i[2]])[i[1]]*l2_t("+-"[i[0]])*ufl.dS ) )
     print(l2_n_v.array)
-    l2_n.append(dolfinx.fem.Function(l2))
-    l2_n[-1].x.array[:] = l2_n_v.array
+    l2_n[i] = dolfinx.fem.Function(l2)
+    l2_n[i].x.array[:] = l2_n_v.array
 
 subplotter = pyvista.Plotter(shape=(2, 4))
 
@@ -45,11 +46,11 @@ for i in itertools.product(*[range(i) for i in [2, 2, 2]]):
     print(vmsh)
     grid = pyvista.UnstructuredGrid(*vmsh)
     fname = "l2_n{}{}{}".format("+-"[i[2]], "xy"[i[1]], "+-"[i[0]])
-    grid.point_data[fname] = l2_n[i[0]+2*(i[1]+2*i[2])].x.array
+    grid.point_data[fname] = l2_n[i].x.array
     grid.set_active_scalars(fname)
 
     subplotter.subplot(i[2], i[0]+2*i[1])
-    subplotter.add_mesh(grid, show_edges=True)
+    subplotter.add_mesh(grid, clim=[-1.1, 1.1], cmap="bwr", show_edges=True)
     subplotter.view_xy()
 
 subplotter.show()
