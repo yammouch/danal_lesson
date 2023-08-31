@@ -54,22 +54,6 @@ l2_2d = dolfinx.fem.VectorFunctionSpace(msh, ("DG", 2))
 l2_2d_f = dolfinx.fem.Function(l2_2d)
 l2_2d_f.interpolate(sol)
 
-cells, cell_types, x = dolfinx.plot.create_vtk_mesh(l2_2d)
-grid = pyvista.UnstructuredGrid(cells, cell_types, x)
-grid.point_data["l2_2d_f"] = np.hstack \
-( [ l2_2d_f.x.array.reshape \
-    ( x.shape[0], l2_2d.dofmap.index_map_bs )
-  , np.zeros((x.shape[0], 1)) ] )
-glyphs = grid.glyph(orient="l2_2d_f", factor=1e5)
-
-plotter = pyvista.Plotter()
-plotter.add_mesh \
-( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(msh))
-, style="wireframe", line_width=2, color="black" )
-plotter.add_mesh(glyphs)
-plotter.view_xy()
-plotter.show()
-
 er = dolfinx.fem.FunctionSpace \
 ( msh
 , basix.ufl_wrapper.BasixElement(p06.element) )
@@ -95,4 +79,41 @@ L_er -= ufl.inner \
 , er_ts("-")[0] )/scipy.constants.mu_0*ufl.dS
 problem_er = dolfinx.fem.petsc.LinearProblem(a_er, L_er, [])
 sol_er = problem_er.solve()
+l2_2d_er = dolfinx.fem.Function(l2_2d)
+l2_2d_er.interpolate(sol_er)
 print(sol_er.x.array)
+
+cells, cell_types, x = dolfinx.plot.create_vtk_mesh(l2_2d)
+
+plotter = pyvista.Plotter(shape=(1, 2))
+
+grid = pyvista.UnstructuredGrid(cells, cell_types, x)
+grid.point_data["l2_2d_f"] = np.hstack \
+( [ l2_2d_f.x.array.reshape \
+    ( x.shape[0], l2_2d.dofmap.index_map_bs )
+  , np.zeros((x.shape[0], 1)) ] )
+glyphs = grid.glyph(orient="l2_2d_f", factor=1e5)
+
+plotter.subplot(0, 0)
+plotter.add_mesh \
+( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(msh))
+, style="wireframe", line_width=2, color="black" )
+plotter.add_mesh(glyphs)
+plotter.view_xy()
+
+grid1 = pyvista.UnstructuredGrid(cells, cell_types, x)
+grid1.point_data["l2_2d_er"] = np.hstack \
+( [ l2_2d_er.x.array.reshape \
+    ( x.shape[0], l2_2d.dofmap.index_map_bs )
+  , np.zeros((x.shape[0], 1)) ] )
+glyphs1 = grid1.glyph(orient="l2_2d_er", factor=1e20)
+
+plotter.subplot(0, 1)
+plotter.add_mesh \
+( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(msh))
+, style="wireframe", line_width=2, color="black" )
+plotter.add_mesh(glyphs1)
+plotter.view_xy()
+
+plotter.show()
+
