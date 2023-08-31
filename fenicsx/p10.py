@@ -2,6 +2,7 @@ import numpy as np
 import gmsh
 import dolfinx
 import mpi4py
+import pyvista
 
 class Mesh(object):
 
@@ -78,10 +79,21 @@ class Mesh(object):
 
 def main():
     msh = Mesh()
-    for i in range(4, -1, -1):
+    for i in range(1, -1, -1):
         #msh.tgl_len *= 1.1
         msh.tgl_len[np.argmin(msh.nod.sum(axis=-1)[msh.tgl[1]].min(axis=-1))] *= 0.5
         msh = Mesh(msh.nod[msh.tgl[1]], msh.tgl_len, i==0, i==0)
+    mshv = dolfinx.plot.create_vtk_mesh(msh.msh[0])
+    grid = pyvista.UnstructuredGrid(*mshv)
+    grid.cell_data["Marker"] = msh.msh[1].values
+    grid.set_active_scalars("Marker")
+
+    plotter = pyvista.Plotter(shape=(1, 2))
+    plotter.subplot(0, 0)
+    plotter.add_mesh(grid, show_edges=True)
+    plotter.view_xy()
+
+    plotter.show()
 
 if __name__ == "__main__":
     main()
