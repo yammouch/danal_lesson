@@ -79,19 +79,20 @@ class Mesh(object):
 
 def main():
     msh = Mesh()
-    for i in range(1, -1, -1):
+    plotter = pyvista.Plotter(shape=(2, 3))
+    for i in range(6):
         #msh.tgl_len *= 1.1
         msh.tgl_len[np.argmin(msh.nod.sum(axis=-1)[msh.tgl[1]].min(axis=-1))] *= 0.5
-        msh = Mesh(msh.nod[msh.tgl[1]], msh.tgl_len, i==0, i==0)
-    mshv = dolfinx.plot.create_vtk_mesh(msh.msh[0])
-    grid = pyvista.UnstructuredGrid(*mshv)
-    grid.cell_data["Marker"] = msh.msh[1].values
-    grid.set_active_scalars("Marker")
-
-    plotter = pyvista.Plotter(shape=(1, 2))
-    plotter.subplot(0, 0)
-    plotter.add_mesh(grid, show_edges=True)
-    plotter.view_xy()
+        msh = Mesh(msh.nod[msh.tgl[1]], msh.tgl_len, i==3, False)
+        mshv = dolfinx.plot.create_vtk_mesh(msh.msh[0])
+        grid = pyvista.UnstructuredGrid(*mshv)
+        mark_name = "Marker{}".format(i)
+        grid.cell_data[mark_name] = msh.msh[1].values
+        grid.set_active_scalars(mark_name)
+        plotter.subplot(i//3, i%3)
+        plotter.add_text("r{}_c{}".format(i//3, i%3))
+        plotter.add_mesh(grid, show_edges=True)
+        plotter.view_xy()
 
     plotter.show()
 
