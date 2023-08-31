@@ -1,5 +1,7 @@
 import numpy as np
 import gmsh
+import dolfinx
+import mpi4py
 
 class Mesh(object):
 
@@ -18,9 +20,12 @@ class Mesh(object):
           , [p[3], p[0]] ] ]
         c = gmsh.model.occ.addCurveLoop([l[0], l[1], l[2], l[3]])
         s = gmsh.model.occ.addPlaneSurface([c])
-        p = gmsh.model.addPhysicalGroup(2, [s])
 
         gmsh.model.occ.synchronize()
+
+        self.isrc   = gmsh.model.addPhysicalGroup(1, [l[3]])
+        self.pec    = gmsh.model.addPhysicalGroup(1, [l[0], l[1], l[2]])
+        self.vacuum = gmsh.model.addPhysicalGroup(2, [s])
 
         gmsh.option.setNumber("Mesh.Algorithm", 8)
 
@@ -54,6 +59,12 @@ class Mesh(object):
         .sum(axis=-1).max(axis=-1)
         **0.5 )
 
+        self.tgl = tgl
+        self.nod = nod
+        self.tgl_len = tgl_len
+        self.msh = dolfinx.io.gmshio.model_to_mesh \
+        (gmsh.model, mpi4py.MPI.COMM_SELF, 0)
+
         if save:
             gmsh.write("p10.geo_unrolled")
             gmsh.write("p10.brep")
@@ -65,14 +76,10 @@ class Mesh(object):
 
         gmsh.finalize()
 
-        self.tgl = tgl
-        self.nod = nod
-        self.tgl_len = tgl_len
-
 def main():
     msh = Mesh()
-    for i in range(20, -1, -1):
-        #tgl_len *= 1.1
+    for i in range(4, -1, -1):
+        #msh.tgl_len *= 1.1
         msh.tgl_len[np.argmin(msh.nod.sum(axis=-1)[msh.tgl[1]].min(axis=-1))] *= 0.5
         msh = Mesh(msh.nod[msh.tgl[1]], msh.tgl_len, i==0, i==0)
 
