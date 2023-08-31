@@ -83,6 +83,16 @@ L_er += w**2*scipy.constants.epsilon_0*ufl.inner(sol, er_ts)*ufl.dx
 L_er -= ufl.inner(0*n[1]-1*n[0], er_ts[0]*n[1]-er_ts[1]*n[0])*-w*ds(1)
 L_er -= ufl.inner( n[1]*ufl.curl(sol), er_ts[0])/scipy.constants.mu_0*ds(0)
 L_er -= ufl.inner(-n[0]*ufl.curl(sol), er_ts[1])/scipy.constants.mu_0*ds(0)
+L_er -= ufl.inner \
+(   n("+")[1]
+  * 0.5
+  * (ufl.curl(sol)("+") + ufl.curl(sol)("-"))
+, er_ts("+")[0] )/scipy.constants.mu_0*ufl.dS
+L_er -= ufl.inner \
+(   n("-")[1]
+  * 0.5
+  * (ufl.curl(sol)("+") + ufl.curl(sol)("-"))
+, er_ts("-")[0] )/scipy.constants.mu_0*ufl.dS
 problem_er = dolfinx.fem.petsc.LinearProblem(a_er, L_er, [])
 sol_er = problem_er.solve()
 print(sol_er.x.array)
