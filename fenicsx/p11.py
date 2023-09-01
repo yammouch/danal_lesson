@@ -10,21 +10,8 @@ import petsc4py
 import p06
 import p10
 
-msh = None
-hc = None
-
-def main():
-    global msh
-    global hc
-    mshg = p10.Mesh()
-
-    print(petsc4py.PETSc.ScalarType)
-
-    msh = mshg.msh[0]
-
-    hc = dolfinx.fem.FunctionSpace(msh, ('N1curl', 1))
-
-    mt = mshg.msh[2]
+def solve_field(mesh, facet_tags, pec, isrc, w):
+    hc = dolfinx.fem.FunctionSpace(mesh, ('N1curl', 1))
 
     dirichlet_f = dolfinx.fem.Function(hc)
     dirichlet_f.x.array[:] = 0
@@ -34,26 +21,37 @@ def main():
     , ( np.sort
         ( np.hstack
           ( [ dolfinx.fem.locate_dofs_topological(hc, 1, [i])
-              for i in mt.find(mshg.pec) ] ) ) ) )
+              for i in facet_tags.find(pec) ] ) ) ) )
 
-    ds = ufl.Measure('ds', msh, subdomain_data=mt)
+    ds = ufl.Measure('ds', mesh, subdomain_data=facet_tags)
     hc_tr = ufl.TrialFunction(hc)
     hc_ts = ufl.TestFunction(hc)
-    n = ufl.FacetNormal(msh)
-    w = 2*scipy.constants.pi*1
+    n = ufl.FacetNormal(mesh)
     a = ufl.inner(ufl.curl(hc_tr), ufl.curl(hc_ts))/scipy.constants.mu_0*ufl.dx
     a -= w**2*scipy.constants.epsilon_0*ufl.inner(hc_tr, hc_ts)*ufl.dx
-    L = ufl.inner(0*n[1]-1*n[0], hc_ts[0]*n[1]-hc_ts[1]*n[0])*-w*ds(mshg.isrc)
+    L = ufl.inner(0*n[1]-1*n[0], hc_ts[0]*n[1]-hc_ts[1]*n[0])*-w*ds(isrc)
     problem = dolfinx.fem.petsc.LinearProblem(a, L, [dirichlet_bc])
     sol = problem.solve()
+    return sol
+
+
+def main():
+    mshg = p10.Mesh()
+
+    print(petsc4py.PETSc.ScalarType)
+
+    w = 2*scipy.constants.pi*1
+    sol = solve_field(mshg.msh[0], mshg.msh[2], mshg.pec, mshg.isrc, w)
     print(sol.x.array)
 
-    l2_2d = dolfinx.fem.VectorFunctionSpace(msh, ("DG", 2))
+    l2_2d = dolfinx.fem.VectorFunctionSpace(mshg.msh[0], ("DG", 2))
     l2_2d_f = dolfinx.fem.Function(l2_2d)
     l2_2d_f.interpolate(sol)
 
+    n = ufl.FacetNormal(mshg.msh[0])
+    ds = ufl.Measure('ds', mshg.msh[0], subdomain_data=mshg.msh[2])
     er = dolfinx.fem.FunctionSpace \
-    ( msh
+    ( mshg.msh[0]
     , basix.ufl_wrapper.BasixElement(p06.element) )
     er_tr = ufl.TrialFunction(er)
     er_ts = ufl.TestFunction(er)
@@ -94,7 +92,7 @@ def main():
 
     plotter.subplot(0, 0)
     plotter.add_mesh \
-    ( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(msh))
+    ( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(mshg.msh[0]))
     , style="wireframe", line_width=2, color="black" )
     plotter.add_mesh(glyphs)
     plotter.view_xy()
@@ -108,7 +106,7 @@ def main():
 
     plotter.subplot(0, 1)
     plotter.add_mesh \
-    ( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(msh))
+    ( pyvista.UnstructuredGrid(*dolfinx.plot.create_vtk_mesh(mshg.msh[0]))
     , style="wireframe", line_width=2, color="black" )
     plotter.add_mesh(glyphs1)
     plotter.view_xy()
