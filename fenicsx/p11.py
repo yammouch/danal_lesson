@@ -35,23 +35,11 @@ def solve_field(mesh, facet_tags, pec, isrc, w):
     return sol
 
 
-def main():
-    mshg = p10.Mesh()
-
-    print(petsc4py.PETSc.ScalarType)
-
-    w = 2*scipy.constants.pi*1
-    sol = solve_field(mshg.msh[0], mshg.msh[2], mshg.pec, mshg.isrc, w)
-    print(sol.x.array)
-
-    l2_2d = dolfinx.fem.VectorFunctionSpace(mshg.msh[0], ("DG", 2))
-    l2_2d_f = dolfinx.fem.Function(l2_2d)
-    l2_2d_f.interpolate(sol)
-
-    n = ufl.FacetNormal(mshg.msh[0])
-    ds = ufl.Measure('ds', mshg.msh[0], subdomain_data=mshg.msh[2])
+def posteriori_error(mesh, facet_tags, sol, pec, isrc, w):
+    n = ufl.FacetNormal(mesh)
+    ds = ufl.Measure('ds', mesh, subdomain_data=facet_tags)
     er = dolfinx.fem.FunctionSpace \
-    ( mshg.msh[0]
+    ( mesh
     , basix.ufl_wrapper.BasixElement(p06.element) )
     er_tr = ufl.TrialFunction(er)
     er_ts = ufl.TestFunction(er)
@@ -60,9 +48,9 @@ def main():
     a_er -= w**2*scipy.constants.epsilon_0*ufl.inner(er_tr, er_ts)*ufl.dx
     L_er = -ufl.inner(ufl.curl(sol), ufl.curl(er_ts))/scipy.constants.mu_0*ufl.dx
     L_er += w**2*scipy.constants.epsilon_0*ufl.inner(sol, er_ts)*ufl.dx
-    L_er -= ufl.inner(0*n[1]-1*n[0], er_ts[0]*n[1]-er_ts[1]*n[0])*-w*ds(mshg.isrc)
-    L_er -= ufl.inner( n[1]*ufl.curl(sol), er_ts[0])/scipy.constants.mu_0*ds(mshg.pec)
-    L_er -= ufl.inner(-n[0]*ufl.curl(sol), er_ts[1])/scipy.constants.mu_0*ds(mshg.pec)
+    L_er -= ufl.inner(0*n[1]-1*n[0], er_ts[0]*n[1]-er_ts[1]*n[0])*-w*ds(isrc)
+    L_er -= ufl.inner( n[1]*ufl.curl(sol), er_ts[0])/scipy.constants.mu_0*ds(pec)
+    L_er -= ufl.inner(-n[0]*ufl.curl(sol), er_ts[1])/scipy.constants.mu_0*ds(pec)
     L_er -= ufl.inner \
     (   n("+")[1]
       * 0.5
@@ -75,6 +63,23 @@ def main():
     , er_ts("-")[0] )/scipy.constants.mu_0*ufl.dS
     problem_er = dolfinx.fem.petsc.LinearProblem(a_er, L_er, [])
     sol_er = problem_er.solve()
+    return sol_er
+
+
+def main():
+    mshg = p10.Mesh()
+
+    print(petsc4py.PETSc.ScalarType)
+
+    w = 2*scipy.constants.pi*1
+    sol = solve_field(mshg.msh[0], mshg.msh[2], mshg.pec, mshg.isrc, w)
+    print(sol.x.array)
+    l2_2d = dolfinx.fem.VectorFunctionSpace(mshg.msh[0], ("DG", 2))
+    l2_2d_f = dolfinx.fem.Function(l2_2d)
+    l2_2d_f.interpolate(sol)
+
+    sol_er = posteriori_error(mshg.msh[0], mshg.msh[2], sol, mshg.pec, mshg.isrc, w)
+
     l2_2d_er = dolfinx.fem.Function(l2_2d)
     l2_2d_er.interpolate(sol_er)
     print(sol_er.x.array)
