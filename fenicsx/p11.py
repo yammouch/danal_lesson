@@ -66,6 +66,16 @@ def posteriori_error(mesh, facet_tags, sol, pec, isrc, w):
     return sol_er
 
 
+def cell_error(mesh, sol_er):
+    dg0 = dolfinx.fem.FunctionSpace(mesh, ('DG', 0))
+    tf = ufl.TestFunction(dg0)
+    v = dolfinx.fem.assemble_vector \
+    ( dolfinx.fem.form
+      ( ufl.inner(ufl.inner(sol_er, sol_er), tf)
+      * ufl.dx ) )
+    print(v.array)
+
+
 def main():
     mshg = p10.Mesh()
 
@@ -83,6 +93,8 @@ def main():
     l2_2d_er = dolfinx.fem.Function(l2_2d)
     l2_2d_er.interpolate(sol_er)
     print(sol_er.x.array)
+
+    cell_error(mshg.msh[0], sol_er)
 
     cells, cell_types, x = dolfinx.plot.create_vtk_mesh(l2_2d)
 
