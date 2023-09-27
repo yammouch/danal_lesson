@@ -74,7 +74,12 @@ def cell_error(mesh, sol_er):
       ( ufl.inner(ufl.inner(sol_er, sol_er), tf)
       * ufl.dx ) )
     print(v.array)
-
+    dof_num = np.argsort(v.array)
+    dof_num = dof_num[:-int(np.ceil(0.1*len(dof_num)))]
+    print(dof_num)
+    dof2ent = np.zeros(len(dg0.dofmap.list), dtype=int)
+    dof2ent[dg0.dofmap.list.array] = np.arange(len(dg0.dofmap.list), dtype=int)
+    print(dof2ent)
 
 def main():
     mshg = p10.Mesh()
