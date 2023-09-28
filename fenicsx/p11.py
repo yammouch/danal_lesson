@@ -80,6 +80,19 @@ def cell_error(mesh, sol_er):
     dof2ent = np.zeros(len(dg0.dofmap.list), dtype=int)
     dof2ent[dg0.dofmap.list.array] = np.arange(len(dg0.dofmap.list), dtype=int)
     print(dof2ent)
+    mesh.topology.create_connectivity(2, 0)
+    tgl = mesh.topology.connectivity(2, 0).array.reshape((-1, 3))
+    print(tgl)
+    xyz = mesh.geometry.x
+    print(type(xyz))
+    print(xyz)
+    tgl_len = \
+    ( ( ( xyz[tgl[..., [0, 0, 1]]]
+        - xyz[tgl[..., [1, 2, 2]]] )
+      **2 )
+    .sum(axis=-1).max(axis=-1)
+    **0.5 )
+    print(tgl_len)
 
 def main():
     mshg = p10.Mesh()
