@@ -3,8 +3,12 @@
   <head>
     <title>Something Like SVG</title>
     <script>
-      console.log("hoge")
-      console.log(1)
+      function b1() {
+        var el = document.getElementById("text_area")
+        var i = parseInt(el.innerText, 10)
+        i++;
+        el.innerText = i.toString()
+      }
     </script>
   </head>
   <body>
@@ -12,5 +16,11 @@
       <path d="M 10 10 L 20 10" stroke="black" />
       <circle cx="20" cy="20" r="10" fill="red" />
     </svg>
+    <div id="text_area">
+      0
+    </div>
+    <form name="F1">
+      <input type="button" value="b1" onclick="b1()">
+    </form>
   </body>
 </html>
