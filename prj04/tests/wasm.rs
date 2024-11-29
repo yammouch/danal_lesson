@@ -3,6 +3,7 @@ use wasm_bindgen_test::*;
 use std::arch::wasm32::*;
 use prj02::add;
 use prj02::log;
+use prj02::simd_test_body;
 
 //#[wasm_bindgen]
 //extern "C" {
@@ -20,17 +21,6 @@ fn it_works() {
 fn pass() {
   log("hello");
   assert_eq!(1, 1);
-}
-
-#[cfg(target_arch = "wasm32")]
-#[target_feature(enable = "simd128")]
-unsafe fn simd_test_body() -> [f32; 4] {
-  use std::mem;
-  let u: v128 = f32x4(1., 2., 3., 4.);
-  let v: v128 = f32x4(2., 3., 4., 5.);
-  let w: v128 = f32x4_add(u, v);
-  let sum: [f32; 4] = { mem::transmute(w) };
-  sum
 }
 
 #[wasm_bindgen_test]
