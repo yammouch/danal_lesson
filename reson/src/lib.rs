@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use std::arch::wasm32::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -7,27 +6,34 @@ extern "C" {
   pub fn log(s: &str);
 }
 
-//#[wasm_bindgen]
-#[no_mangle]
-pub fn add(left: u64, right: u64) -> u64 {
-    log("Hello");
-    left + right
+#[derive(Debug)]
+pub struct Fir {
+  pos  : usize,
+  buf  : Vec<f64>,
+  coeff: Vec<f64>,
 }
 
-//#[wasm_bindgen]
-//extern "C" {
-//  #[wasm_bindgen(js_namespace = console)]
-//  fn log(s: &str);
-//}
+impl Fir {
+  fn new(v: Vec<f64>) -> Self {
+    let mut buf : Vec<f64> = Vec::with_capacity(v.len());
+    buf.resize(v.len(), 0.0);
+    Fir {
+      pos  : 0,
+      buf  : buf,
+      coeff: v,
+    }
+  }
 
-#[cfg(target_arch = "wasm32")]
-#[target_feature(enable = "simd128")]
-#[no_mangle]
-pub unsafe fn simd_test_body() -> [f32; 4] {
-  use std::mem;
-  let u: v128 = f32x4(1., 2., 3., 4.);
-  let v: v128 = f32x4(2., 3., 4., 5.);
-  let w: v128 = f32x4_add(u, v);
-  let sum: [f32; 4] = { mem::transmute(w) };
-  sum
+  fn next(&mut self, din: f64) -> f64 {
+    if self.pos == 0 {
+      self.pos = self.buf.len() - 1;
+    } else {
+      self.pos -= 1;
+    }
+    self.buf[self.pos] = din;
+    self.buf[self.pos..].iter().zip(&self.coeff)
+    .chain(self.buf[0..self.pos].iter()
+           .zip(&self.coeff[self.coeff.len()-self.pos..]))
+    .map(|(b, c)| (*b)*(*c)).sum()
+  }
 }
