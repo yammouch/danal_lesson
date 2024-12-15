@@ -1,37 +1,11 @@
-use wasm_bindgen::prelude::*;
 use wasm_bindgen_test::*;
-use std::arch::wasm32::*;
-use prj02::add;
-use prj02::log;
-use prj02::simd_test_body;
-
-//#[wasm_bindgen]
-//extern "C" {
-//  #[wasm_bindgen(js_namespace = console)]
-//  fn log(s: &str);
-//}
+use reson::Fir;
+use reson::log;
 
 #[wasm_bindgen_test]
-fn it_works() {
-  let result = add(2, 2);
-  assert_eq!(result, 4);
+fn fir_test() {
+  let mut fir = Fir::new(vec![1.0]);
+  let test_case : Vec<f64> = vec![-0.5, -0.25, 0., 0.25, 0.5];
+  test_case.into_iter().for_each( |x| assert_eq!(fir.next(x), x) );
+  log(&format!("{:?}", fir));
 }
-
-#[wasm_bindgen_test]
-fn pass() {
-  log("hello");
-  assert_eq!(1, 1);
-}
-
-#[wasm_bindgen_test]
-fn simd_test() {
-  unsafe {
-    let r = simd_test_body();
-    log(&format!("{} {} {} {}", r[0], r[1], r[2], r[3]))
-  }
-}
-
-//#[wasm_bindgen_test]
-//fn fail() {
-//    assert_eq!(1, 2);
-//}

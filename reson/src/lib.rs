@@ -14,7 +14,7 @@ pub struct Fir {
 }
 
 impl Fir {
-  fn new(v: Vec<f64>) -> Self {
+  pub fn new(v: Vec<f64>) -> Self {
     let mut buf : Vec<f64> = Vec::with_capacity(v.len());
     buf.resize(v.len(), 0.0);
     Fir {
@@ -24,7 +24,7 @@ impl Fir {
     }
   }
 
-  fn next(&mut self, din: f64) -> f64 {
+  pub fn next(&mut self, din: f64) -> f64 {
     if self.pos == 0 {
       self.pos = self.buf.len() - 1;
     } else {
