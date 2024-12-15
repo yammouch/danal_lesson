@@ -47,3 +47,10 @@ pub fn div_wave(n: u32) -> Vec<Vec<f64>> {
     }).collect()
   ).collect()
 }
+
+pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
+  v.iter().zip(m)
+  .map( |(v1, row)| row.iter().map( |x| (*v1)*(*x) ).collect() )
+  .reduce( |acc: Vec<f64>, row| acc.iter().zip(row).map( |(a, r)| (*a)+r )
+                                .collect() ).unwrap()
+}
