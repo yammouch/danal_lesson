@@ -38,6 +38,22 @@ impl Fir {
   }
 }
 
+// 0 -> [0.0]
+// 1 -> [0.0, 0.5  ]
+// 2 -> [0.0, 0.333]             = [0/3, 1/3]
+// 3 -> [0.0. 0.25 , 0.5]        = [0/4, 1/4, 2/4]
+// 4 -> [0.0. 0.2  , 0.4]        = [0/5, 1/5, 2/5]
+// 5 -> [0.0, 0.166, 0.333, 0.5] = [0/6, 1/6, 2/6, 3/6]
+pub fn order_to_f(n: u32) -> Vec<f64> {
+  let denom = f64::from(n+1);
+  let mut ret : Vec<f64> = (0..=n/2).map( |i| f64::from(i)/denom )
+                           .collect();
+  if n % 2 != 0 {
+    ret.push(0.5); // must be exact 0.5
+  }
+  ret
+}
+
 pub fn div_wave(n: u32) -> Vec<Vec<f64>> {
   (0..n).map( |i|
     (0..n).map( |j| {
