@@ -37,3 +37,13 @@ impl Fir {
     .map(|(b, c)| (*b)*(*c)).sum()
   }
 }
+
+pub fn div_wave(n: u32) -> Vec<Vec<f64>> {
+  (0..n).map( |i|
+    (0..n).map( |j| {
+      let tau          = std::f64::consts::TAU;
+      let (iflt, j, n) = (f64::from(i), f64::from(j), f64::from(n));
+      (tau*iflt*j/n).cos() / if i == 0 { n } else { 0.5*n }
+    }).collect()
+  ).collect()
+}
