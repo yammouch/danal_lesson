@@ -44,17 +44,18 @@ impl Fir {
 // 3 -> [0.0. 0.25 , 0.5]        = [0/4, 1/4, 2/4]
 // 4 -> [0.0. 0.2  , 0.4]        = [0/5, 1/5, 2/5]
 // 5 -> [0.0, 0.166, 0.333, 0.5] = [0/6, 1/6, 2/6, 3/6]
-pub fn order_to_f(n: u32) -> Vec<f64> {
-  let denom = f64::from(n+1);
-  (0..=(n+1)/2).map( |i| f64::from(i)/denom ).collect()
+pub fn order_to_f(ord: u32) -> Vec<f64> {
+  let denom = f64::from(ord+1);
+  (0..=(ord+1)/2).map( |i| f64::from(i)/denom ).collect()
 }
 
-pub fn div_wave(n: u32) -> Vec<Vec<f64>> {
-  (0..n).map( |i|
-    (0..n).map( |j| {
-      let tau          = std::f64::consts::TAU;
-      let (iflt, j, n) = (f64::from(i), f64::from(j), f64::from(n));
-      (tau*iflt*j/n).cos() / if i == 0 { n } else { 0.5*n }
+pub fn div_wave(ord: u32) -> Vec<Vec<f64>> {
+  let tau   = std::f64::consts::TAU;
+  let denom = f64::from(ord+1);
+  order_to_f(ord).into_iter().map( |f|
+    (0..=(ord+1)).map( |i| {
+      (tau*f*f64::from(i)).cos()
+      / if f == 0.0 || f == 0.5 { denom } else { 0.5*denom }
     }).collect()
   ).collect()
 }

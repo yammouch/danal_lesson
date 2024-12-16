@@ -26,3 +26,22 @@ fn order_to_f_test() {
     })
   })
 }
+
+fn div_wave_test() {
+  let t = std::f64::consts::TAU;
+
+  let expc = vec!
+  [vec![(0.*t/3.).cos()/3. , (0.*t/3.).cos()/3. , (0.*t/3.).cos()/3. ],
+   vec![(0.*t/3.).cos()/1.5, (1.*t/3.).cos()/1.5, (2.*t/3.).cos()/1.5],
+   vec![(0.*t/3.).cos()/1.5, (2.*t/3.).cos()/1.5, (4.*t/3.).cos()/1.5]];
+  assert_eq!(reson::div_wave(2), expc);
+
+  let expc = vec!
+  [vec![(0.*t/4.).cos()/4. , (0.*t/4.).cos()/4. ,
+        (0.*t/4.).cos()/4. , (0.*t/4.).cos()/4. ],
+   vec![(0.*t/4.).cos()/2. , (1.*t/4.).cos()/2. ,
+        (2.*t/4.).cos()/2. , (3.*t/4.).cos()/2. ],
+   vec![(0.*t/4.).cos()/4. , (2.*t/4.).cos()/4. ,
+        (4.*t/4.).cos()/4. , (6.*t/4.).cos()/4. ]];
+  assert_eq!(reson::div_wave(3), expc);
+}
