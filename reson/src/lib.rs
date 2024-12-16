@@ -15,11 +15,9 @@ pub struct Fir {
 
 impl Fir {
   pub fn new(v: Vec<f64>) -> Self {
-    let mut buf : Vec<f64> = Vec::with_capacity(v.len());
-    buf.resize(v.len(), 0.0);
     Fir {
       pos  : 0,
-      buf  : buf,
+      buf  : vec![0.0; v.len()],
       coeff: v,
     }
   }
@@ -34,7 +32,7 @@ impl Fir {
     self.buf[self.pos..].iter().zip(&self.coeff)
     .chain(self.buf[0..self.pos].iter()
            .zip(&self.coeff[self.coeff.len()-self.pos..]))
-    .map(|(b, c)| (*b)*(*c)).sum()
+    .map(|(&b, &c)| b*c).sum()
   }
 }
 
@@ -68,8 +66,7 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
 }
 
 pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
-  let mut ret : Vec<_> =
-   std::iter::repeat_n(0., u.len() + v.len() - 1).collect();
+  let mut ret : Vec<_> = vec![0.0; u.len() + v.len() - 1];
   u.iter().enumerate().for_each( |(i, &u1)| {
     (i..).zip(v).for_each( |(j, &v1)| { ret[j] += u1*v1; } )
   });
