@@ -53,7 +53,7 @@ pub fn div_wave(ord: u32) -> Vec<Vec<f64>> {
   let tau   = std::f64::consts::TAU;
   let denom = f64::from(ord+1);
   order_to_f(ord).into_iter().map( |f|
-    (0..=(ord+1)).map( |i| {
+    (0..=ord).map( |i| {
       (tau*f*f64::from(i)).cos()
       / if f == 0.0 || f == 0.5 { denom } else { 0.5*denom }
     }).collect()
