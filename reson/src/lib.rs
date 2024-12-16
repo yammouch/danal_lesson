@@ -46,12 +46,7 @@ impl Fir {
 // 5 -> [0.0, 0.166, 0.333, 0.5] = [0/6, 1/6, 2/6, 3/6]
 pub fn order_to_f(n: u32) -> Vec<f64> {
   let denom = f64::from(n+1);
-  let mut ret : Vec<f64> = (0..=n/2).map( |i| f64::from(i)/denom )
-                           .collect();
-  if n % 2 != 0 {
-    ret.push(0.5); // must be exact 0.5
-  }
-  ret
+  (0..=(n+1)/2).map( |i| f64::from(i)/denom ).collect()
 }
 
 pub fn div_wave(n: u32) -> Vec<Vec<f64>> {

@@ -19,10 +19,10 @@ fn order_to_f_test() {
           (3, vec![0./4., 1./4., 2./4.]),
           (4, vec![0./5., 1./5., 2./5.]),
           (5, vec![0./6., 1./6., 2./6., 3./6.]) ];
-  test_cases.iter().for_each( |(i, expc)| {
-    let ret = reson::order_to_f(*i);
-    ret.iter().zip(expc).for_each( |(r, e)| {
-      assert!((*r - *e).abs() < 1e-6);
+  test_cases.iter().for_each( |&(i, ref expc)| {
+    let ret = reson::order_to_f(i);
+    ret.iter().zip(expc.iter()).for_each( |(&r, &e)| {
+      assert_eq!(r, e);
     })
   })
 }
