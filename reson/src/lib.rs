@@ -76,8 +76,18 @@ pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
   ret
 }
 
+pub fn cumconvolve<'a, I>(polys: I) -> impl Iterator<Item=Vec<f64>> + 'a
+where
+  I: Iterator<Item=&'a Vec<f64>> + 'a,
+{
+  polys.scan(vec![1.], |state, p| {
+    *state = convolve(state, p);
+    Some(state.clone())
+  })
+}
+
 pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
-  let mut polys : Vec<Vec<f64>> = cosines.iter().rev().map( |&c|
+  let polys : Vec<Vec<f64>> = cosines.iter().map( |&c|
     match c {
       1. => vec![1., -1.  ], // for DC
      -1. => vec![1.,  1.  ], // for Nyquist
@@ -85,17 +95,13 @@ pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
     }
   ).collect();
 
-  let mut fwd : Vec<Vec<f64>> = vec![polys[0].clone()];
-  polys[1..polys.len()-1].iter().for_each( |p| {
-    fwd.push(convolve(fwd.last().unwrap(), p));
-  });
-
-  let mut ret = vec![fwd.pop().unwrap()];
-  let mut acc = polys.pop().unwrap();
-  fwd.into_iter().rev().zip(polys.into_iter().rev()).for_each( |(f, p)| {
-    ret.push(convolve(&f, &acc));
-    acc = convolve(&acc, &p);
-  });
-  ret.push(acc);
+  let fwd = cumconvolve(polys[1..].iter()).collect::<Vec<_>>();
+  let bwd = cumconvolve(polys[0..polys.len()-1].iter().rev())
+            .collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>();
+  let mut mid = fwd[1..].iter().zip(bwd.iter())
+                .map(|(f, b)| convolve(f, b)).collect::<Vec<_>>();
+  let mut ret = vec![fwd[0].clone()];
+  ret.append(&mut mid);
+  ret.push(bwd[bwd.len()-1].clone());
   ret
 }
