@@ -45,3 +45,18 @@ fn div_wave_test() {
         (4.*t/4.).cos()/4. , (6.*t/4.).cos()/4. ]];
   assert_eq!(reson::div_wave(3), expc);
 }
+
+#[wasm_bindgen_test]
+fn vxm_test() {
+  let v = vec![1., 2.];
+  let m = vec![vec![3., 5.],
+               vec![4., 6.]];
+  let expc = vec![11., 17.];
+  assert_eq!(reson::vxm(&v, &m), expc);
+}
+
+#[wasm_bindgen_test]
+fn convolve_test() {
+  assert_eq!(reson::convolve(&vec![1., 3.], &vec![1., 6., 9.]),
+             vec![1., 9., 27., 27.]);
+}

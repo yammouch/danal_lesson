@@ -66,3 +66,12 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
   .reduce( |acc: Vec<f64>, row| acc.into_iter().zip(row).map( |(a, r)| a+r )
                                 .collect() ).unwrap()
 }
+
+pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
+  let mut ret : Vec<_> =
+   std::iter::repeat_n(0., u.len() + v.len() - 1).collect();
+  u.iter().enumerate().for_each( |(i, &u1)| {
+    (i..).zip(v).for_each( |(j, &v1)| { ret[j] += u1*v1; } )
+  });
+  ret
+}
