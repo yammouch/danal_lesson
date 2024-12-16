@@ -75,3 +75,27 @@ pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
   });
   ret
 }
+
+pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
+  let mut polys : Vec<Vec<f64>> = cosines.iter().rev().map( |&c|
+    match c {
+      1. => vec![1., -1.],
+     -1. => vec![1.,  1.],
+      _  => vec![1.,  c , 1.],
+    }
+  ).collect();
+
+  let mut fwd : Vec<Vec<f64>> = vec![polys[0].clone()];
+  polys[1..polys.len()-1].iter().for_each( |p| {
+    fwd.push(convolve(fwd.last().unwrap(), p));
+  });
+
+  let mut ret = vec![fwd.pop().unwrap()];
+  let mut acc = polys.pop().unwrap();
+  fwd.into_iter().rev().zip(polys.into_iter().rev()).for_each( |(f, p)| {
+    ret.push(convolve(&f, &acc));
+    acc = convolve(&acc, &p);
+  });
+  ret.push(acc);
+  ret
+}
