@@ -79,9 +79,9 @@ pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
 pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
   let mut polys : Vec<Vec<f64>> = cosines.iter().rev().map( |&c|
     match c {
-      1. => vec![1., -1.],
-     -1. => vec![1.,  1.],
-      _  => vec![1.,  c , 1.],
+      1. => vec![1., -1.  ], // for DC
+     -1. => vec![1.,  1.  ], // for Nyquist
+      _  => vec![1.,  2.*c, 1.],
     }
   ).collect();
 
