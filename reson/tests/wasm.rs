@@ -61,10 +61,45 @@ fn convolve_test() {
              vec![1., 9., 27., 27.]);
 }
 
+fn zeros_test1(f: f64, coeff: &[f64]) {
+  let tau = std::f64::consts::TAU;
+  let x : f64 = coeff.iter().enumerate().map( |(i, &x)|
+                  (tau*f*(i as f64)).cos()*x
+                ).sum();
+  assert!(x.abs() < 1e-6);
+}
+
 #[wasm_bindgen_test]
 fn zeros_test() {
-  log(&format!("{:?}", reson::zeros(&vec![1., -1. ])));
-  log(&format!("{:?}", reson::zeros(&vec![1., -0.5])));
-  log(&format!("{:?}", reson::zeros(&vec![1.,  0. , -1. ])));
-  log(&format!("{:?}", reson::zeros(&vec![1.,  0.5, -0.5, -1.])));
+  let tau = std::f64::consts::TAU;
+
+  let ret = reson::zeros(&vec![1., -1. ]);
+  zeros_test1(1./2., &ret[0]);
+  zeros_test1(0./2., &ret[1]);
+
+  let ret = reson::zeros(&vec![1., -0.5]);
+  zeros_test1(1./3., &ret[0]);
+  zeros_test1(0./3., &ret[1]);
+
+  let ret = reson::zeros(&vec![1.,  0. , -1. ]);
+  zeros_test1(1./4., &ret[0]);
+  zeros_test1(2./4., &ret[0]);
+  zeros_test1(0./4., &ret[1]);
+  zeros_test1(2./4., &ret[1]);
+  zeros_test1(0./4., &ret[2]);
+  zeros_test1(1./4., &ret[2]);
+
+  let ret = reson::zeros(&vec![1.,  0.5, -0.5, -1.]);
+  zeros_test1(1./6., &ret[0]);
+  zeros_test1(2./6., &ret[0]);
+  zeros_test1(3./6., &ret[0]);
+  zeros_test1(0./6., &ret[1]);
+  zeros_test1(2./6., &ret[1]);
+  zeros_test1(3./6., &ret[1]);
+  zeros_test1(0./6., &ret[2]);
+  zeros_test1(1./6., &ret[2]);
+  zeros_test1(3./6., &ret[2]);
+  zeros_test1(0./6., &ret[3]);
+  zeros_test1(1./6., &ret[3]);
+  zeros_test1(2./6., &ret[3]);
 }
