@@ -88,17 +88,17 @@ pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
     match c {
       1. => vec![1., -1.  ], // for DC
      -1. => vec![1.,  1.  ], // for Nyquist
-      _  => vec![1.,  2.*c, 1.],
+      _  => vec![1., -2.*c, 1.],
     }
   ).collect();
 
-  let fwd = cumconvolve(polys[1..].iter()).collect::<Vec<_>>();
-  let bwd = cumconvolve(polys[0..polys.len()-1].iter().rev())
+  let fwd = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
+  let bwd = cumconvolve(polys[1..].iter().rev())
             .collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>();
-  let mut mid = fwd[1..].iter().zip(bwd.iter())
+  let mut mid = fwd.iter().zip(&bwd[1..])
                 .map(|(f, b)| convolve(f, b)).collect::<Vec<_>>();
-  let mut ret = vec![fwd[0].clone()];
+  let mut ret = vec![bwd[0].clone()];
   ret.append(&mut mid);
-  ret.push(bwd[bwd.len()-1].clone());
+  ret.push(fwd[fwd.len()-1].clone());
   ret
 }

@@ -60,3 +60,11 @@ fn convolve_test() {
   assert_eq!(reson::convolve(&vec![1., 3.], &vec![1., 6., 9.]),
              vec![1., 9., 27., 27.]);
 }
+
+#[wasm_bindgen_test]
+fn zeros_test() {
+  log(&format!("{:?}", reson::zeros(&vec![1., -1. ])));
+  log(&format!("{:?}", reson::zeros(&vec![1., -0.5])));
+  log(&format!("{:?}", reson::zeros(&vec![1.,  0. , -1. ])));
+  log(&format!("{:?}", reson::zeros(&vec![1.,  0.5, -0.5, -1.])));
+}
