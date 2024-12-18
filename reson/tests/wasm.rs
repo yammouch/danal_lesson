@@ -120,3 +120,14 @@ fn polyval_test() {
   assert!((re - 0.0        ).abs() < 1e-6);
   assert!((im - 3f64.sqrt()).abs() < 1e-6);
 }
+
+#[wasm_bindgen_test]
+fn linsolve01_test() {
+  let (x0, x1) = reson::linsolve01(2., 3., 3., 4.);
+  assert!((x0 -  3.0).abs() < 1e-6);
+  assert!((x1 - -2.0).abs() < 1e-6);
+
+  let (x0, x1) = reson::linsolve01(4., 3., 3., 2.);
+  assert!((x0 -  3.0).abs() < 1e-6);
+  assert!((x1 - -4.0).abs() < 1e-6);
+}

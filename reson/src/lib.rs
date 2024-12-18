@@ -108,3 +108,15 @@ pub fn polyval(coef: &[f64], cosine: f64) -> (f64, f64) {
   coef.iter().rfold((0f64, 0f64), |(re, im), &k|
     (k+cosine*re-sine*im, cosine*im+sine*re) )
 }
+
+pub fn linsolve01(a00: f64, a01: f64, a10: f64, a11: f64) -> (f64, f64) {
+  if a00.abs() < a01.abs() {
+    let r = -a00/a01;
+    let sol = 1.0/(a10 + a11*r);
+    (sol, sol*r)
+  } else {
+    let r = -a01/a00;
+    let sol = 1.0/(a10*r + a11);
+    (sol*r, sol)
+  }
+}
