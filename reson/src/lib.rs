@@ -102,3 +102,9 @@ pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
   ret.push(fwd[fwd.len()-1].clone());
   ret
 }
+
+pub fn polyval(coef: &[f64], cosine: f64) -> (f64, f64) {
+  let sine = (1.0-cosine*cosine).sqrt();
+  coef.iter().rfold((0f64, 0f64), |(re, im), &k|
+    (k+cosine*re-sine*im, cosine*im+sine*re) )
+}

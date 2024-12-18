@@ -71,8 +71,6 @@ fn zeros_test1(f: f64, coeff: &[f64]) {
 
 #[wasm_bindgen_test]
 fn zeros_test() {
-  let tau = std::f64::consts::TAU;
-
   let ret = reson::zeros(&vec![1., -1. ]);
   zeros_test1(1./2., &ret[0]);
   zeros_test1(0./2., &ret[1]);
@@ -102,4 +100,23 @@ fn zeros_test() {
   zeros_test1(0./6., &ret[3]);
   zeros_test1(1./6., &ret[3]);
   zeros_test1(2./6., &ret[3]);
+}
+
+#[wasm_bindgen_test]
+fn polyval_test() {
+  let (re, im) = reson::polyval(&[1.], 0.5);
+  assert!((re - 1.0).abs() < 1e-6);
+  assert!((im - 0.0).abs() < 1e-6);
+
+  let (re, im) = reson::polyval(&[0., 0., 1.], 0.5_f64.sqrt());
+  assert!((re - 0.0).abs() < 1e-6);
+  assert!((im - 1.0).abs() < 1e-6);
+
+  let (re, im) = reson::polyval(&[-1., 2.], 0.0);
+  assert!((re - -1.0).abs() < 1e-6);
+  assert!((im -  2.0).abs() < 1e-6);
+
+  let (re, im) = reson::polyval(&[-1., 2.], 0.5);
+  assert!((re - 0.0        ).abs() < 1e-6);
+  assert!((im - 3f64.sqrt()).abs() < 1e-6);
 }
