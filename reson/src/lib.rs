@@ -104,7 +104,7 @@ pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
 }
 
 pub fn polyval(coef: &[f64], cosine: f64) -> (f64, f64) {
-  let sine = (1.0-cosine*cosine).sqrt();
+  let sine = -(1.0-cosine*cosine).sqrt();
   coef.iter().rfold((0f64, 0f64), |(re, im), &k|
     (k+cosine*re-sine*im, cosine*im+sine*re) )
 }
@@ -139,9 +139,9 @@ pub fn normalize_other(coef: &[f64], dly1st: usize, f: f64)
   let w = std::f64::consts::TAU * f;
   let dly1st = dly1st as f64;
   let (z0re, z0im) = polyval(coef, f.cos());
-  let (a1re, a1im) = ((w* dly1st    ).cos(), (w* dly1st    ).sin());
+  let (a1re, a1im) = ((w* dly1st    ).cos(), -(w* dly1st    ).sin());
+  let (a2re, a2im) = ((w*(dly1st+1.)).cos(), -(w*(dly1st+1.)).sin());
   let (z1re, z1im) = (z0re*a1re - z0im*a1im, z0re*a1im + z0im*a1re);
-  let (a2re, a2im) = ((w*(dly1st+1.)).cos(), (w*(dly1st+1.)).sin());
   let (z2re, z2im) = (z0re*a2re - z0im*a2im, z0re*a2im + z0im*a2re);
   let k = linsolve01(z1im, z2im, z1re, z2re);
   convolve(&vec![k.0, k.1], coef)
