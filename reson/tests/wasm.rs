@@ -109,16 +109,16 @@ fn polyval_test() {
   assert!((im - 0.0).abs() < 1e-6);
 
   let (re, im) = reson::polyval(&[0., 0., 1.], 0.5_f64.sqrt());
-  assert!((re - 0.0).abs() < 1e-6);
-  assert!((im - 1.0).abs() < 1e-6);
+  assert!((re -  0.0).abs() < 1e-6);
+  assert!((im - -1.0).abs() < 1e-6);
 
   let (re, im) = reson::polyval(&[-1., 2.], 0.0);
   assert!((re - -1.0).abs() < 1e-6);
-  assert!((im -  2.0).abs() < 1e-6);
+  assert!((im - -2.0).abs() < 1e-6);
 
   let (re, im) = reson::polyval(&[-1., 2.], 0.5);
-  assert!((re - 0.0        ).abs() < 1e-6);
-  assert!((im - 3f64.sqrt()).abs() < 1e-6);
+  assert!((re -   0.0         ).abs() < 1e-6);
+  assert!((im - -(3f64.sqrt())).abs() < 1e-6);
 }
 
 #[wasm_bindgen_test]
