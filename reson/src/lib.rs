@@ -120,3 +120,42 @@ pub fn linsolve01(a00: f64, a01: f64, a10: f64, a11: f64) -> (f64, f64) {
     (sol*r, sol)
   }
 }
+
+pub fn normalize_0(coef: &[f64]) -> Vec<f64> {
+  let denom = 1f64/coef.iter().sum::<f64>();
+  coef.iter().map( |&x| x * denom ).collect()
+}
+
+pub fn normalize_nyq(coef: &[f64], dly1st: usize) -> Vec<f64> {
+  let even_sum = coef     .iter().step_by(2).sum::<f64>();
+  let odd_sum  = coef[1..].iter().step_by(2).sum::<f64>();
+  let denom = 1f64 /
+   if dly1st & 2 == 0 { even_sum - odd_sum } else { odd_sum - even_sum };
+  coef.iter().map( |&x| x * denom ).collect()
+}
+
+pub fn normalize_other(coef: &[f64], dly1st: usize, f: f64)
+ -> Vec<f64> {
+  let w = std::f64::consts::TAU * f;
+  let dly1st = dly1st as f64;
+  let (z0re, z0im) = polyval(coef, f.cos());
+  let (a1re, a1im) = ((w* dly1st    ).cos(), (w* dly1st    ).sin());
+  let (z1re, z1im) = (z0re*a1re - z0im*a1im, z0re*a1im + z0im*a1re);
+  let (a2re, a2im) = ((w*(dly1st+1.)).cos(), (w*(dly1st+1.)).sin());
+  let (z2re, z2im) = (z0re*a2re - z0im*a2im, z0re*a2im + z0im*a2re);
+  let k = linsolve01(z1im, z2im, z1re, z2re);
+  convolve(&vec![k.0, k.1], coef)
+}
+
+pub fn normalize_bunch(
+ dly1st : usize,
+ f      : &[f64],
+ coeffs : &[Vec<f64>]) -> Vec<Vec<f64>> {
+  f.iter().zip(coeffs).map( |(&f, coef)|
+    match f {
+      0.0 => normalize_0    (coef),
+      0.5 => normalize_nyq  (coef, dly1st),
+      f   => normalize_other(coef, dly1st, f),
+    }
+  ).collect()
+}
