@@ -61,11 +61,19 @@ fn convolve_test() {
              vec![1., 9., 27., 27.]);
 }
 
-fn zeros_test1(f: f64, coeff: &[f64]) {
+fn freq_resp(f: f64, coef: &[f64], skip: usize) -> (f64, f64) {
   let tau = std::f64::consts::TAU;
-  let x : f64 = coeff.iter().enumerate().map( |(i, &x)|
-                  (tau*f*(i as f64)).cos()*x
-                ).sum();
+  let re : f64 = (skip..).zip(coef).map( |(i, &x)|
+                   (-tau*f*(i as f64)).cos()*x
+                 ).sum();
+  let im : f64 = (skip..).zip(coef).map( |(i, &x)|
+                   (-tau*f*(i as f64)).sin()*x
+                 ).sum();
+  (re, im)
+}
+
+fn zeros_test1(f: f64, coef: &[f64]) {
+  let (x, _) = freq_resp(f, coef, 0);
   assert!(x.abs() < 1e-6);
 }
 
