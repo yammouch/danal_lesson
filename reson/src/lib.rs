@@ -159,3 +159,9 @@ pub fn normalize_bunch(
     }
   ).collect()
 }
+
+pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
+  let cosines = f.iter().map( |&f| f.cos() ).collect::<Vec<_>>();
+  let z = zeros(&cosines);
+  normalize_bunch(dly1st, f, &z)
+}
