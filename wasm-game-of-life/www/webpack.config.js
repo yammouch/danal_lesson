@@ -11,9 +11,6 @@ module.exports = {
     },
     plugins: [
         new CopyWebpackPlugin(['index.html']),
-        new WasmPackPlugin({
-            crateDirectory: path.resolve(__dirname, ".")
-        }),
     ],
     mode: 'development',
     experiments: {
