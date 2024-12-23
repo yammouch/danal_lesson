@@ -142,5 +142,8 @@ fn linsolve01_test() {
 
 #[wasm_bindgen_test]
 fn normalize_0_test() {
-  log(&format!("{:?}", reson::normalize_0(&vec![-1., -1. -1., -1.])));
+  let result = reson::normalize_0(&vec![-1., -1., -1., -1.]);
+  log(&format!("{:?}", result));
+  log(&format!("{:?}", freq_resp(1./4., &result, 0)));
+  //log(&format!("{:?}", reson::normalize_0(&vec![-1., -1., -1., -1.])));
 }
