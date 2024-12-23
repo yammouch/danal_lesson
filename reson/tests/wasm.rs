@@ -186,5 +186,20 @@ fn normalize_other_test() {
 #[wasm_bindgen_test]
 fn resonator_coef_test() {
   let result = reson::resonator_coef(2, &vec![0., 1./3.]);
-  log(&format!("{:?}", result));
+
+  let (re, im) = freq_resp(0./3., &result[0], 2);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let (re, im) = freq_resp(1./3., &result[0], 2);
+  assert!( re      .abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let (re, im) = freq_resp(0./3., &result[1], 2);
+  assert!( re      .abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let (re, im) = freq_resp(1./3., &result[1], 2);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
 }

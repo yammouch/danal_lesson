@@ -161,8 +161,8 @@ pub fn normalize_bunch(
 }
 
 pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
-  let cosines = f.iter().map( |&f| f.cos() ).collect::<Vec<_>>();
+  let tau = std::f64::consts::TAU;
+  let cosines = f.iter().map( |&f| (tau*f).cos() ).collect::<Vec<_>>();
   let z = zeros(&cosines);
-  log(&format!("{:?}", z));
   normalize_bunch(dly1st, f, &z)
 }
