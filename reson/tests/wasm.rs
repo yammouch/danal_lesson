@@ -147,6 +147,25 @@ fn normalize_0_test() {
   assert!(re.abs() < 1e-6);
   assert!(im.abs() < 1e-6);
   let (re, im) = freq_resp(0., &result, 0);
-  assert!((re.abs() - 1.) < 1e-6);
-  assert!( im.abs()       < 1e-6);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn normalize_nyq_test() {
+  let result = reson::normalize_nyq(&vec![-1., 1., -1., 1.], 0);
+  let (re, im) = freq_resp(1./4., &result, 0);
+  assert!(re.abs() < 1e-6);
+  assert!(im.abs() < 1e-6);
+  let (re, im) = freq_resp(1./2., &result, 0);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let result = reson::normalize_nyq(&vec![-1., 1., -1., 1.], 1);
+  let (re, im) = freq_resp(1./4., &result, 1);
+  assert!(re.abs() < 1e-6);
+  assert!(im.abs() < 1e-6);
+  let (re, im) = freq_resp(1./2., &result, 1);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
 }
