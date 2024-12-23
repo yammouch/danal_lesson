@@ -173,8 +173,12 @@ fn normalize_nyq_test() {
 #[wasm_bindgen_test]
 fn normalize_other_test() {
   let result = reson::normalize_other(&vec![-1., 0., 1.], 0, 1./4.);
-  log(&format!("{:?}", result));
   let (re, im) = freq_resp(1./4., &result, 0);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let result = reson::normalize_other(&vec![-1., 0., 1.], 1, 1./4.);
+  let (re, im) = freq_resp(1./4., &result, 1);
   assert!((re - 1.).abs() < 1e-6);
   assert!( im      .abs() < 1e-6);
 }

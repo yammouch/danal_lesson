@@ -138,7 +138,7 @@ pub fn normalize_other(coef: &[f64], dly1st: usize, f: f64)
  -> Vec<f64> {
   let w = std::f64::consts::TAU * f;
   let dly1st = dly1st as f64;
-  let (z0re, z0im) = polyval(coef, f.cos());
+  let (z0re, z0im) = polyval(coef, w.cos());
   let (a1re, a1im) = ((w* dly1st    ).cos(), -(w* dly1st    ).sin());
   let (a2re, a2im) = ((w*(dly1st+1.)).cos(), -(w*(dly1st+1.)).sin());
   let (z1re, z1im) = (z0re*a1re - z0im*a1im, z0re*a1im + z0im*a1re);
