@@ -182,3 +182,9 @@ fn normalize_other_test() {
   assert!((re - 1.).abs() < 1e-6);
   assert!( im      .abs() < 1e-6);
 }
+
+#[wasm_bindgen_test]
+fn resonator_coef_test() {
+  let result = reson::resonator_coef(2, &vec![0., 1./3.]);
+  log(&format!("{:?}", result));
+}
