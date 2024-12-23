@@ -130,7 +130,7 @@ pub fn normalize_nyq(coef: &[f64], dly1st: usize) -> Vec<f64> {
   let even_sum = coef     .iter().step_by(2).sum::<f64>();
   let odd_sum  = coef[1..].iter().step_by(2).sum::<f64>();
   let denom = 1f64 /
-   if dly1st & 2 == 0 { even_sum - odd_sum } else { odd_sum - even_sum };
+   if dly1st % 2 == 0 { even_sum - odd_sum } else { odd_sum - even_sum };
   coef.iter().map( |&x| x * denom ).collect()
 }
 
