@@ -146,4 +146,7 @@ fn normalize_0_test() {
   let (re, im) = freq_resp(1./4., &result, 0);
   assert!(re.abs() < 1e-6);
   assert!(im.abs() < 1e-6);
+  let (re, im) = freq_resp(0., &result, 0);
+  assert!((re.abs() - 1.) < 1e-6);
+  assert!( im.abs()       < 1e-6);
 }
