@@ -139,3 +139,8 @@ fn linsolve01_test() {
   assert!((x0 -  3.0).abs() < 1e-6);
   assert!((x1 - -4.0).abs() < 1e-6);
 }
+
+#[wasm_bindgen_test]
+fn normalize_0_test() {
+  log(&format!("{:?}", reson::normalize_0(&vec![-1., -1. -1., -1.])));
+}
