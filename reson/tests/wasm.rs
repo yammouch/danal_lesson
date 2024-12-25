@@ -203,3 +203,22 @@ fn resonator_coef_test() {
   assert!((re - 1.).abs() < 1e-6);
   assert!( im      .abs() < 1e-6);
 }
+
+#[wasm_bindgen_test]
+fn hamrs_test() {
+  let result = reson::harms(0.12, 0.4);
+  let expc = vec![0.0, 0.12, 0.24, 0.36, 0.5];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+
+  let result = reson::harms(0.12, 0.3);
+  let expc = vec![0.0, 0.12, 0.24, 0.37, 0.5];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+
+  let result = reson::harms(0.15, 0.4);
+  let expc = vec![0.0, 0.15, 0.3, 0.4+0.1/3.];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+
+  let result = reson::harms(0.15, 0.5);
+  let expc = vec![0.0, 0.15, 0.3, 0.45];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+}

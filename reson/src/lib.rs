@@ -168,15 +168,14 @@ pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
 }
 
 pub fn harms(f: f64, flim: f64) -> Vec<f64> {
-  let sector_n = flim/f as usize;
-  let sector_out_n = ((1.0/f + 0.5) as usize) - 2*sector_n;
-  let mut ret : Vec<f64> = (0..=sector_n as usize).map( |i| i*f ).collect();
-  let sector_out_angle = (0.5 - ret[hi_harm])*2./sector_out_n;
-  (0..(sector_out_n-1)/2).foreach( |i| {
-    ret.push(ret[ret.len()-1] + sector_out_angle);
-  });
-  if sector_out_n % 2 == 0 {
-    ret.push(0.5);
-  }
-  ret
+  use std::iter::successors;
+  let point_n = (1.0/f + 0.5) as usize;
+  let mut v : Vec<f64> = (0..=(point_n-1)/2).map(|i| f*i as f64)
+                         .take_while(|&fi| fi <= flim).collect();
+  let sector_n = point_n - 2*(v.len() - 1);
+  let sector = 2.*(0.5 - v[v.len()-1])/(sector_n as f64);
+  successors(Some(v[v.len()-1]), |x| Some(x + sector)).skip(1)
+  .take((sector_n-1)/2).for_each( |f| v.push(f) );
+  if point_n % 2 == 0 { v.push(0.5); }
+  v
 }
