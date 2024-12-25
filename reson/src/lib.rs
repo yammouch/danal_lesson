@@ -83,12 +83,14 @@ where
   })
 }
 
-pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
-  let polys : Vec<Vec<f64>> = cosines.iter().map( |&c|
-    match c {
-      1. => vec![1., -1.  ], // for DC
-     -1. => vec![1.,  1.  ], // for Nyquist
-      _  => vec![1., -2.*c, 1.],
+pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
+  let tau = std::f64::consts::TAU;
+
+  let polys : Vec<Vec<f64>> = f.iter().map( |&f|
+    match f {
+     0.  => vec![1., -1.              ], // for DC
+     0.5 => vec![1.,  1.              ], // for Nyquist
+     _   => vec![1., -2.*(tau*f).cos(), 1.],
     }
   ).collect();
 
@@ -161,9 +163,7 @@ pub fn normalize_bunch(
 }
 
 pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
-  let tau = std::f64::consts::TAU;
-  let cosines = f.iter().map( |&f| (tau*f).cos() ).collect::<Vec<_>>();
-  let z = zeros(&cosines);
+  let z = zeros(f);
   normalize_bunch(dly1st, f, &z)
 }
 

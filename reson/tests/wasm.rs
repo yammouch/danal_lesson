@@ -79,15 +79,15 @@ fn zeros_test1(f: f64, coef: &[f64]) {
 
 #[wasm_bindgen_test]
 fn zeros_test() {
-  let ret = reson::zeros(&vec![1., -1. ]);
+  let ret = reson::zeros(&vec![0., 0.5]);
   zeros_test1(1./2., &ret[0]);
   zeros_test1(0./2., &ret[1]);
 
-  let ret = reson::zeros(&vec![1., -0.5]);
+  let ret = reson::zeros(&vec![0., 1./3.]);
   zeros_test1(1./3., &ret[0]);
   zeros_test1(0./3., &ret[1]);
 
-  let ret = reson::zeros(&vec![1.,  0. , -1. ]);
+  let ret = reson::zeros(&vec![0., 1./4., 1./2.]);
   zeros_test1(1./4., &ret[0]);
   zeros_test1(2./4., &ret[0]);
   zeros_test1(0./4., &ret[1]);
@@ -95,7 +95,7 @@ fn zeros_test() {
   zeros_test1(0./4., &ret[2]);
   zeros_test1(1./4., &ret[2]);
 
-  let ret = reson::zeros(&vec![1.,  0.5, -0.5, -1.]);
+  let ret = reson::zeros(&vec![0., 1./6., 2./6., 3./6.]);
   zeros_test1(1./6., &ret[0]);
   zeros_test1(2./6., &ret[0]);
   zeros_test1(3./6., &ret[0]);
