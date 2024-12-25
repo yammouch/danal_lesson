@@ -9,15 +9,17 @@ extern "C" {
 #[derive(Debug)]
 pub struct Fir {
   pos  : usize,
+  skip : usize,
   buf  : Vec<f64>,
   coeff: Vec<f64>,
 }
 
 impl Fir {
-  pub fn new(v: Vec<f64>) -> Self {
+  pub fn new(v: Vec<f64>, skip: usize) -> Self {
     Fir {
       pos  : 0,
-      buf  : vec![0.0; v.len()],
+      skip : skip,
+      buf  : vec![0.0; v.len()+skip],
       coeff: v,
     }
   }
@@ -29,10 +31,8 @@ impl Fir {
       self.pos -= 1;
     }
     self.buf[self.pos] = din;
-    self.buf[self.pos..].iter().zip(&self.coeff)
-    .chain(self.buf[0..self.pos].iter()
-           .zip(&self.coeff[self.coeff.len()-self.pos..]))
-    .map(|(&b, &c)| b*c).sum()
+    self.buf[self.pos..].iter().chain(&self.buf).skip(self.skip)
+    .zip(&self.coeff).map(|(&b, &c)| b*c).sum()
   }
 }
 
