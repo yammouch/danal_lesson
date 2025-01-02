@@ -5,12 +5,39 @@
   <script type="text/javascript">
    const audioContext = new AudioContext();
 
-   window.addEventListener("DOMContentLoaded", () => {
-     let a = new Uint8Array([0x31, 0x32, 0x33]);
-     let b = new Blob([a.buffer], { type: "text/plain" });
-     let link = document.getElementById("alink");
-     link.href = URL.createObjectURL(b);
+   // refer to:
+   // https://www.youfit.co.jp/archives/1418
+   // https://qiita.com/optimisuke/items/f1434d4a46afd667adc6
+   function array2wav(ar) {
+     const sr = audioContext.sampleRate;
+     const v = new DataView(new ArrayBuffer(44 + 2*ar.length));
+     Array.from("RIFF", (c, i) => v.setUint8(i, c.charCodeAt(0)));
+     v.setUint32(4, 36 + 2*ar.length, true);
+     Array.from("WAVEfmt ", (c, i) => v.setUint8(8+i, c.charCodeAt(0)));
+     v.setUint32(16, 16, true);
+     v.setUint16(20, 1, true);
+     v.setUint16(22, 1, true);
+     v.setUint32(24, sr, true);
+     v.setUint32(28, sr*2, true);
+     v.setUint16(32, 2, true);
+     v.setUint16(34, 16, true);
+     Array.from("data", (c, i) => v.setUint8(36+i, c.charCodeAt(0)));
+     v.setUint32(40, 2*sr.length, true);
+     let i = 44;
+     ar.forEach( (x) => {
+       x *= 0x8000;
+       if (0x7fff <= x) {
+         x = 0x7fff;
+       } else if (x <= -0x8000) {
+         x = -0x8000;
+       }
+       v.setUint16(i, x, true);
+       i += 2;
+     });
+     return v.buffer;
+   }
 
+   window.addEventListener("DOMContentLoaded", () => {
      const sr = audioContext.sampleRate;
      const f = 440/sr;
      const y = Array.from({length:sr}, (_, i) =>Math.sin(2*Math.PI*f*i));
@@ -21,11 +48,20 @@
      , [{ x: Array.from({length:100}, (_, i) => i),
           y: y.slice(0, 100) }]
      , { margin: { t: 0 } } );
+
+     const wav = array2wav(y);
+     const blob = new Blob([wav], {type: 'audio/wav'});
+     const url = URL.createObjectURL(blob);
+     const audio = document.createElement('audio');
+     audio.src = url;
+     audio.controls = true;
+     const tone = document.getElementById("tone");
+     tone.appendChild(audio);
    });
   </script>
  </head>
  <body>
-  <a href="" id="alink">blob here</a>
+  <div id="tone"></div>
   <div id="tester" style="width:600px;height:250px"></div>
  </body>
 </html>
