@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <script type="text/javascript">
+   const audioContext = new AudioContext();
+
+   window.addEventListener("DOMContentLoaded", () => {
+     let a = new Uint8Array([0x31, 0x32, 0x33]);
+     let b = new Blob([a.buffer], { type: "text/plain" });
+     let link = document.getElementById("alink");
+     link.href = URL.createObjectURL(b);
+
+     const sr = audioContext.sampleRate;
+     const f = 440/sr;
+     const y = Array.from({length:sr}, (_, i) =>Math.sin(2*Math.PI*f*i));
+
+     const TESTER = document.getElementById('tester');
+     Plotly.newPlot
+     ( TESTER
+     , [{ x: Array.from({length:100}, (_, i) => i),
+          y: y.slice(0, 100) }]
+     , { margin: { t: 0 } } );
+   });
+  </script>
+ </head>
+ <body>
+  <a href="" id="alink">blob here</a>
+  <div id="tester" style="width:600px;height:250px"></div>
+ </body>
+</html>
