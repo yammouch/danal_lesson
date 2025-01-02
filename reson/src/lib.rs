@@ -9,15 +9,17 @@ extern "C" {
 #[derive(Debug)]
 pub struct Fir {
   pos  : usize,
+  skip : usize,
   buf  : Vec<f64>,
   coeff: Vec<f64>,
 }
 
 impl Fir {
-  pub fn new(v: Vec<f64>) -> Self {
+  pub fn new(v: Vec<f64>, skip: usize) -> Self {
     Fir {
       pos  : 0,
-      buf  : vec![0.0; v.len()],
+      skip : skip,
+      buf  : vec![0.0; v.len()+skip],
       coeff: v,
     }
   }
@@ -29,10 +31,8 @@ impl Fir {
       self.pos -= 1;
     }
     self.buf[self.pos] = din;
-    self.buf[self.pos..].iter().zip(&self.coeff)
-    .chain(self.buf[0..self.pos].iter()
-           .zip(&self.coeff[self.coeff.len()-self.pos..]))
-    .map(|(&b, &c)| b*c).sum()
+    self.buf[self.pos..].iter().chain(&self.buf).skip(self.skip)
+    .zip(&self.coeff).map(|(&b, &c)| b*c).sum()
   }
 }
 
@@ -83,12 +83,14 @@ where
   })
 }
 
-pub fn zeros(cosines: &[f64]) -> Vec<Vec<f64>> {
-  let polys : Vec<Vec<f64>> = cosines.iter().map( |&c|
-    match c {
-      1. => vec![1., -1.  ], // for DC
-     -1. => vec![1.,  1.  ], // for Nyquist
-      _  => vec![1., -2.*c, 1.],
+pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
+  let tau = std::f64::consts::TAU;
+
+  let polys : Vec<Vec<f64>> = f.iter().map( |&f|
+    match f {
+     0.  => vec![1., -1.              ], // for DC
+     0.5 => vec![1.,  1.              ], // for Nyquist
+     _   => vec![1., -2.*(tau*f).cos(), 1.],
     }
   ).collect();
 
@@ -130,7 +132,7 @@ pub fn normalize_nyq(coef: &[f64], dly1st: usize) -> Vec<f64> {
   let even_sum = coef     .iter().step_by(2).sum::<f64>();
   let odd_sum  = coef[1..].iter().step_by(2).sum::<f64>();
   let denom = 1f64 /
-   if dly1st & 2 == 0 { even_sum - odd_sum } else { odd_sum - even_sum };
+   if dly1st % 2 == 0 { even_sum - odd_sum } else { odd_sum - even_sum };
   coef.iter().map( |&x| x * denom ).collect()
 }
 
@@ -138,7 +140,7 @@ pub fn normalize_other(coef: &[f64], dly1st: usize, f: f64)
  -> Vec<f64> {
   let w = std::f64::consts::TAU * f;
   let dly1st = dly1st as f64;
-  let (z0re, z0im) = polyval(coef, f.cos());
+  let (z0re, z0im) = polyval(coef, w.cos());
   let (a1re, a1im) = ((w* dly1st    ).cos(), -(w* dly1st    ).sin());
   let (a2re, a2im) = ((w*(dly1st+1.)).cos(), -(w*(dly1st+1.)).sin());
   let (z1re, z1im) = (z0re*a1re - z0im*a1im, z0re*a1im + z0im*a1re);
@@ -161,7 +163,19 @@ pub fn normalize_bunch(
 }
 
 pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
-  let cosines = f.iter().map( |&f| f.cos() ).collect::<Vec<_>>();
-  let z = zeros(&cosines);
+  let z = zeros(f);
   normalize_bunch(dly1st, f, &z)
+}
+
+pub fn harms(f: f64, flim: f64) -> Vec<f64> {
+  use std::iter::successors;
+  let point_n = (1.0/f + 0.5) as usize;
+  let mut v : Vec<f64> = (0..=(point_n-1)/2).map(|i| f*i as f64)
+                         .take_while(|&fi| fi <= flim).collect();
+  let sector_n = point_n - 2*(v.len() - 1);
+  let sector = 2.*(0.5 - v[v.len()-1])/(sector_n as f64);
+  successors(Some(v[v.len()-1]), |x| Some(x + sector)).skip(1)
+  .take((sector_n-1)/2).for_each( |f| v.push(f) );
+  if point_n % 2 == 0 { v.push(0.5); }
+  v
 }

@@ -4,7 +4,7 @@ use reson::log;
 
 #[wasm_bindgen_test]
 fn fir_test() {
-  let mut fir = Fir::new(vec![1.0]);
+  let mut fir = Fir::new(vec![1.0], 0);
   let test_case : Vec<f64> = vec![-0.5, -0.25, 0., 0.25, 0.5];
   test_case.into_iter().for_each( |x| assert_eq!(fir.next(x), x) );
   log(&format!("{:?}", fir));
@@ -79,15 +79,15 @@ fn zeros_test1(f: f64, coef: &[f64]) {
 
 #[wasm_bindgen_test]
 fn zeros_test() {
-  let ret = reson::zeros(&vec![1., -1. ]);
+  let ret = reson::zeros(&vec![0., 0.5]);
   zeros_test1(1./2., &ret[0]);
   zeros_test1(0./2., &ret[1]);
 
-  let ret = reson::zeros(&vec![1., -0.5]);
+  let ret = reson::zeros(&vec![0., 1./3.]);
   zeros_test1(1./3., &ret[0]);
   zeros_test1(0./3., &ret[1]);
 
-  let ret = reson::zeros(&vec![1.,  0. , -1. ]);
+  let ret = reson::zeros(&vec![0., 1./4., 1./2.]);
   zeros_test1(1./4., &ret[0]);
   zeros_test1(2./4., &ret[0]);
   zeros_test1(0./4., &ret[1]);
@@ -95,7 +95,7 @@ fn zeros_test() {
   zeros_test1(0./4., &ret[2]);
   zeros_test1(1./4., &ret[2]);
 
-  let ret = reson::zeros(&vec![1.,  0.5, -0.5, -1.]);
+  let ret = reson::zeros(&vec![0., 1./6., 2./6., 3./6.]);
   zeros_test1(1./6., &ret[0]);
   zeros_test1(2./6., &ret[0]);
   zeros_test1(3./6., &ret[0]);
@@ -138,4 +138,87 @@ fn linsolve01_test() {
   let (x0, x1) = reson::linsolve01(4., 3., 3., 2.);
   assert!((x0 -  3.0).abs() < 1e-6);
   assert!((x1 - -4.0).abs() < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn normalize_0_test() {
+  let result = reson::normalize_0(&vec![-1., -1., -1., -1.]);
+  let (re, im) = freq_resp(1./4., &result, 0);
+  assert!(re.abs() < 1e-6);
+  assert!(im.abs() < 1e-6);
+  let (re, im) = freq_resp(0., &result, 0);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn normalize_nyq_test() {
+  let result = reson::normalize_nyq(&vec![-1., 1., -1., 1.], 0);
+  let (re, im) = freq_resp(1./4., &result, 0);
+  assert!(re.abs() < 1e-6);
+  assert!(im.abs() < 1e-6);
+  let (re, im) = freq_resp(1./2., &result, 0);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let result = reson::normalize_nyq(&vec![-1., 1., -1., 1.], 1);
+  let (re, im) = freq_resp(1./4., &result, 1);
+  assert!(re.abs() < 1e-6);
+  assert!(im.abs() < 1e-6);
+  let (re, im) = freq_resp(1./2., &result, 1);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn normalize_other_test() {
+  let result = reson::normalize_other(&vec![-1., 0., 1.], 0, 1./4.);
+  let (re, im) = freq_resp(1./4., &result, 0);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let result = reson::normalize_other(&vec![-1., 0., 1.], 1, 1./4.);
+  let (re, im) = freq_resp(1./4., &result, 1);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn resonator_coef_test() {
+  let result = reson::resonator_coef(2, &vec![0., 1./3.]);
+
+  let (re, im) = freq_resp(0./3., &result[0], 2);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let (re, im) = freq_resp(1./3., &result[0], 2);
+  assert!( re      .abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let (re, im) = freq_resp(0./3., &result[1], 2);
+  assert!( re      .abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+
+  let (re, im) = freq_resp(1./3., &result[1], 2);
+  assert!((re - 1.).abs() < 1e-6);
+  assert!( im      .abs() < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn hamrs_test() {
+  let result = reson::harms(0.12, 0.4);
+  let expc = vec![0.0, 0.12, 0.24, 0.36, 0.5];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+
+  let result = reson::harms(0.12, 0.3);
+  let expc = vec![0.0, 0.12, 0.24, 0.37, 0.5];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+
+  let result = reson::harms(0.15, 0.4);
+  let expc = vec![0.0, 0.15, 0.3, 0.4+0.1/3.];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
+
+  let result = reson::harms(0.15, 0.5);
+  let expc = vec![0.0, 0.15, 0.3, 0.45];
+  result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));
 }
