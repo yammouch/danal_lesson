@@ -66,7 +66,7 @@ impl Resonator {
 
   pub fn tick(&mut self) {
     if self.wav_pos == 0 {
-      self.fir.tick(self.fir.out);
+      self.fir.tick(self.fir.out*self.decay);
     } else {
       self.wav_pos -= 1;
       self.fir.tick(self.wav[self.wav_pos]);
