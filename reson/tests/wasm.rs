@@ -6,7 +6,9 @@ use reson::log;
 fn fir_test() {
   let mut fir = Fir::new(vec![1.0], 0);
   let test_case : Vec<f64> = vec![-0.5, -0.25, 0., 0.25, 0.5];
-  test_case.into_iter().for_each( |x| assert_eq!(fir.next(x), x) );
+  test_case.into_iter().for_each( |x| {
+    fir.tick(x);
+    assert_eq!(fir.out, x) } );
   log(&format!("{:?}", fir));
 }
 

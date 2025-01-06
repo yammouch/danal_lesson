@@ -8,10 +8,11 @@ extern "C" {
 
 #[derive(Debug)]
 pub struct Fir {
-  pos  : usize,
-  skip : usize,
-  buf  : Vec<f64>,
-  coeff: Vec<f64>,
+  pos     : usize,
+  skip    : usize,
+  buf     : Vec<f64>,
+  coeff   : Vec<f64>,
+  pub out : f64,
 }
 
 impl Fir {
@@ -21,18 +22,64 @@ impl Fir {
       skip : skip,
       buf  : vec![0.0; v.len()+skip],
       coeff: v,
+      out  : 0.0,
     }
   }
 
-  pub fn next(&mut self, din: f64) -> f64 {
+  pub fn tick(&mut self, din: f64) {
     if self.pos == 0 {
       self.pos = self.buf.len() - 1;
     } else {
       self.pos -= 1;
     }
     self.buf[self.pos] = din;
-    self.buf[self.pos..].iter().chain(&self.buf).skip(self.skip)
-    .zip(&self.coeff).map(|(&b, &c)| b*c).sum()
+    self.out = self.buf[self.pos..].iter().chain(&self.buf).skip(self.skip)
+               .zip(&self.coeff).map(|(&b, &c)| b*c).sum();
+  }
+}
+
+#[derive(Debug)]
+pub struct Resonator {
+  fir      : Fir,
+  wav      : Vec<f64>,
+  wav_pos  : usize,
+  decay_on : f64,
+  decay_off: f64,
+  decay    : f64,
+}
+
+impl Resonator {
+  pub fn new(fir: Fir, wav: Vec<f64>, decay_on: f64, decay_off: f64) -> Self {
+    Self { fir: fir, wav: wav, wav_pos: 0,
+           decay_on: decay_on, decay_off: decay_off,
+           decay: decay_off }
+  }
+
+  pub fn off(&mut self) {
+    self.decay = self.decay_off;
+  }
+
+  pub fn on(&mut self) {
+    self.decay = self.decay_on;
+    self.wav_pos = self.wav.len();
+  }
+
+  pub fn tick(&mut self) {
+    if self.wav_pos == 0 {
+      self.fir.tick(self.fir.out);
+    } else {
+      self.wav_pos -= 1;
+      self.fir.tick(self.wav[self.wav_pos]);
+    }
+  }
+}
+
+impl Iterator for Resonator {
+  type Item = f64;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    self.tick();
+    Some(self.fir.out)
   }
 }
 
