@@ -27,6 +27,24 @@ fn resonator_test() {
   re.off();
   let out : Vec<f64> = re.by_ref().take(4).collect();
   assert_eq!(out, [0., 3./8., 0., 3./16.]);
+
+  let mut re = reson::Resonator::new(
+   Fir::new(vec![1.], 1),
+   vec![1., 1./2.],
+   1.,
+   0. );
+  re.on();
+  let out : Vec<f64> = re.by_ref().take(5).collect();
+  assert_eq!(out, [0., 1./2., 1., 1./2., 1.]);
+
+  let mut re = reson::Resonator::new(
+   Fir::new(vec![1., 1./2.], 2),
+   vec![1.],
+   1.,
+   0. );
+  re.on();
+  let out : Vec<f64> = re.by_ref().take(7).collect();
+  assert_eq!(out, [0., 0., 1., 1./2., 0., 1., 1.]);
 }
 
 #[wasm_bindgen_test]
