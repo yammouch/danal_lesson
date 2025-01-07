@@ -72,6 +72,14 @@ impl Resonator {
       self.fir.tick(self.wav[self.wav_pos]);
     }
   }
+
+  pub fn reson1() -> Self {
+    let h = harms(0.12, 0.4);
+    // 2->2, 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5
+    let c = resonator_coef(5, &h);
+    let fir = Fir::new(vxm(&vec![1.], &c), 5);
+    Resonator::new(fir, vec![1.], 1. - 1e-4, 1. - 1e-1)
+  }
 }
 
 impl Iterator for Resonator {
