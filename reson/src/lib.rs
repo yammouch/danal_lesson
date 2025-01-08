@@ -7,6 +7,7 @@ extern "C" {
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub struct Fir {
   pos     : usize,
   skip    : usize,
@@ -39,6 +40,7 @@ impl Fir {
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub struct Resonator {
   fir      : Fir,
   wav      : Vec<f64>,
@@ -48,6 +50,7 @@ pub struct Resonator {
   decay    : f64,
 }
 
+#[wasm_bindgen]
 impl Resonator {
   pub fn new(fir: Fir, wav: Vec<f64>, decay_on: f64, decay_off: f64) -> Self {
     Self { fir: fir, wav: wav, wav_pos: 0,
@@ -73,11 +76,15 @@ impl Resonator {
     }
   }
 
+  pub fn out(&self) -> f64 {
+    self.fir.out
+  }
+
   pub fn reson1() -> Self {
     let h = harms(0.12, 0.4);
     // 2->2, 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5
     let c = resonator_coef(5, &h);
-    let fir = Fir::new(vxm(&vec![1.], &c), 5);
+    let fir = Fir::new(vxm(&vec![0., 1.], &c), 5);
     Resonator::new(fir, vec![1.], 1. - 1e-4, 1. - 1e-1)
   }
 }

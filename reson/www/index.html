@@ -2,7 +2,8 @@
 <html>
  <head>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
-  <script type="text/javascript">
+  <script type="module">
+   import init, { Resonator } from '../pkg/reson.js';
    const audioContext = new AudioContext();
 
    // refer to:
@@ -37,7 +38,9 @@
      return v.buffer;
    }
 
-   window.addEventListener("DOMContentLoaded", () => {
+   async function main() {
+     const wasm = await init();
+     const reson = Resonator.reson1();
      const sr = audioContext.sampleRate;
      const f = 440/sr;
      const y = Array.from({length:sr}, (_, i) =>Math.sin(2*Math.PI*f*i));
@@ -57,7 +60,9 @@
      audio.controls = true;
      const tone = document.getElementById("tone");
      tone.appendChild(audio);
-   });
+   }
+
+   main();
   </script>
  </head>
  <body>
