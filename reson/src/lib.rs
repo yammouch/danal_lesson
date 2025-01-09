@@ -80,6 +80,10 @@ impl Resonator {
     self.fir.out
   }
 
+  pub fn coeff(&self) -> Vec<f64> {
+    self.fir.coeff.to_vec()
+  }
+
   pub fn reson1() -> Self {
     let f : f64 = 0.014;
     //let f : f64 = 0.013; // diverges

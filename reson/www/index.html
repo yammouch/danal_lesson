@@ -42,7 +42,7 @@
      const wasm = await init();
      const reson = Resonator.reson1();
      const sr = audioContext.sampleRate;
-     console.log(sr);
+     const coeff = reson.coeff();
      reson.on();
      let y = [];
      for (let i = 0; i < sr; i++) {
@@ -50,12 +50,25 @@
        y.push(reson.out());
      }
 
+     const polts = document.getElementById('plots');
+
      const plotlen = 4000;
-     const TESTER = document.getElementById('tester');
+     const waveform = document.createElement('div');
+     waveform.style = 'width:600px;height:250px';
+     plots.appendChild(waveform);
      Plotly.newPlot
-     ( TESTER
+     ( waveform
      , [{ x: Array.from({length:plotlen}, (_, i) => i),
           y: y.slice(0, plotlen) }]
+     , { margin: { t: 0 } } );
+
+     const coeff_plot = document.createElement('div');
+     coeff_plot.style = 'width:600px;height:250px';
+     plots.appendChild(coeff_plot);
+     Plotly.newPlot
+     ( coeff_plot
+     , [{ x: Array.from({length:coeff.length}, (_, i) => i),
+          y: coeff }]
      , { margin: { t: 0 } } );
 
      const wav = array2wav(y);
@@ -73,6 +86,6 @@
  </head>
  <body>
   <div id="tone"></div>
-  <div id="tester" style="width:600px;height:250px"></div>
+  <div id="plots"></div>
  </body>
 </html>
