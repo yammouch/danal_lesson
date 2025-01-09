@@ -81,11 +81,14 @@ impl Resonator {
   }
 
   pub fn reson1() -> Self {
-    let h = harms(0.12, 0.4);
+    let f : f64 = 0.014;
+    //let f : f64 = 0.013; // diverges
+    let h = harms(f, 0.4);
+    let dly1st = ((1./f + 0.5) as usize)/2 + 1;
     // 2->2, 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5
-    let c = resonator_coef(5, &h);
-    let fir = Fir::new(vxm(&vec![0., 1.], &c), 5);
-    Resonator::new(fir, vec![1.], 1. - 1e-4, 1. - 1e-1)
+    let c = resonator_coef(dly1st, &h);
+    let fir = Fir::new(vxm(&vec![0., 1.], &c), dly1st);
+    Resonator::new(fir, vec![8.], 1. - 1e-4, 1. - 1e-1)
   }
 }
 

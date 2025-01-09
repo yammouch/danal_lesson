@@ -50,11 +50,12 @@
        y.push(reson.out());
      }
 
+     const plotlen = 4000;
      const TESTER = document.getElementById('tester');
      Plotly.newPlot
      ( TESTER
-     , [{ x: Array.from({length:100}, (_, i) => i),
-          y: y.slice(0, 100) }]
+     , [{ x: Array.from({length:plotlen}, (_, i) => i),
+          y: y.slice(0, plotlen) }]
      , { margin: { t: 0 } } );
 
      const wav = array2wav(y);
