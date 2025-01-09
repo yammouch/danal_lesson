@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+  <script src="./node_modules/plotly.js-dist/plotly.js" charset="utf-8"></script>
   <script type="module">
-   import init, { Resonator } from '../pkg/reson.js';
+   import init, { Resonator } from './node_modules/wasm_engine/reson.js';
    const audioContext = new AudioContext();
 
    // refer to:
