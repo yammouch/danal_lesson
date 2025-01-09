@@ -84,8 +84,8 @@ impl Resonator {
     self.fir.coeff.to_vec()
   }
 
-  pub fn reson1() -> Self {
-    let f : f64 = 0.014;
+  pub fn reson1(f: f64) -> Self {
+    //let f : f64 = 0.016;
     //let f : f64 = 0.013; // diverges
     let h = harms(f, 0.4);
     let dly1st = ((1./f + 0.5) as usize)/2 + 1;
