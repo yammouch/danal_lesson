@@ -42,8 +42,13 @@
      const wasm = await init();
      const reson = Resonator.reson1();
      const sr = audioContext.sampleRate;
-     const f = 440/sr;
-     const y = Array.from({length:sr}, (_, i) =>Math.sin(2*Math.PI*f*i));
+     console.log(sr);
+     reson.on();
+     let y = [];
+     for (let i = 0; i < sr; i++) {
+       reson.tick();
+       y.push(reson.out());
+     }
 
      const TESTER = document.getElementById('tester');
      Plotly.newPlot
