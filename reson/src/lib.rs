@@ -152,6 +152,21 @@ where
   })
 }
 
+pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
+  let     fwd  = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
+  let mut bwd  = cumconvolve(polys.iter().rev()).collect::<Vec<_>>();
+  let     ret1 = bwd.pop().unwrap();
+  let mut ret  = vec![];
+  if !bwd.is_empty() {
+    ret.push(bwd.pop().unwrap());
+  }
+  fwd.iter().enumerate().for_each( |(i, f)| {
+    ret.push(convolve(f, &bwd[fwd.len()-1-i]));
+  });
+
+  (ret, ret1)
+}
+
 pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
   let tau = std::f64::consts::TAU;
 
