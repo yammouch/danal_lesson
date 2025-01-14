@@ -1,3 +1,4 @@
+use std::ops::{Add, Mul};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -134,10 +135,15 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
                                 .collect() ).unwrap()
 }
 
-pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
-  let mut ret : Vec<_> = vec![0.0; u.len() + v.len() - 1];
-  u.iter().enumerate().for_each( |(i, &u1)| {
-    (i..).zip(v).for_each( |(j, &v1)| { ret[j] += u1*v1; } )
+pub fn convolve<T>(u: &[T], v: &[T]) -> Vec<T>
+where T: Add<Output=T> + Mul<Output=T> + Copy
+{
+  let mut ret : Vec<_> = v.iter().map( |&v| u[0]*v ).collect();
+  (1..u.len()).for_each( |i| {
+    (0..v.len()-1).for_each ( |j| {
+      ret[i+j] = ret[i+j] + u[i] * v[j];
+    });
+    ret.push(u[i] * v[v.len()-1]);
   });
   ret
 }
