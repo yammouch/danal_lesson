@@ -136,7 +136,8 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
 }
 
 pub fn convolve<T>(u: &[T], v: &[T]) -> Vec<T>
-where T: Add<Output=T> + Mul<Output=T> + Copy
+where
+  T: Add<Output=T> + Mul<Output=T> + Copy
 {
   let mut ret : Vec<_> = v.iter().map( |&v| u[0]*v ).collect();
   (1..u.len()).for_each( |i| {
@@ -148,11 +149,14 @@ where T: Add<Output=T> + Mul<Output=T> + Copy
   ret
 }
 
-pub fn cumconvolve(polys: &[Vec<f64>]) -> Vec<Vec<f64>> {
+pub fn cumconvolve<T>(polys: &[Vec<T>]) -> Vec<Vec<T>>
+where
+  T: Add<Output=T> + Mul<Output=T> + Copy
+{
   if polys.is_empty() {
     vec![]
   } else {
-    let mut ret : Vec<Vec<f64>> = vec![polys[0].clone()];
+    let mut ret = vec![polys[0].clone()];
     (1..polys.len()).for_each( |i| {
       ret.push(convolve(&ret[ret.len()-1], &polys[i]));
     });
