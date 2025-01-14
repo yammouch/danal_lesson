@@ -191,15 +191,7 @@ pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
     }
   ).collect();
 
-  let fwd = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
-  let bwd = cumconvolve(polys[1..].iter().rev())
-            .collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>();
-  let mut mid = fwd.iter().zip(&bwd[1..])
-                .map(|(f, b)| convolve(f, b)).collect::<Vec<_>>();
-  let mut ret = vec![bwd[0].clone()];
-  ret.append(&mut mid);
-  ret.push(fwd[fwd.len()-1].clone());
-  ret
+  diagless(&polys).0
 }
 
 pub fn polyval(coef: &[f64], cosine: f64) -> (f64, f64) {
