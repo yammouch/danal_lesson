@@ -158,9 +158,18 @@ pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
   // fwd[0] [f00, f01]           *      [b10, b11, b12] bwd[1] = ret[1]
   // fwd[1] [f10, f11, f12]      *           [b00, b01] bwd[0] = ret[2]
   // fwd[2] [f20, f21, f22, f23]                               = ret[3]
-  let mut fwd  = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
-  let mut bwd  = cumconvolve(polys.iter().rev()).collect::<Vec<_>>();
-  let     ret1 = bwd.pop().unwrap();
+  let mut fwd = if polys.is_empty() {
+    vec![]
+  } else {
+    cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>()
+  };
+  let mut bwd = cumconvolve(polys.iter().rev()).collect::<Vec<_>>();
+
+  let ret1 = match bwd.pop() {
+    Some(v) => v,
+    None    => vec![1.],
+  };
+
   let mut ret  = vec![];
   if let Some(v) = bwd.pop() {
     ret.push(v);
@@ -173,7 +182,7 @@ pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
   if let Some(v) = fwd.pop() {
     ret.push(v);
   }
-  if ret.is_empty() {
+  if polys.len() == 1 {
     ret.push(vec![1.]);
   }
 
@@ -203,6 +212,9 @@ pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
     }
   });
 
+  let (edg_diag, edg_prod) = diagless(&edges);
+  let (mid_diag, mid_prod) = diagless(&midds);
+
   let mut polys : Vec<Vec<f64>> = vec![];
   let mut m = 0;
   let mut e = 0;
@@ -211,22 +223,22 @@ pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
       if edges.len() <= e {
         break;
       } else {
-        polys.push(edges[e].clone());
+        polys.push(convolve(&edg_diag[e], &mid_prod));
         e += 1;
       }
     } else if edges.len() <= e {
-      polys.push(midds[m].clone());
+      polys.push(convolve(&mid_diag[m], &edg_prod));
       m += 1;
     } else if mid_i[m] < edg_i[e] {
-      polys.push(midds[m].clone());
+      polys.push(convolve(&mid_diag[m], &edg_prod));
       m += 1;
     } else {
-      polys.push(edges[e].clone());
+      polys.push(convolve(&edg_diag[e], &mid_prod));
       e += 1;
     }
   }
 
-  diagless(&polys).0
+  polys
 }
 
 pub fn polyval(coef: &[f64], cosine: f64) -> (f64, f64) {

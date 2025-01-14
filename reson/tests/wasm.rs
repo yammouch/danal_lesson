@@ -111,6 +111,10 @@ fn diagless_test() {
   let v : Vec<Vec<f64>> = vec![vec![2.]];
   let res = reson::diagless(&v);
   assert_eq!(res, (vec![vec![1.]], vec![2.]));
+
+  let v : Vec<Vec<f64>> = vec![];
+  let res = reson::diagless(&v);
+  assert_eq!(res, (vec![], vec![1.]));
 }
 
 fn freq_resp(f: f64, coef: &[f64], skip: usize) -> (f64, f64) {
