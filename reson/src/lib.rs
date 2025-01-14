@@ -1,4 +1,5 @@
 use std::ops::{Add, Mul};
+use num_traits::identities::One;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -137,7 +138,7 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
 
 pub fn convolve<T>(u: &[T], v: &[T]) -> Vec<T>
 where
-  T: Add<Output=T> + Mul<Output=T> + Copy
+  T: Add<Output=T> + Mul<Output=T> + Copy,
 {
   let mut ret : Vec<_> = v.iter().map( |&v| u[0]*v ).collect();
   (1..u.len()).for_each( |i| {
@@ -151,7 +152,7 @@ where
 
 pub fn cumconvolve<T>(polys: &[Vec<T>]) -> Vec<Vec<T>>
 where
-  T: Add<Output=T> + Mul<Output=T> + Copy
+  T: Add<Output=T> + Mul<Output=T> + Copy,
 {
   if polys.is_empty() {
     vec![]
@@ -164,7 +165,10 @@ where
   }
 }
 
-pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
+pub fn diagless<T>(polys: &[Vec<T>]) -> (Vec<Vec<T>>, Vec<T>)
+where
+  T: Add<Output=T> + Mul<Output=T> + One + Copy,
+{
   //                          [b30, b31, b32, b33, b34] bwd[3] = ret1
   //                               [b20, b21, b22, b23] bwd[2] = ret[0]
   // fwd[0] [f00, f01]           *      [b10, b11, b12] bwd[1] = ret[1]
@@ -181,7 +185,7 @@ pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
 
   let ret1 = match bwd.pop() {
     Some(v) => v,
-    None    => vec![1.],
+    None    => vec![T::one()],
   };
 
   let mut ret  = vec![];
@@ -197,7 +201,7 @@ pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
     ret.push(v);
   }
   if polys.len() == 1 {
-    ret.push(vec![1.]);
+    ret.push(vec![T::one()]);
   }
 
   (ret, ret1)
