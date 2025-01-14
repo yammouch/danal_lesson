@@ -149,10 +149,15 @@ where T: Add<Output=T> + Mul<Output=T> + Copy
 }
 
 pub fn cumconvolve(polys: &[Vec<f64>]) -> Vec<Vec<f64>> {
-  polys.iter().scan(vec![1.], |state, p| {
-    *state = convolve(state, p);
-    Some(state.clone())
-  }).collect()
+  if polys.is_empty() {
+    vec![]
+  } else {
+    let mut ret : Vec<Vec<f64>> = vec![polys[0].clone()];
+    (1..polys.len()).for_each( |i| {
+      ret.push(convolve(&ret[ret.len()-1], &polys[i]));
+    });
+    ret
+  }
 }
 
 pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
