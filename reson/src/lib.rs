@@ -182,13 +182,24 @@ pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
 
 pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
   let tau = std::f64::consts::TAU;
-  let mut midds : Vec<(usize, Vec<f64>)> = vec![];
-  let mut edges : Vec<(usize, Vec<f64>)> = vec![];
+  let mut midds : Vec<Vec<f64>> = vec![];
+  let mut mid_i : Vec<usize>    = vec![];
+  let mut edges : Vec<Vec<f64>> = vec![];
+  let mut edg_i : Vec<usize>    = vec![];
   f.iter().enumerate().for_each( |(i, &f)| {
     match f {
-      0.  => edges.push((i, vec![1., -1.])), // for DC
-      0.5 => edges.push((i, vec![1.,  1.])), // for Nyquist
-      f   => midds.push((i, vec![1., -2.*(tau*f).cos(), 1.])),
+      0. => {
+        edges.push(vec![1., -1.]);
+        edg_i.push(i);
+      }, // for DC
+      0.5 => {
+        edges.push(vec![1.,  1.]);
+        edg_i.push(i);
+      }, // for Nyquist
+      f => {
+        midds.push(vec![1., -2.*(tau*f).cos(), 1.]);
+        mid_i.push(i);
+      },
     }
   });
 
@@ -200,17 +211,17 @@ pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
       if edges.len() <= e {
         break;
       } else {
-        polys.push(edges[e].1.clone());
+        polys.push(edges[e].clone());
         e += 1;
       }
     } else if edges.len() <= e {
-      polys.push(midds[m].1.clone());
+      polys.push(midds[m].clone());
       m += 1;
-    } else if midds[m].0 < edges[e].0 {
-      polys.push(midds[m].1.clone());
+    } else if mid_i[m] < edg_i[e] {
+      polys.push(midds[m].clone());
       m += 1;
     } else {
-      polys.push(edges[e].1.clone());
+      polys.push(edges[e].clone());
       e += 1;
     }
   }
