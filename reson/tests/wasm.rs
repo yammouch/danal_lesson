@@ -98,6 +98,21 @@ fn convolve_test() {
              vec![1., 9., 27., 27.]);
 }
 
+#[wasm_bindgen_test]
+fn diagless_test() {
+  let v : Vec<Vec<f64>> = vec![vec![2.], vec![3.], vec![4.]];
+  let res = reson::diagless(&v);
+  assert_eq!(res, (vec![vec![12.], vec![8.], vec![6.]], vec![24.]));
+
+  let v : Vec<Vec<f64>> = vec![vec![2.], vec![3.]];
+  let res = reson::diagless(&v);
+  assert_eq!(res, (vec![vec![3.], vec![2.]], vec![6.]));
+
+  let v : Vec<Vec<f64>> = vec![vec![2.]];
+  let res = reson::diagless(&v);
+  assert_eq!(res, (vec![vec![1.]], vec![2.]));
+}
+
 fn freq_resp(f: f64, coef: &[f64], skip: usize) -> (f64, f64) {
   let tau = std::f64::consts::TAU;
   let re : f64 = (skip..).zip(coef).map( |(i, &x)|

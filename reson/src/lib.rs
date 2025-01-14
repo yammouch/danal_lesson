@@ -153,16 +153,29 @@ where
 }
 
 pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
-  let     fwd  = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
+  //                          [b30, b31, b32, b33, b34] bwd[3] = ret1
+  //                               [b20, b21, b22, b23] bwd[2] = ret[0]
+  // fwd[0] [f00, f01]           *      [b10, b11, b12] bwd[1] = ret[1]
+  // fwd[1] [f10, f11, f12]      *           [b00, b01] bwd[0] = ret[2]
+  // fwd[2] [f20, f21, f22, f23]                               = ret[3]
+  let mut fwd  = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
   let mut bwd  = cumconvolve(polys.iter().rev()).collect::<Vec<_>>();
   let     ret1 = bwd.pop().unwrap();
   let mut ret  = vec![];
-  if !bwd.is_empty() {
-    ret.push(bwd.pop().unwrap());
+  if let Some(v) = bwd.pop() {
+    ret.push(v);
   }
-  fwd.iter().enumerate().for_each( |(i, f)| {
-    ret.push(convolve(f, &bwd[fwd.len()-1-i]));
-  });
+  if !fwd.is_empty() {
+    (0..fwd.len()-1).for_each( |i| {
+      ret.push(convolve(&fwd[i], &bwd[fwd.len()-2-i]));
+    });
+  }
+  if let Some(v) = fwd.pop() {
+    ret.push(v);
+  }
+  if ret.is_empty() {
+    ret.push(vec![1.]);
+  }
 
   (ret, ret1)
 }
