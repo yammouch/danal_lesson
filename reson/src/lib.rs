@@ -148,14 +148,11 @@ where T: Add<Output=T> + Mul<Output=T> + Copy
   ret
 }
 
-pub fn cumconvolve<'a, I>(polys: I) -> impl Iterator<Item=Vec<f64>> + 'a
-where
-  I: Iterator<Item=&'a Vec<f64>> + 'a,
-{
-  polys.scan(vec![1.], |state, p| {
+pub fn cumconvolve(polys: &[Vec<f64>]) -> Vec<Vec<f64>> {
+  polys.iter().scan(vec![1.], |state, p| {
     *state = convolve(state, p);
     Some(state.clone())
-  })
+  }).collect()
 }
 
 pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
@@ -167,9 +164,11 @@ pub fn diagless(polys: &[Vec<f64>]) -> (Vec<Vec<f64>>, Vec<f64>) {
   let mut fwd = if polys.is_empty() {
     vec![]
   } else {
-    cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>()
+    cumconvolve(&polys[..polys.len()-1])
   };
-  let mut bwd = cumconvolve(polys.iter().rev()).collect::<Vec<_>>();
+  let mut polys_rev = polys.to_vec().clone();
+  polys_rev.reverse();
+  let mut bwd = cumconvolve(&polys_rev);
 
   let ret1 = match bwd.pop() {
     Some(v) => v,
