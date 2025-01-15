@@ -1,5 +1,6 @@
 use std::ops::{Add, Mul};
 use num_traits::identities::One;
+use num_complex::*;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -207,12 +208,17 @@ where
   (ret, ret1)
 }
 
+pub fn conv_conj(p: &[Complex64]) -> Vec<f64> {
+  convolve(p, &p.iter().map( |&c| c.conj() ).collect::<Vec<_>>())
+  .iter().map( |&c| c.re ).collect()
+}
+
 pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
   let tau = std::f64::consts::TAU;
-  let mut midds : Vec<Vec<f64>> = vec![];
-  let mut mid_i : Vec<usize>    = vec![];
-  let mut edges : Vec<Vec<f64>> = vec![];
-  let mut edg_i : Vec<usize>    = vec![];
+  let mut midds : Vec<Vec<Complex64>> = vec![];
+  let mut mid_i : Vec<usize>          = vec![];
+  let mut edges : Vec<Vec<f64>>       = vec![];
+  let mut edg_i : Vec<usize>          = vec![];
   f.iter().enumerate().for_each( |(i, &f)| {
     match f {
       0. => {
@@ -224,7 +230,8 @@ pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
         edg_i.push(i);
       }, // for Nyquist
       f => {
-        midds.push(vec![1., -2.*(tau*f).cos(), 1.]);
+        let w = tau*f;
+        midds.push(vec![c64(1., 0.), -c64(w.cos(), -w.sin())]);
         mid_i.push(i);
       },
     }
@@ -232,6 +239,8 @@ pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
 
   let (edg_diag, edg_prod) = diagless(&edges);
   let (mid_diag, mid_prod) = diagless(&midds);
+  let mid_diag = mid_diag.iter().map( |v| conv_conj(v) ).collect::<Vec<_>>();
+  let mid_prod = conv_conj(&mid_prod);
 
   let mut polys : Vec<Vec<f64>> = vec![];
   let mut m = 0;
