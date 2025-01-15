@@ -40,7 +40,7 @@
 
    async function main() {
      const wasm = await init();
-     const reson = Resonator.reson1();
+     const reson = Resonator.reson1(0.014);
      const sr = audioContext.sampleRate;
      const coeff = reson.coeff();
      reson.on();
