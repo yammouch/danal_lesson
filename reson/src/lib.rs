@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+extern crate nalgebra as na;
 
 #[wasm_bindgen]
 extern "C" {
@@ -232,8 +233,55 @@ pub fn normalize_bunch(
 }
 
 pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
-  let z = zeros(f);
-  normalize_bunch(dly1st, f, &z)
+  let mut f_pm : Vec<f64> = vec![];
+  f.iter().for_each( |&x| {
+    match x {
+      0. | 0.5 => {
+        f_pm.push(x);
+      },
+      x => {
+        f_pm.push( x);
+        f_pm.push(-x);
+      },
+    }
+  });
+  //console_log!("{f_pm:?}");
+  let mut b = na::DMatrix::from_element(f_pm.len(), f.len(),
+   na::Complex::new(0., 0.) );
+  let mut i : usize = 0;
+  f.iter().enumerate().for_each( |(j, &x)| {
+    //console_log!("{i:?} {j:?}");
+    match x {
+      0. | 0.5 => {
+        b[(i, j)] = na::Complex::new(1., 0.);
+        i += 1;
+      },
+      x => {
+        b[(i  , j)] = na::Complex::new(1., 0.);
+        b[(i+1, j)] = na::Complex::new(1., 0.);
+        i += 2;
+      },
+    }
+  });
+  //console_log!("{b:#?}");
+  let f_pm = na::DVector::from_vec(f_pm);
+  let n = na::RowDVector::from_vec(
+   (dly1st..dly1st+f_pm.len()).map( |i| i as f64).collect::<Vec<_>>());
+  let a = na::DMatrix::from_fn(f_pm.len(), n.len(), |i, j| {
+    let tau = std::f64::consts::TAU;
+    let val = (f_pm[i] - (f_pm[i]*n[j] + 1./2.).floor()/n[j])*n[j];
+    let ph = tau*val;
+    na::Complex::new(ph.cos(), -ph.sin())
+  } );
+  //console_log!("{a:#?}");
+  let x = a.full_piv_lu().solve(&b).unwrap();
+  //console_log!("{x:#?}");
+  //x.column_iter().for_each( |x| console_log!("{:#?}", x.as_slice()) );
+  let v = x.column_iter().map( |c| {
+    c.as_slice().iter().map( |&x| x.re ).collect::<Vec<_>>()
+  }).collect::<Vec<_>>();
+  //console_log!("{v:#?}");
+  v
 }
 
 pub fn harms(f: f64, flim: f64) -> Vec<f64> {
