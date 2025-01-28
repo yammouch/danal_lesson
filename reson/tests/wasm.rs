@@ -92,12 +92,6 @@ fn vxm_test() {
   assert_eq!(reson::vxm(&v, &m), expc);
 }
 
-#[wasm_bindgen_test]
-fn convolve_test() {
-  assert_eq!(reson::convolve(&vec![1., 3.], &vec![1., 6., 9.]),
-             vec![1., 9., 27., 27.]);
-}
-
 fn freq_resp(f: f64, coef: &[f64], skip: usize) -> (f64, f64) {
   let tau = std::f64::consts::TAU;
   let re : f64 = (skip..).zip(coef).map( |(i, &x)|
@@ -107,117 +101,6 @@ fn freq_resp(f: f64, coef: &[f64], skip: usize) -> (f64, f64) {
                    (-tau*f*(i as f64)).sin()*x
                  ).sum();
   (re, im)
-}
-
-fn zeros_test1(f: f64, coef: &[f64]) {
-  let (x, _) = freq_resp(f, coef, 0);
-  assert!(x.abs() < 1e-6);
-}
-
-#[wasm_bindgen_test]
-fn zeros_test() {
-  let ret = reson::zeros(&vec![0., 0.5]);
-  zeros_test1(1./2., &ret[0]);
-  zeros_test1(0./2., &ret[1]);
-
-  let ret = reson::zeros(&vec![0., 1./3.]);
-  zeros_test1(1./3., &ret[0]);
-  zeros_test1(0./3., &ret[1]);
-
-  let ret = reson::zeros(&vec![0., 1./4., 1./2.]);
-  zeros_test1(1./4., &ret[0]);
-  zeros_test1(2./4., &ret[0]);
-  zeros_test1(0./4., &ret[1]);
-  zeros_test1(2./4., &ret[1]);
-  zeros_test1(0./4., &ret[2]);
-  zeros_test1(1./4., &ret[2]);
-
-  let ret = reson::zeros(&vec![0., 1./6., 2./6., 3./6.]);
-  zeros_test1(1./6., &ret[0]);
-  zeros_test1(2./6., &ret[0]);
-  zeros_test1(3./6., &ret[0]);
-  zeros_test1(0./6., &ret[1]);
-  zeros_test1(2./6., &ret[1]);
-  zeros_test1(3./6., &ret[1]);
-  zeros_test1(0./6., &ret[2]);
-  zeros_test1(1./6., &ret[2]);
-  zeros_test1(3./6., &ret[2]);
-  zeros_test1(0./6., &ret[3]);
-  zeros_test1(1./6., &ret[3]);
-  zeros_test1(2./6., &ret[3]);
-}
-
-#[wasm_bindgen_test]
-fn polyval_test() {
-  let (re, im) = reson::polyval(&[1.], 0.5);
-  assert!((re - 1.0).abs() < 1e-6);
-  assert!((im - 0.0).abs() < 1e-6);
-
-  let (re, im) = reson::polyval(&[0., 0., 1.], 0.5_f64.sqrt());
-  assert!((re -  0.0).abs() < 1e-6);
-  assert!((im - -1.0).abs() < 1e-6);
-
-  let (re, im) = reson::polyval(&[-1., 2.], 0.0);
-  assert!((re - -1.0).abs() < 1e-6);
-  assert!((im - -2.0).abs() < 1e-6);
-
-  let (re, im) = reson::polyval(&[-1., 2.], 0.5);
-  assert!((re -   0.0         ).abs() < 1e-6);
-  assert!((im - -(3f64.sqrt())).abs() < 1e-6);
-}
-
-#[wasm_bindgen_test]
-fn linsolve01_test() {
-  let (x0, x1) = reson::linsolve01(2., 3., 3., 4.);
-  assert!((x0 -  3.0).abs() < 1e-6);
-  assert!((x1 - -2.0).abs() < 1e-6);
-
-  let (x0, x1) = reson::linsolve01(4., 3., 3., 2.);
-  assert!((x0 -  3.0).abs() < 1e-6);
-  assert!((x1 - -4.0).abs() < 1e-6);
-}
-
-#[wasm_bindgen_test]
-fn normalize_0_test() {
-  let result = reson::normalize_0(&vec![-1., -1., -1., -1.]);
-  let (re, im) = freq_resp(1./4., &result, 0);
-  assert!(re.abs() < 1e-6);
-  assert!(im.abs() < 1e-6);
-  let (re, im) = freq_resp(0., &result, 0);
-  assert!((re - 1.).abs() < 1e-6);
-  assert!( im      .abs() < 1e-6);
-}
-
-#[wasm_bindgen_test]
-fn normalize_nyq_test() {
-  let result = reson::normalize_nyq(&vec![-1., 1., -1., 1.], 0);
-  let (re, im) = freq_resp(1./4., &result, 0);
-  assert!(re.abs() < 1e-6);
-  assert!(im.abs() < 1e-6);
-  let (re, im) = freq_resp(1./2., &result, 0);
-  assert!((re - 1.).abs() < 1e-6);
-  assert!( im      .abs() < 1e-6);
-
-  let result = reson::normalize_nyq(&vec![-1., 1., -1., 1.], 1);
-  let (re, im) = freq_resp(1./4., &result, 1);
-  assert!(re.abs() < 1e-6);
-  assert!(im.abs() < 1e-6);
-  let (re, im) = freq_resp(1./2., &result, 1);
-  assert!((re - 1.).abs() < 1e-6);
-  assert!( im      .abs() < 1e-6);
-}
-
-#[wasm_bindgen_test]
-fn normalize_other_test() {
-  let result = reson::normalize_other(&vec![-1., 0., 1.], 0, 1./4.);
-  let (re, im) = freq_resp(1./4., &result, 0);
-  assert!((re - 1.).abs() < 1e-6);
-  assert!( im      .abs() < 1e-6);
-
-  let result = reson::normalize_other(&vec![-1., 0., 1.], 1, 1./4.);
-  let (re, im) = freq_resp(1./4., &result, 1);
-  assert!((re - 1.).abs() < 1e-6);
-  assert!( im      .abs() < 1e-6);
 }
 
 #[wasm_bindgen_test]
@@ -242,7 +125,7 @@ fn resonator_coef_test() {
 }
 
 #[wasm_bindgen_test]
-fn hamrs_test() {
+fn harms_test() {
   let result = reson::harms(0.12, 0.4);
   let expc = vec![0.0, 0.12, 0.24, 0.36, 0.5];
   result.iter().zip(&expc).for_each( |(&r, &e)| assert!((r-e).abs() < 1e-6));

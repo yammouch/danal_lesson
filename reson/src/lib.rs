@@ -135,103 +135,6 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
                                 .collect() ).unwrap()
 }
 
-pub fn convolve(u: &[f64], v: &[f64]) -> Vec<f64> {
-  let mut ret : Vec<_> = vec![0.0; u.len() + v.len() - 1];
-  u.iter().enumerate().for_each( |(i, &u1)| {
-    (i..).zip(v).for_each( |(j, &v1)| { ret[j] += u1*v1; } )
-  });
-  ret
-}
-
-pub fn cumconvolve<'a, I>(polys: I) -> impl Iterator<Item=Vec<f64>> + 'a
-where
-  I: Iterator<Item=&'a Vec<f64>> + 'a,
-{
-  polys.scan(vec![1.], |state, p| {
-    *state = convolve(state, p);
-    Some(state.clone())
-  })
-}
-
-pub fn zeros(f: &[f64]) -> Vec<Vec<f64>> {
-  let tau = std::f64::consts::TAU;
-
-  let polys : Vec<Vec<f64>> = f.iter().map( |&f|
-    match f {
-     0.  => vec![1., -1.              ], // for DC
-     0.5 => vec![1.,  1.              ], // for Nyquist
-     _   => vec![1., -2.*(tau*f).cos(), 1.],
-    }
-  ).collect();
-
-  let fwd = cumconvolve(polys[..polys.len()-1].iter()).collect::<Vec<_>>();
-  let bwd = cumconvolve(polys[1..].iter().rev())
-            .collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>();
-  let mut mid = fwd.iter().zip(&bwd[1..])
-                .map(|(f, b)| convolve(f, b)).collect::<Vec<_>>();
-  let mut ret = vec![bwd[0].clone()];
-  ret.append(&mut mid);
-  ret.push(fwd[fwd.len()-1].clone());
-  ret
-}
-
-pub fn polyval(coef: &[f64], cosine: f64) -> (f64, f64) {
-  let sine = -(1.0-cosine*cosine).sqrt();
-  coef.iter().rfold((0f64, 0f64), |(re, im), &k|
-    (k+cosine*re-sine*im, cosine*im+sine*re) )
-}
-
-pub fn linsolve01(a00: f64, a01: f64, a10: f64, a11: f64) -> (f64, f64) {
-  if a00.abs() < a01.abs() {
-    let r = -a00/a01;
-    let sol = 1.0/(a10 + a11*r);
-    (sol, sol*r)
-  } else {
-    let r = -a01/a00;
-    let sol = 1.0/(a10*r + a11);
-    (sol*r, sol)
-  }
-}
-
-pub fn normalize_0(coef: &[f64]) -> Vec<f64> {
-  let denom = 1f64/coef.iter().sum::<f64>();
-  coef.iter().map( |&x| x * denom ).collect()
-}
-
-pub fn normalize_nyq(coef: &[f64], dly1st: usize) -> Vec<f64> {
-  let even_sum = coef     .iter().step_by(2).sum::<f64>();
-  let odd_sum  = coef[1..].iter().step_by(2).sum::<f64>();
-  let denom = 1f64 /
-   if dly1st % 2 == 0 { even_sum - odd_sum } else { odd_sum - even_sum };
-  coef.iter().map( |&x| x * denom ).collect()
-}
-
-pub fn normalize_other(coef: &[f64], dly1st: usize, f: f64)
- -> Vec<f64> {
-  let w = std::f64::consts::TAU * f;
-  let dly1st = dly1st as f64;
-  let (z0re, z0im) = polyval(coef, w.cos());
-  let (a1re, a1im) = ((w* dly1st    ).cos(), -(w* dly1st    ).sin());
-  let (a2re, a2im) = ((w*(dly1st+1.)).cos(), -(w*(dly1st+1.)).sin());
-  let (z1re, z1im) = (z0re*a1re - z0im*a1im, z0re*a1im + z0im*a1re);
-  let (z2re, z2im) = (z0re*a2re - z0im*a2im, z0re*a2im + z0im*a2re);
-  let k = linsolve01(z1im, z2im, z1re, z2re);
-  convolve(&vec![k.0, k.1], coef)
-}
-
-pub fn normalize_bunch(
- dly1st : usize,
- f      : &[f64],
- coeffs : &[Vec<f64>]) -> Vec<Vec<f64>> {
-  f.iter().zip(coeffs).map( |(&f, coef)|
-    match f {
-      0.0 => normalize_0    (coef),
-      0.5 => normalize_nyq  (coef, dly1st),
-      f   => normalize_other(coef, dly1st, f),
-    }
-  ).collect()
-}
-
 pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
   let mut f_pm : Vec<f64> = vec![];
   f.iter().for_each( |&x| {
@@ -245,25 +148,22 @@ pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
       },
     }
   });
-  //console_log!("{f_pm:?}");
   let mut b = na::DMatrix::from_element(f_pm.len(), f.len(),
    na::Complex::new(0., 0.) );
   let mut i : usize = 0;
   f.iter().enumerate().for_each( |(j, &x)| {
-    //console_log!("{i:?} {j:?}");
     match x {
       0. | 0.5 => {
         b[(i, j)] = na::Complex::new(1., 0.);
         i += 1;
       },
-      x => {
+      _ => {
         b[(i  , j)] = na::Complex::new(1., 0.);
         b[(i+1, j)] = na::Complex::new(1., 0.);
         i += 2;
       },
     }
   });
-  //console_log!("{b:#?}");
   let f_pm = na::DVector::from_vec(f_pm);
   let n = na::RowDVector::from_vec(
    (dly1st..dly1st+f_pm.len()).map( |i| i as f64).collect::<Vec<_>>());
@@ -273,14 +173,10 @@ pub fn resonator_coef(dly1st: usize, f: &[f64]) -> Vec<Vec<f64>> {
     let ph = tau*val;
     na::Complex::new(ph.cos(), -ph.sin())
   } );
-  //console_log!("{a:#?}");
   let x = a.full_piv_lu().solve(&b).unwrap();
-  //console_log!("{x:#?}");
-  //x.column_iter().for_each( |x| console_log!("{:#?}", x.as_slice()) );
   let v = x.column_iter().map( |c| {
     c.as_slice().iter().map( |&x| x.re ).collect::<Vec<_>>()
   }).collect::<Vec<_>>();
-  //console_log!("{v:#?}");
   v
 }
 
