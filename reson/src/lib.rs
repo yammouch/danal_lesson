@@ -81,6 +81,10 @@ impl Resonator {
     self.fir.out
   }
 
+  pub fn ptr(&self) -> *const f64 {
+    &self.fir.out
+  }
+
   pub fn coeff(&self) -> Vec<f64> {
     self.fir.coeff.to_vec()
   }

@@ -43,11 +43,20 @@
      const reson = Resonator.reson1(0.014);
      const sr = audioContext.sampleRate;
      const coeff = reson.coeff();
+     const out_ptr = reson.ptr();
+     const f64view = new Float64Array(wasm.memory.buffer, out_ptr);
      reson.on();
      let y = [];
+     let y2 = [];
      for (let i = 0; i < sr; i++) {
        reson.tick();
        y.push(reson.out());
+       y2.push(f64view[0]);
+     }
+
+     for (let i = 100; i < 105; i++) {
+       console.log(y[i]);
+       console.log(y2[i]);
      }
 
      const polts = document.getElementById('plots');
