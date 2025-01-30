@@ -97,7 +97,8 @@ impl Resonator {
     // 2->2, 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5
     let c = resonator_coef(dly1st, &h);
     let fir = Fir::new(vxm(&vec![0., 1.], &c), dly1st);
-    Resonator::new(fir, vec![8.], 1. - 1e-4, 1. - 1e-1)
+    let mag = (fir.coeff.len() as f64)/2.;
+    Resonator::new(fir, vec![mag], 1. - 1e-4, 1. - 1e-1)
   }
 }
 
