@@ -40,6 +40,29 @@ impl Fir {
   }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct Cplxpol {
+  mag  : f64,
+  angle: f64, // rad
+}
+
+impl Cplxpol {
+  pub fn add_re(&mut self, x: f64) {
+    let pi = std::f64::consts::PI;
+    let mag = (self.mag*self.mag + x*x + 2.*self.mag*x*self.angle.cos()).sqrt();
+    let x_angle = if 0. <= mag {
+      -self.angle
+    } else if 0. <= self.angle {
+      pi - self.angle
+    } else {
+      -pi - self.angle
+    };
+    let angle_add = (x*x_angle.sin()).atan2(self.mag + x*x_angle.cos());
+    self.mag = mag;
+    self.angle += angle_add;
+  }
+}
+
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Resonator {
