@@ -61,25 +61,36 @@ impl Cplxpol {
     self.mag = mag;
     self.angle += angle_add;
   }
+
+  pub fn rotate(&mut self, a: f64) {
+    let pi = std::f64::consts::PI;
+    self.angle += a;
+    if pi < self.angle {
+      self.angle -= 2.*pi;
+    }
+  }
 }
 
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Resonator {
-  fir      : Fir,
+  c        : Cplxpol,
+  w        : f64,
   wav      : Vec<f64>,
   wav_pos  : usize,
   decay_on : f64,
   decay_off: f64,
   decay    : f64,
+  out      : f64,
 }
 
 #[wasm_bindgen]
 impl Resonator {
-  pub fn new(fir: Fir, wav: Vec<f64>, decay_on: f64, decay_off: f64) -> Self {
-    Self { fir: fir, wav: wav, wav_pos: 0,
+  pub fn new(f: f64, wav: Vec<f64>, decay_on: f64, decay_off: f64) -> Self {
+    let tau = std::f64::consts::TAU;
+    Self { c: Cplxpol { mag: 0., angle: 0. }, w: tau*f, wav: wav, wav_pos: 0,
            decay_on: decay_on, decay_off: decay_off,
-           decay: decay_off }
+           decay: decay_off, out: 0. }
   }
 
   pub fn off(&mut self) {
@@ -92,36 +103,25 @@ impl Resonator {
   }
 
   pub fn tick(&mut self) {
-    if self.wav_pos == 0 {
-      self.fir.tick(self.fir.out*self.decay);
-    } else {
+    if self.wav_pos != 0 {
       self.wav_pos -= 1;
-      self.fir.tick(self.wav[self.wav_pos]);
+      self.c.add_re(self.wav[self.wav_pos]);
     }
+    self.c.rotate(self.w);
+    self.c.mag *= self.decay;
+    self.out = self.c.mag * self.c.angle.cos();
   }
 
   pub fn out(&self) -> f64 {
-    self.fir.out
+    self.out
   }
 
   pub fn ptr(&self) -> *const f64 {
-    &self.fir.out
-  }
-
-  pub fn coeff(&self) -> Vec<f64> {
-    self.fir.coeff.to_vec()
+    &self.out
   }
 
   pub fn reson1(f: f64) -> Self {
-    //let f : f64 = 0.016;
-    //let f : f64 = 0.013; // diverges
-    let h = harms(f, 0.4);
-    let dly1st = ((1./f + 0.5) as usize)/2 + 1;
-    // 2->2, 3->2, 4->3, 5->3, 6->4, 7->4, 8->5, 9->5
-    let c = resonator_coef(dly1st, &h);
-    let fir = Fir::new(vxm(&vec![0., 1.], &c), dly1st);
-    let mag = (fir.coeff.len() as f64)/2.;
-    Resonator::new(fir, vec![mag], 1. - 1e-4, 1. - 1e-1)
+    Resonator::new(f, vec![1.], 1. - 1e-4, 1. - 1e-1)
   }
 }
 
@@ -130,7 +130,7 @@ impl Iterator for Resonator {
 
   fn next(&mut self) -> Option<Self::Item> {
     self.tick();
-    Some(self.fir.out)
+    Some(self.out)
   }
 }
 

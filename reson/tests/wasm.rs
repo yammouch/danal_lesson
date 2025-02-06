@@ -43,36 +43,30 @@ fn cplxpol_test() {
 #[wasm_bindgen_test]
 fn resonator_test() {
   let mut re = reson::Resonator::new(
-   Fir::new(vec![1.], 1),
+   1./4.,
    vec![1.],
-   3./4.,
-   1./2. );
+   1./2.,
+   1./4. );
+
   let out : Vec<f64> = re.by_ref().take(3).collect();
-  assert_eq!(out, [0., 0., 0.]);
+  let exp = [0., 0., 0.];
+  for i in 0..out.len() {
+    assert!((out[i] - exp[i]).abs() < 1e-6);
+  }
+
   re.on();
   let out : Vec<f64> = re.by_ref().take(4).collect();
-  assert_eq!(out, [0., 1., 0., 3./4.]);
+  let exp = [0., -1./4., 0., 1./16.];
+  for i in 0..out.len() {
+    assert!((out[i] - exp[i]).abs() < 1e-6);
+  }
+
   re.off();
   let out : Vec<f64> = re.by_ref().take(4).collect();
-  assert_eq!(out, [0., 3./8., 0., 3./16.]);
-
-  let mut re = reson::Resonator::new(
-   Fir::new(vec![1.], 1),
-   vec![1., 1./2.],
-   1.,
-   0. );
-  re.on();
-  let out : Vec<f64> = re.by_ref().take(5).collect();
-  assert_eq!(out, [0., 1./2., 1., 1./2., 1.]);
-
-  let mut re = reson::Resonator::new(
-   Fir::new(vec![1., 1./2.], 2),
-   vec![1.],
-   1.,
-   0. );
-  re.on();
-  let out : Vec<f64> = re.by_ref().take(7).collect();
-  assert_eq!(out, [0., 0., 1., 1./2., 0., 1., 1.]);
+  let exp = [0., -1./256., 0., 1./4096.];
+  for i in 0..out.len() {
+    assert!((out[i] - exp[i]).abs() < 1e-6);
+  }
 }
 
 #[wasm_bindgen_test]
