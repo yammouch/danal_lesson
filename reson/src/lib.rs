@@ -42,8 +42,8 @@ impl Fir {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Cplxpol {
-  mag  : f64,
-  angle: f64, // rad
+  pub mag  : f64,
+  pub angle: f64, // rad
 }
 
 impl Cplxpol {

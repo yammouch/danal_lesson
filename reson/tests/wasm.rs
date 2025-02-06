@@ -12,6 +12,34 @@ fn fir_test() {
   log(&format!("{:?}", fir));
 }
 
+fn cplxpol_add_re_test1(
+ mag      : f64,
+ angle    : f64,
+ re       : f64,
+ mag_exp  : f64,
+ angle_exp: f64) {
+  let mut z = reson::Cplxpol { mag: mag, angle: angle };
+  z.add_re(re);
+  assert!((z.mag - mag_exp) < 1e-6);
+  assert!((z.angle - angle_exp) < 1e-6);
+}
+
+#[wasm_bindgen_test]
+fn cplxpol_test() {
+  let pi = std::f64::consts::PI;
+
+  cplxpol_add_re_test1(1.,  0.,        1., 2.             ,  0.      );
+  cplxpol_add_re_test1(1.,  0.,       -2., 1.             ,  pi      );
+  cplxpol_add_re_test1(2.,  pi   /3.,  2., 2.*3_f64.sqrt(),  pi   /6.);
+  cplxpol_add_re_test1(2.,  pi   /3., -1.,    3_f64.sqrt(),  pi   /2.);
+  cplxpol_add_re_test1(2.,  pi   /3., -2., 2.             ,  pi*2./3.);
+  cplxpol_add_re_test1(2.,  pi   /3., -4., 2.*3_f64.sqrt(),  pi*5./6.);
+  cplxpol_add_re_test1(2., -pi*2./3., -2., 2.*3_f64.sqrt(), -pi*5./6.);
+  cplxpol_add_re_test1(2., -pi*2./3.,  1.,    3_f64.sqrt(), -pi   /2.);
+  cplxpol_add_re_test1(2., -pi*2./3.,  2., 2.             , -pi   /3.);
+  cplxpol_add_re_test1(2., -pi*2./3.,  4., 2.*3_f64.sqrt(), -pi   /6.);
+}
+
 #[wasm_bindgen_test]
 fn resonator_test() {
   let mut re = reson::Resonator::new(
