@@ -42,7 +42,6 @@
      const wasm = await init();
      const reson = Resonator.reson1(0.014);
      const sr = audioContext.sampleRate;
-     const coeff = reson.coeff();
      const out_ptr = reson.ptr();
      const f64view = new Float64Array(wasm.memory.buffer, out_ptr);
      reson.on();
@@ -69,15 +68,6 @@
      ( waveform
      , [{ x: Array.from({length:plotlen}, (_, i) => i),
           y: y.slice(0, plotlen) }]
-     , { margin: { t: 0 } } );
-
-     const coeff_plot = document.createElement('div');
-     coeff_plot.style = 'width:600px;height:250px';
-     plots.appendChild(coeff_plot);
-     Plotly.newPlot
-     ( coeff_plot
-     , [{ x: Array.from({length:coeff.length}, (_, i) => i),
-          y: coeff }]
      , { margin: { t: 0 } } );
 
      const wav = array2wav(y);
