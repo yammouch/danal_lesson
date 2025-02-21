@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript">
+
+let audioContext;
+let squareNode = null;
+let keyDown = {};
+let keyOn = {
+  "KeyQ": {cmd:"on", note:0},
+  "ShiftLeft": {cmd:"on", note:1},
+  "KeyA": {cmd:"on", note:2},
+  "KeyW": {cmd:"on", note:3},
+  "KeyZ": {cmd:"on", note:4},
+  "KeyS": {cmd:"on", note:5},
+  "KeyE": {cmd:"on", note:6},
+  "KeyX": {cmd:"on", note:7},
+  "KeyD": {cmd:"on", note:8},
+  "KeyR": {cmd:"on", note:9},
+  "KeyC": {cmd:"on", note:10},
+  "KeyF": {cmd:"on", note:11},
+  "KeyT": {cmd:"on", note:12},
+  "KeyV": {cmd:"on", note:13},
+  "KeyG": {cmd:"on", note:14},
+  "KeyY": {cmd:"on", note:15},
+  "KeyB": {cmd:"on", note:16},
+  "KeyH": {cmd:"on", note:17},
+  "KeyU": {cmd:"on", note:18},
+  "KeyN": {cmd:"on", note:19},
+  "KeyJ": {cmd:"on", note:20},
+  "KeyI": {cmd:"on", note:21},
+  "KeyM": {cmd:"on", note:22},
+  "KeyK": {cmd:"on", note:23},
+  "KeyO": {cmd:"on", note:24},
+  "Comma": {cmd:"on", note:25},
+  "KeyL": {cmd:"on", note:26},
+  "KeyP": {cmd:"on", note:27},
+  "Period": {cmd:"on", note:28},
+  "Semicolon": {cmd:"on", note:29},
+  "BracketLeft": {cmd:"on", note:30},
+  "Slash": {cmd:"on", note:31},
+  "Quote": {cmd:"on", note:32},
+  "BracketRight": {cmd:"on", note:33},
+  "IntlRo": {cmd:"on", note:34},
+  "Backslash": {cmd:"on", note:35},
+  "Enter": {cmd:"on", note:36},
+  "ShiftRight": {cmd:"on", note:37}
+};
+let keyOff = {
+  "KeyQ": {cmd:"off", note:0},
+  "ShiftLeft": {cmd:"off", note:1},
+  "KeyA": {cmd:"off", note:2},
+  "KeyW": {cmd:"off", note:3},
+  "KeyZ": {cmd:"off", note:4},
+  "KeyS": {cmd:"off", note:5},
+  "KeyE": {cmd:"off", note:6},
+  "KeyX": {cmd:"off", note:7},
+  "KeyD": {cmd:"off", note:8},
+  "KeyR": {cmd:"off", note:9},
+  "KeyC": {cmd:"off", note:10},
+  "KeyF": {cmd:"off", note:11},
+  "KeyT": {cmd:"off", note:12},
+  "KeyV": {cmd:"off", note:13},
+  "KeyG": {cmd:"off", note:14},
+  "KeyY": {cmd:"off", note:15},
+  "KeyB": {cmd:"off", note:16},
+  "KeyH": {cmd:"off", note:17},
+  "KeyU": {cmd:"off", note:18},
+  "KeyN": {cmd:"off", note:19},
+  "KeyJ": {cmd:"off", note:20},
+  "KeyI": {cmd:"off", note:21},
+  "KeyM": {cmd:"off", note:22},
+  "KeyK": {cmd:"off", note:23},
+  "KeyO": {cmd:"off", note:24},
+  "Comma": {cmd:"off", note:25},
+  "KeyL": {cmd:"off", note:26},
+  "KeyP": {cmd:"off", note:27},
+  "Period": {cmd:"off", note:28},
+  "Semicolon": {cmd:"off", note:29},
+  "BracketLeft": {cmd:"off", note:30},
+  "Slash": {cmd:"off", note:31},
+  "Quote": {cmd:"off", note:32},
+  "BracketRight": {cmd:"off", note:33},
+  "IntlRo": {cmd:"off", note:34},
+  "Backslash": {cmd:"off", note:35},
+  "Enter": {cmd:"off", note:36},
+  "ShiftRight": {cmd:"off", note:37}
+};
+
+window.addEventListener("load", () => {
+  audioContext = new AudioContext();
+  const resume = document.getElementById("resume");
+  let cnt = 0;
+  resume.addEventListener("click", () => {
+    audioContext.resume().then( () => {
+      console.log('Playback resumed successfully');
+    });
+  });
+  document.addEventListener("keydown", (e) => {
+    let td = document.getElementById("td_" + e.code);
+    if (td) {
+      td.style.background = "#fcf";
+    }
+    if (!keyDown[e.code]) {
+      console.log(e.code);
+      squareNode.port.postMessage(keyOn[e.code]);
+      keyDown[e.code] = true;
+    }
+  });
+  document.addEventListener("keyup", (e) => {
+    let td = document.getElementById("td_" + e.code);
+    if (td) {
+      td.style.background = "#fff";
+    }
+    squareNode.port.postMessage(keyOff[e.code]);
+    keyDown[e.code] = false;
+  });
+  play();
+
+});
+
+async function play() {
+  await audioContext.audioWorklet.addModule("keyon.js");
+  console.log("keyon");
+  squareNode = new AudioWorkletNode(
+    audioContext,
+    "sq-pr",
+  );
+  squareNode.connect(audioContext.destination);
+  squareNode.port.postMessage({cmd:"init", sampleRate:audioContext.sampleRate, master:440});
+}
+
+</script>
+<body>
+<button id="resume">resume</button>
+<table border="1">
+<tr>
+<td id="td_Digit1" colspan="2">1</td>
+<td id="td_Digit2" colspan="2">2</td>
+<td id="td_Digit3" colspan="2">3</td>
+<td id="td_Digit4" colspan="2">4</td>
+<td id="td_Digit5" colspan="2">5</td>
+<td id="td_Digit6" colspan="2">6</td>
+<td id="td_Digit7" colspan="2">7</td>
+<td id="td_Digit8" colspan="2">8</td>
+<td id="td_Digit9" colspan="2">9</td>
+<td id="td_Digit0" colspan="2">0</td>
+<td id="td_Minus" colspan="2">-</td>
+<td id="td_Equal" colspan="2">^</td>
+<td id="td_IntlYen" colspan="2">\</td>
+</tr>
+<tr>
+<td></td>
+<td id="td_KeyQ" colspan="2">Q</td>
+<td id="td_KeyW" colspan="2">W</td>
+<td id="td_KeyE" colspan="2">E</td>
+<td id="td_KeyR" colspan="2">R</td>
+<td id="td_KeyT" colspan="2">T</td>
+<td id="td_KeyY" colspan="2">Y</td>
+<td id="td_KeyU" colspan="2">U</td>
+<td id="td_KeyI" colspan="2">I</td>
+<td id="td_KeyO" colspan="2">O</td>
+<td id="td_KeyP" colspan="2">P</td>
+<td id="td_BracketLeft" colspan="2">@</td>
+<td id="td_BracketRight" colspan="2">[</td>
+</tr>
+<tr>
+<td colspan="2"></td>
+<td id="td_KeyA" colspan="2">A</td>
+<td id="td_KeyS" colspan="2">S</td>
+<td id="td_KeyD" colspan="2">D</td>
+<td id="td_KeyF" colspan="2">F</td>
+<td id="td_KeyG" colspan="2">G</td>
+<td id="td_KeyH" colspan="2">H</td>
+<td id="td_KeyJ" colspan="2">J</td>
+<td id="td_KeyK" colspan="2">K</td>
+<td id="td_KeyL" colspan="2">L</td>
+<td id="td_Semicolon" colspan="2">;</td>
+<td id="td_Quote" colspan="2">:</td>
+<td id="td_Backslash" colspan="2">]</td>
+</tr>
+<tr>
+<td id="td_ShiftLeft" colspan="3">Shift</td>
+<td id="td_KeyZ" colspan="2">Z</td>
+<td id="td_KeyX" colspan="2">X</td>
+<td id="td_KeyC" colspan="2">C</td>
+<td id="td_KeyV" colspan="2">V</td>
+<td id="td_KeyB" colspan="2">B</td>
+<td id="td_KeyN" colspan="2">N</td>
+<td id="td_KeyM" colspan="2">M</td>
+<td id="td_Comma" colspan="2">,</td>
+<td id="td_Period" colspan="2">.</td>
+<td id="td_Slash" colspan="2">/</td>
+<td id="td_IntlRo" colspan="2">\</td>
+<td id="td_ShiftRight" colspan="2">Shift</td>
+</tr>
+</table>
+</body>
+</html>
