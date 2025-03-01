@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-extern crate nalgebra as na;
 
 #[wasm_bindgen]
 extern "C" {
