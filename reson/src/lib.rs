@@ -133,6 +133,35 @@ impl Iterator for Resonator {
   }
 }
 
+#[derive(Debug)]
+#[wasm_bindgen]
+pub struct Source {
+  r: Resonator,
+  v: Vec<f32>,
+}
+
+#[wasm_bindgen]
+impl Source {
+  pub fn reson1(f: f64) -> Self {
+    Self {
+      r: Resonator::new(f, vec![1.], 1. - 1e-4, 1. - 1e-1),
+      v: Vec::with_capacity(128),
+    }
+  }
+
+  pub fn tick(&mut self, n: usize) {
+    self.v.clear();
+    for _ in 0..n {
+      self.r.tick();
+      self.v.push(self.r.out() as f32);
+    }
+  }
+
+  pub fn ptr(&self) -> *const f32 {
+    self.v.as_ptr()
+  }
+}
+
 // 0 -> [0.0]
 // 1 -> [0.0, 0.5  ]
 // 2 -> [0.0, 0.333]             = [0/3, 1/3]
