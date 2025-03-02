@@ -149,6 +149,14 @@ impl Source {
     }
   }
 
+  pub fn off(&mut self) {
+    self.r.off();
+  }
+
+  pub fn on(&mut self) {
+    self.r.on();
+  }
+
   pub fn tick(&mut self, n: usize) {
     self.v.clear();
     for _ in 0..n {

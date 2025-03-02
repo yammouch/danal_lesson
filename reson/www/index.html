@@ -3,7 +3,7 @@
  <head>
   <script src="./node_modules/plotly.js-dist/plotly.js" charset="utf-8"></script>
   <script type="module">
-   import init, { Resonator } from './node_modules/wasm_engine/reson.js';
+   import init, { Source } from './node_modules/wasm_engine/reson.js';
    const audioContext = new AudioContext();
 
    // refer to:
@@ -40,22 +40,20 @@
 
    async function main() {
      const wasm = await init();
-     const reson = Resonator.reson1(0.014);
+     const sound_src = Source.reson1(0.014);
      const sr = audioContext.sampleRate;
-     const out_ptr = reson.ptr();
-     const f64view = new Float64Array(wasm.memory.buffer, out_ptr);
-     reson.on();
+     sound_src.on();
      let y = [];
      let y2 = [];
      for (let i = 0; i < sr; i++) {
-       reson.tick();
-       y.push(reson.out());
-       y2.push(f64view[0]);
+       sound_src.tick(1);
+       const out_ptr = sound_src.ptr();
+       const f32view = new Float32Array(wasm.memory.buffer, out_ptr);
+       y.push(f32view[0]);
      }
 
      for (let i = 100; i < 105; i++) {
        console.log(y[i]);
-       console.log(y2[i]);
      }
 
      const polts = document.getElementById('plots');
