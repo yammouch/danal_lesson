@@ -43,14 +43,12 @@
      const sound_src = Source.reson1(0.014);
      const sr = audioContext.sampleRate;
      sound_src.on();
-     let y = [];
-     let y2 = [];
-     for (let i = 0; i < sr; i++) {
-       sound_src.tick(1);
-       const out_ptr = sound_src.ptr();
-       const f32view = new Float32Array(wasm.memory.buffer, out_ptr);
-       y.push(f32view[0]);
-     }
+     let y = new Float32Array(sr);
+
+     sound_src.tick(sr);
+     const out_ptr = sound_src.ptr();
+     const f32view = new Float32Array(wasm.memory.buffer, out_ptr, sr);
+     y.set(f32view);
 
      for (let i = 100; i < 105; i++) {
        console.log(y[i]);
