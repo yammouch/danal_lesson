@@ -142,12 +142,17 @@ pub struct Source {
 
 #[wasm_bindgen]
 impl Source {
-  pub fn reson1(f: f64) -> Self {
+  pub fn reson1(f_master_a: f64) -> Self {
     let mut slf = Self {
       r: vec![],
       v: Vec::with_capacity(128),
     };
-    slf.r.push(Resonator::new(f, vec![1.], 1. - 1e-4, 1. - 1e-1));
+    for i in 0..=37 {
+      slf.r.push(
+       Resonator::new(
+        f_master_a * 2f64.powf((i as f64 - 31.)/12.),
+        vec![1.], 1. - 1e-4, 1. - 1e-1));
+    }
     slf
   }
 

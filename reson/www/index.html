@@ -40,9 +40,11 @@
 
    async function main() {
      const wasm = await init();
-     const sound_src = Source.reson1(0.014);
      const sr = audioContext.sampleRate;
-     sound_src.on();
+     const sound_src = Source.reson1(440.0/sr);
+     sound_src.on(19);
+     sound_src.on(26);
+     sound_src.on(35);
      let y = new Float32Array(sr);
 
      sound_src.tick(sr);
