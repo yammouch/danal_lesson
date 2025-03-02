@@ -136,32 +136,34 @@ impl Iterator for Resonator {
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Source {
-  r: Resonator,
+  r: Vec<Resonator>,
   v: Vec<f32>,
 }
 
 #[wasm_bindgen]
 impl Source {
   pub fn reson1(f: f64) -> Self {
-    Self {
-      r: Resonator::new(f, vec![1.], 1. - 1e-4, 1. - 1e-1),
+    let mut slf = Self {
+      r: vec![],
       v: Vec::with_capacity(128),
-    }
+    };
+    slf.r.push(Resonator::new(f, vec![1.], 1. - 1e-4, 1. - 1e-1));
+    slf
   }
 
-  pub fn off(&mut self) {
-    self.r.off();
+  pub fn off(&mut self, i: usize) {
+    self.r[i].off();
   }
 
-  pub fn on(&mut self) {
-    self.r.on();
+  pub fn on(&mut self, i: usize) {
+    self.r[i].on();
   }
 
   pub fn tick(&mut self, n: usize) {
     self.v.clear();
     for _ in 0..n {
-      self.r.tick();
-      self.v.push(self.r.out() as f32);
+      self.r.iter_mut().for_each( |r| r.tick() );
+      self.v.push(self.r.iter().map(Resonator::out).sum::<f64>() as f32);
     }
   }
 
