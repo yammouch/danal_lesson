@@ -102,16 +102,18 @@ export class StringModel {
 
 export class Source {
 
-  constructor(e) {
-    this.strs = [];
+  static new(e) {
+    const o = Object.create(Source.prototype);
+    o.strs = [];
     let note = -31;
     for (let i = 0; i <= 37; i++, note++) {
-      this.strs.push
+      o.strs.push
       ( new StringModel
         ( e.data.sampleRate
         / (e.data.master * 2**(note/12))
         ));
     }
+    return o;
   }
 
   on(e) {

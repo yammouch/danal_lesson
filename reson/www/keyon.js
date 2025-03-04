@@ -12,7 +12,7 @@ class SquareProcessor extends AudioWorkletProcessor {
       } else if (e.data.cmd == "off") {
         this.src.off(e);
       } else if (e.data.cmd == "init") {
-        this.src = new Source(e);
+        this.src = Source.new(e);
       }
     };
   }
