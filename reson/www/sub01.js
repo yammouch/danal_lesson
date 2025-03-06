@@ -112,13 +112,13 @@ export class Source {
     return o;
   }
 
-  on(e) {
-    this.strs[e.data.note].excite = this.strs[e.data.note].wave.length;
-    this.strs[e.data.note].decay = 1 - 1e-2;
+  on(note) {
+    this.strs[note].excite = this.strs[note].wave.length;
+    this.strs[note].decay = 1 - 1e-2;
   }
 
-  off(e) {
-    this.strs[e.data.note].decay = 1 - 1e-1;
+  off(note) {
+    this.strs[note].decay = 1 - 1e-1;
   }
 
   pop() {
