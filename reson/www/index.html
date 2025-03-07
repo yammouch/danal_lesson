@@ -4,6 +4,7 @@
   <script src="./node_modules/plotly.js-dist/plotly.js" charset="utf-8"></script>
   <script type="module">
    import init, { Source } from './node_modules/wasm_engine/reson.js';
+   //import init, { Source } from './sub01.js';
    const audioContext = new AudioContext();
 
    // refer to:
@@ -41,7 +42,7 @@
    async function main() {
      const wasm = await init();
      const sr = audioContext.sampleRate;
-     const sound_src = Source.reson1(440.0/sr);
+     const sound_src = Source.new(440.0/sr);
      sound_src.on(19);
      sound_src.on(26);
      sound_src.on(35);

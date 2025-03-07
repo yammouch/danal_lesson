@@ -1,4 +1,6 @@
-import { Source } from "./sub01.js";
+import init, { Source } from "./sub01.js";
+
+const wasm = await init();
 
 class SquareProcessor extends AudioWorkletProcessor {
 
@@ -22,7 +24,11 @@ class SquareProcessor extends AudioWorkletProcessor {
     const channel = output[0];
     for (let i = 0; i < channel.length; i++) {
       let sum = 0.0;
-      sum += this.src.pop();
+      //sum += this.src.pop();
+      this.src.tick(1);
+      const out_ptr = this.src.ptr();
+      const f32view = new Float32Array(wasm.memory.buffer, out_ptr, 1);
+      sum += f32view[0];
       channel[i] = 0.2*sum;
     }
     return true;

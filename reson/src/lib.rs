@@ -142,7 +142,7 @@ pub struct Source {
 
 #[wasm_bindgen]
 impl Source {
-  pub fn reson1(f_master_a: f64) -> Self {
+  pub fn new(f_master_a: f64) -> Self {
     let mut slf = Self {
       r: vec![],
       v: Vec::with_capacity(128),

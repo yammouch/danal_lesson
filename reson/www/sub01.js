@@ -100,6 +100,14 @@ export class StringModel {
 
 }
 
+const wasm = { memory: new Float32Array(2**17) };
+
+async function __wbg_init() {
+  return wasm;
+}
+
+export default __wbg_init;
+
 export class Source {
 
   static new(f_master_a) {
@@ -135,6 +143,25 @@ export class Source {
     }
     return to_lo[0] + this.strs[0].buf[this.strs[0].inow];
   }
+
+  tick(n) {
+    for (let k = 0; k < n; k++) {
+      let sum = 0.0;
+      for (let j = 0; j < this.strs.length; j++) {
+        this.strs[j].pop();
+      }
+      let to_lo = new Float32Array(this.strs.length);
+      for (let i = this.strs.length-1; 0 < i; i--) {
+        to_lo[i-1] = to_lo[i] + this.strs[i].buf[this.strs[i].inow];
+      }
+      for (let i = 0; i < this.strs.length-1; i++) {
+        this.strs[i].buf[this.strs[i].inow] += to_lo[i]*1e-2;
+      }
+      wasm.memory[k] = to_lo[0] + this.strs[0].buf[this.strs[0].inow];
+    }
+  }
+
+  ptr() { return 0 }
 
 }
 
