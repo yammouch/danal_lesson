@@ -24,15 +24,13 @@ class SquareProcessor extends AudioWorkletProcessor {
     if (!this.wasm) { return true; }
     const output = outputs[0];
     const channel = output[0];
-    for (let i = 0; i < channel.length; i++) {
-      let sum = 0.0;
-      //sum += this.src.pop();
-      this.src.tick(1);
-      const out_ptr = this.src.ptr();
-      const f32view = new Float32Array(this.wasm.memory.buffer, out_ptr, 1);
-      sum += f32view[0];
-      channel[i] = 0.2*sum;
-    }
+
+    this.src.tick(channel.length);
+    const out_ptr = this.src.ptr();
+    const f32view = new Float32Array(
+     this.wasm.memory.buffer, out_ptr, channel.length);
+    channel.set(f32view);
+
     return true;
   }
 
