@@ -1,11 +1,11 @@
-import init, { Source } from "./sub01.js";
-
-const wasm = await init();
+//import init, { Source } from "./sub01.js";
+import init, { Source } from "./node_modules/wasm_engine/reson.js";
 
 class SquareProcessor extends AudioWorkletProcessor {
 
   constructor() {
     super();
+    this.wasm = null;
     this.port.onmessage = (e) => {
       console.log(e.data);
       if (e.data.cmd == "on") {
@@ -15,11 +15,14 @@ class SquareProcessor extends AudioWorkletProcessor {
         this.src.off(e.data.note);
       } else if (e.data.cmd == "init") {
         this.src = Source.new(e.data.master / e.data.sampleRate);
+        console.log(typeof(e.data.wasm));
+        init(e.data.wasm).then( (wasm) => this.wasm = wasm );
       }
     };
   }
 
   process(inputs, outputs, parameters) {
+    if (!this.wasm) { return true; }
     const output = outputs[0];
     const channel = output[0];
     for (let i = 0; i < channel.length; i++) {
@@ -27,7 +30,7 @@ class SquareProcessor extends AudioWorkletProcessor {
       //sum += this.src.pop();
       this.src.tick(1);
       const out_ptr = this.src.ptr();
-      const f32view = new Float32Array(wasm.memory.buffer, out_ptr, 1);
+      const f32view = new Float32Array(this.wasm.memory.buffer, out_ptr, 1);
       sum += f32view[0];
       channel[i] = 0.2*sum;
     }

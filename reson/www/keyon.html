@@ -126,8 +126,19 @@ async function play() {
     audioContext,
     "sq-pr",
   );
+  let wasm = null;
+  const resp = await fetch("./node_modules/wasm_engine/reson_bg.wasm");
+  if (resp.ok) {
+    wasm = await resp.arrayBuffer();
+  } else {
+    console.log("fetch failed");
+  }
   squareNode.connect(audioContext.destination);
-  squareNode.port.postMessage({cmd:"init", sampleRate:audioContext.sampleRate, master:440});
+  squareNode.port.postMessage({
+   cmd       : "init",
+   sampleRate: audioContext.sampleRate,
+   master    : 440,
+   wasm      : wasm });
 }
 
 </script>
