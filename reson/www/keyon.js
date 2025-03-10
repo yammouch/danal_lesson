@@ -1,5 +1,5 @@
-//import init, { Source } from "./sub01.js";
-import init, { Source } from "./node_modules/wasm_engine/reson.js";
+//import { initSync, Source } from "./sub01.js";
+import { initSync, Source } from "./node_modules/wasm_engine/reson.js";
 
 class SquareProcessor extends AudioWorkletProcessor {
 
@@ -14,9 +14,8 @@ class SquareProcessor extends AudioWorkletProcessor {
       } else if (e.data.cmd == "off") {
         this.src.off(e.data.note);
       } else if (e.data.cmd == "init") {
+        this.wasm = initSync(e.data.wasm);
         this.src = Source.new(e.data.master / e.data.sampleRate);
-        console.log(typeof(e.data.wasm));
-        init(e.data.wasm).then( (wasm) => this.wasm = wasm );
       }
     };
   }

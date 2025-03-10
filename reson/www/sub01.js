@@ -102,11 +102,9 @@ export class StringModel {
 
 const wasm = { memory: new Float32Array(2**17) };
 
-async function __wbg_init() {
+export function initSync() {
   return wasm;
 }
-
-export default __wbg_init;
 
 export class Source {
 
