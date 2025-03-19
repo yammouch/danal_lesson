@@ -5,9 +5,12 @@
 
 <script type="module">
 
+import { pressed } from "../press2note.js";
+
 function test_main() {
   const result = document.getElementById("result");
-  result.innerText += "\nHello";
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed);
 }
 
 test_main();
