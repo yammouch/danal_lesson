@@ -11,6 +11,21 @@ function test_main() {
   const result = document.getElementById("result");
   result.innerText += "\n";
   result.innerText += JSON.stringify(pressed);
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.on("KeyZ"));
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.on("KeyZ"));
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.off("KeyZ"));
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.on("KeyZ"));
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.on("Digit2"));
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.off("KeyZ"));
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(pressed.off("Digit2"));
+  result.innerText += "\n";
 }
 
 test_main();
