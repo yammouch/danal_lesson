@@ -28,7 +28,17 @@ function test_main() {
   result.innerText += "\n";
 }
 
+function test_main2() {
+  const notekey = [
+   ["KeyZ", "Digit2"],
+   ["KeyS"] ];
+  const result = document.getElementById("result");
+  result.innerText += JSON.stringify(notekey);
+  result.innerText += "\n";
+}
+
 test_main();
+test_main2();
 
 </script>
 
