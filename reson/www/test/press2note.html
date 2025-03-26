@@ -33,10 +33,23 @@ function test_main2() {
    ["KeyZ", "Digit3"],
    ["KeyS"] ];
   const result = document.getElementById("result");
-  result.innerText += JSON.stringify(notekey);
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(updown2note_build(notekey));
-  result.innerText += "\n";
+  let val = updown2note_build(notekey);
+  val = JSON.stringify(val);
+  let expc = {
+   "KeyZ"  : 0,
+   "Digit3": 0,
+   "KeyS"  : 1
+  };
+  expc = JSON.stringify(expc);
+  if (val === expc) {
+    result.innerText += "[OK]\n";
+  } else {
+    result.innerText += "[ER]\n";
+    result.innerText += "val:\n";
+    result.innerText += val + "\n";
+    result.innerText += "expc:\n";
+    result.innerText += expc + "\n";
+  }
 }
 
 test_main();
