@@ -8,6 +8,16 @@ export function updown2note_build(notekey) {
   return o;
 }
 
+export function note2onoff_build(notekey) {
+  return notekey.map( (a) => {
+    let o = {};
+    a.forEach( (x) => {
+      o[x] = false;
+    });
+    return o;
+  });
+}
+
 class press2note {
 
   constructor() {

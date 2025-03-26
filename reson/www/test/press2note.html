@@ -5,7 +5,8 @@
 
 <script type="module">
 
-import { pressed, updown2note_build } from "../press2note.js";
+import { pressed, updown2note_build, note2onoff_build }
+ from "../press2note.js";
 
 function test_main() {
   const result = document.getElementById("result");
@@ -33,6 +34,7 @@ function test_main2() {
    ["KeyZ", "Digit3"],
    ["KeyS"] ];
   const result = document.getElementById("result");
+
   let val = updown2note_build(notekey);
   val = JSON.stringify(val);
   let expc = {
@@ -52,8 +54,34 @@ function test_main2() {
   }
 }
 
+function test_main3() {
+  const notekey = [
+   ["KeyZ", "Digit3"],
+   ["KeyS"] ];
+  const result = document.getElementById("result");
+
+  let val = note2onoff_build(notekey);
+  val = JSON.stringify(val);
+  let expc = [
+   { "KeyZ"  : false,
+     "Digit3": false },
+   { "KeyS"  : false }
+  ];
+  expc = JSON.stringify(expc);
+  if (val === expc) {
+    result.innerText += "[OK]\n";
+  } else {
+    result.innerText += "[ER]\n";
+    result.innerText += "val:\n";
+    result.innerText += val + "\n";
+    result.innerText += "expc:\n";
+    result.innerText += expc + "\n";
+  }
+}
+
 test_main();
 test_main2();
+test_main3();
 
 </script>
 
