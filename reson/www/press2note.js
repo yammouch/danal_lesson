@@ -1,3 +1,13 @@
+export function updown2note_build(notekey) {
+  let o = {};
+  notekey.forEach( (a, i) => {
+    a.forEach( (k) => {
+      o[k] = i;
+    })
+  });
+  return o;
+}
+
 class press2note {
 
   constructor() {

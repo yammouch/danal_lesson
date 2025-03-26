@@ -5,7 +5,7 @@
 
 <script type="module">
 
-import { pressed } from "../press2note.js";
+import { pressed, updown2note_build } from "../press2note.js";
 
 function test_main() {
   const result = document.getElementById("result");
@@ -30,10 +30,12 @@ function test_main() {
 
 function test_main2() {
   const notekey = [
-   ["KeyZ", "Digit2"],
+   ["KeyZ", "Digit3"],
    ["KeyS"] ];
   const result = document.getElementById("result");
   result.innerText += JSON.stringify(notekey);
+  result.innerText += "\n";
+  result.innerText += JSON.stringify(updown2note_build(notekey));
   result.innerText += "\n";
 }
 
