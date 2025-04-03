@@ -8,25 +8,34 @@
 import { pressed, updown2note_build, note2onoff_build }
  from "../press2note.js";
 
+function test1_1(val, expc) {
+  val = JSON.stringify(val);
+  expc = JSON.stringify(expc);
+  let ret = "";
+
+  if (val === expc) {
+    ret += "[OK]\n";
+  } else {
+    ret += "[ER]\n";
+    ret += "result:\n";
+    ret += result + "\n";
+    ret += "expc:\n";
+    ret += expc + "\n";
+  }
+  return ret;
+}
+
 function test_main() {
   const result = document.getElementById("result");
   result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed);
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.on("KeyZ"));
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.on("KeyZ"));
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.off("KeyZ"));
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.on("KeyZ"));
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.on("Digit2"));
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.off("KeyZ"));
-  result.innerText += "\n";
-  result.innerText += JSON.stringify(pressed.off("Digit2"));
-  result.innerText += "\n";
+  result.innerText += "test pressed\n";
+  result.innerText += test1_1(pressed.on("KeyZ"), {cmd:"on", note:4});
+  result.innerText += test1_1(pressed.on("KeyZ"), undefined);
+  result.innerText += test1_1(pressed.off("KeyZ"), {"cmd":"off","note":4});
+  result.innerText += test1_1(pressed.on("KeyZ"), {"cmd":"on","note":4});
+  result.innerText += test1_1(pressed.on("Digit2"), {"cmd":"on","note":1});
+  result.innerText += test1_1(pressed.off("KeyZ"), {"cmd":"off","note":4});
+  result.innerText += test1_1(pressed.off("Digit2"), {"cmd":"off","note":1});
 }
 
 function test_main2() {
