@@ -8,7 +8,7 @@
 import { pressed, updown2note_build, note2onoff_build }
  from "../press2note.js";
 
-function test1_1(val, expc) {
+function objcmp(val, expc) {
   val = JSON.stringify(val);
   expc = JSON.stringify(expc);
   let ret = "";
@@ -29,13 +29,13 @@ function test_main() {
   const result = document.getElementById("result");
   result.innerText += "\n";
   result.innerText += "test pressed\n";
-  result.innerText += test1_1(pressed.on("KeyZ"), {cmd:"on", note:4});
-  result.innerText += test1_1(pressed.on("KeyZ"), undefined);
-  result.innerText += test1_1(pressed.off("KeyZ"), {"cmd":"off","note":4});
-  result.innerText += test1_1(pressed.on("KeyZ"), {"cmd":"on","note":4});
-  result.innerText += test1_1(pressed.on("Digit2"), {"cmd":"on","note":1});
-  result.innerText += test1_1(pressed.off("KeyZ"), {"cmd":"off","note":4});
-  result.innerText += test1_1(pressed.off("Digit2"), {"cmd":"off","note":1});
+  result.innerText += objcmp(pressed.on ("KeyZ"  ), {cmd:"on" , note:4});
+  result.innerText += objcmp(pressed.on ("KeyZ"  ), undefined          );
+  result.innerText += objcmp(pressed.off("KeyZ"  ), {cmd:"off", note:4});
+  result.innerText += objcmp(pressed.on ("KeyZ"  ), {cmd:"on" , note:4});
+  result.innerText += objcmp(pressed.on ("Digit2"), {cmd:"on" , note:1});
+  result.innerText += objcmp(pressed.off("KeyZ"  ), {cmd:"off", note:4});
+  result.innerText += objcmp(pressed.off("Digit2"), {cmd:"off", note:1});
 }
 
 function test_main2() {
@@ -43,24 +43,10 @@ function test_main2() {
    ["KeyZ", "Digit3"],
    ["KeyS"] ];
   const result = document.getElementById("result");
+  result.innerText += "test update2note_build\n";
 
-  let val = updown2note_build(notekey);
-  val = JSON.stringify(val);
-  let expc = {
-   "KeyZ"  : 0,
-   "Digit3": 0,
-   "KeyS"  : 1
-  };
-  expc = JSON.stringify(expc);
-  if (val === expc) {
-    result.innerText += "[OK]\n";
-  } else {
-    result.innerText += "[ER]\n";
-    result.innerText += "val:\n";
-    result.innerText += val + "\n";
-    result.innerText += "expc:\n";
-    result.innerText += expc + "\n";
-  }
+  result.innerText +=
+   objcmp(updown2note_build(notekey), {"KeyZ": 0, "Digit3": 0, "KeyS": 1});
 }
 
 function test_main3() {
@@ -68,24 +54,11 @@ function test_main3() {
    ["KeyZ", "Digit3"],
    ["KeyS"] ];
   const result = document.getElementById("result");
+  result.innerText += "test note2onoff_build\n";
 
-  let val = note2onoff_build(notekey);
-  val = JSON.stringify(val);
-  let expc = [
-   { "KeyZ"  : false,
-     "Digit3": false },
-   { "KeyS"  : false }
-  ];
-  expc = JSON.stringify(expc);
-  if (val === expc) {
-    result.innerText += "[OK]\n";
-  } else {
-    result.innerText += "[ER]\n";
-    result.innerText += "val:\n";
-    result.innerText += val + "\n";
-    result.innerText += "expc:\n";
-    result.innerText += expc + "\n";
-  }
+  result.innerText +=
+   objcmp(note2onoff_build(notekey),
+    [{"KeyZ": false, "Digit3": false }, { "KeyS"  : false }] );
 }
 
 test_main();
