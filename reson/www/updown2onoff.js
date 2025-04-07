@@ -19,6 +19,8 @@ export function note2onoff_build(notekey) {
 }
 
 let notekey = [
+  ["Digit1"],
+  [],
   ["KeyQ"],
   ["ShiftLeft", "Digit2"],
   ["KeyA"],
@@ -69,7 +71,7 @@ export class UpDown2OnOff {
   on(key) {
     const note = this.updown2note[key];
     console.log(note);
-    if (!note) { return; }
+    if (note === undefined) { return; }
     console.log(this.note2onoff[note]);
     if (this.note2onoff[note][key]) { return; }
     this.note2onoff[note][key] = true;
@@ -78,7 +80,7 @@ export class UpDown2OnOff {
 
   off(key) {
     const note = this.updown2note[key];
-    if (!note) { return; }
+    if (note === undefined) { return; }
     this.note2onoff[note][key] = false;
     if (Object.entries(this.note2onoff[note]).some((k) => k[1])) { return; }
     return { cmd: "off", note: note };

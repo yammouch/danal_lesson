@@ -147,10 +147,10 @@ impl Source {
       r: vec![],
       v: Vec::with_capacity(128),
     };
-    for i in 0..=37 {
+    for i in 0..=39 {
       slf.r.push(
        Resonator::new(
-        f_master_a * 2f64.powf((i as f64 - 31.)/12.),
+        f_master_a * 2f64.powf((i as f64 - 33.)/12.),
         vec![1.], 1. - 1e-4, 1. - 1e-1));
     }
     slf
