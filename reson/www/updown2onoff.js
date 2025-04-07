@@ -59,31 +59,29 @@ let notekey = [
   ["ShiftRight"]
 ];
 
-class press2note {
+export class UpDown2OnOff {
 
   constructor() {
-    this.pressed = note2onoff_build(notekey);
-    this.press2note = updown2note_build(notekey);
+    this.note2onoff = note2onoff_build(notekey);
+    this.updown2note = updown2note_build(notekey);
   }
 
   on(key) {
-    const note = this.press2note[key];
+    const note = this.updown2note[key];
     console.log(note);
     if (!note) { return; }
-    console.log(this.pressed[note]);
-    if (this.pressed[note][key]) { return; }
-    this.pressed[note][key] = true;
+    console.log(this.note2onoff[note]);
+    if (this.note2onoff[note][key]) { return; }
+    this.note2onoff[note][key] = true;
     return { cmd: "on", note: note };
   }
 
   off(key) {
-    const note = this.press2note[key];
+    const note = this.updown2note[key];
     if (!note) { return; }
-    this.pressed[note][key] = false;
-    if (Object.entries(this.pressed[note]).some((k) => k[1])) { return; }
+    this.note2onoff[note][key] = false;
+    if (Object.entries(this.note2onoff[note]).some((k) => k[1])) { return; }
     return { cmd: "off", note: note };
   }
 
 }
-
-export const pressed = new press2note();

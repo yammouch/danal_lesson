@@ -5,8 +5,8 @@
 
 <script type="module">
 
-import { pressed, updown2note_build, note2onoff_build }
- from "../press2note.js";
+import { UpDown2OnOff, updown2note_build, note2onoff_build }
+ from "../updown2onoff.js";
 
 function objcmp(val, expc) {
   val = JSON.stringify(val);
@@ -27,15 +27,16 @@ function objcmp(val, expc) {
 
 function test_main() {
   const result = document.getElementById("result");
+  const o = new UpDown2OnOff();
   result.innerText += "\n";
-  result.innerText += "test pressed\n";
-  result.innerText += objcmp(pressed.on ("KeyZ"  ), {cmd:"on" , note:4});
-  result.innerText += objcmp(pressed.on ("KeyZ"  ), undefined          );
-  result.innerText += objcmp(pressed.off("KeyZ"  ), {cmd:"off", note:4});
-  result.innerText += objcmp(pressed.on ("KeyZ"  ), {cmd:"on" , note:4});
-  result.innerText += objcmp(pressed.on ("Digit2"), {cmd:"on" , note:1});
-  result.innerText += objcmp(pressed.off("KeyZ"  ), {cmd:"off", note:4});
-  result.innerText += objcmp(pressed.off("Digit2"), {cmd:"off", note:1});
+  result.innerText += "test UpDown2OnOff\n";
+  result.innerText += objcmp(o.on ("KeyZ"  ), {cmd:"on" , note:4});
+  result.innerText += objcmp(o.on ("KeyZ"  ), undefined          );
+  result.innerText += objcmp(o.off("KeyZ"  ), {cmd:"off", note:4});
+  result.innerText += objcmp(o.on ("KeyZ"  ), {cmd:"on" , note:4});
+  result.innerText += objcmp(o.on ("Digit2"), {cmd:"on" , note:1});
+  result.innerText += objcmp(o.off("KeyZ"  ), {cmd:"off", note:4});
+  result.innerText += objcmp(o.off("Digit2"), {cmd:"off", note:1});
 }
 
 function test_main2() {
