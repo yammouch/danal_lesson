@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use std::ops::AddAssign;
 
 #[wasm_bindgen]
 extern "C" {
@@ -67,6 +68,11 @@ impl Cplxpol {
     if pi < self.angle {
       self.angle -= 2.*pi;
     }
+  }
+}
+
+impl AddAssign for Cplxpol {
+  fn add_assign(&mut self, _other: Self) {
   }
 }
 
