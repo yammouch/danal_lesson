@@ -80,7 +80,7 @@ impl Add for Cplxpol {
     let mag = ( self.mag*self.mag + other.mag*other.mag
               + 2.*self.mag*other.mag*diff_angle.cos() )
             .max(0.).sqrt();
-    let angle_add = other.mag*diff_angle.sin().atan2(
+    let angle_add = (other.mag*diff_angle.sin()).atan2(
                      other.mag*diff_angle.cos()+self.mag );
     let angle_updt = self.angle + angle_add;
     let angle_regu = angle_updt - ((angle_updt+pi)/(2.*pi)).floor()*(2.*pi);
