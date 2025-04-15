@@ -20,7 +20,7 @@ fn cplxpol_add_re_test1(
  angle_exp: f64) {
   let mut z = reson::Cplxpol { mag: mag, angle: angle };
   log(&format!("{z:?}"));
-  z += reson::Cplxpol { mag: re, angle: 0. };
+  z += re;
   log(&format!("{z:?}"));
   assert!((z.mag - mag_exp) < 1e-6);
   assert!((z.angle - angle_exp) < 1e-6);

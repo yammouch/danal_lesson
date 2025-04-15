@@ -47,21 +47,6 @@ pub struct Cplxpol {
 }
 
 impl Cplxpol {
-  pub fn add_re(&mut self, x: f64) {
-    let pi = std::f64::consts::PI;
-    let mag = (self.mag*self.mag + x*x + 2.*self.mag*x*self.angle.cos()).sqrt();
-    let x_angle = if 0. <= mag {
-      -self.angle
-    } else if 0. <= self.angle {
-      pi - self.angle
-    } else {
-      -pi - self.angle
-    };
-    let angle_add = (x*x_angle.sin()).atan2(self.mag + x*x_angle.cos());
-    self.mag = mag;
-    self.angle += angle_add;
-  }
-
   pub fn rotate(&mut self, a: f64) {
     let pi = std::f64::consts::PI;
     self.angle += a;
@@ -88,11 +73,23 @@ impl Add for Cplxpol {
   }
 }
 
+impl Add<f64> for Cplxpol {
+  type Output = Self;
+
+  fn add(self, other: f64) -> Self {
+    self + Cplxpol { mag: other, angle: 0. }
+  }
+}
+
 impl AddAssign for Cplxpol {
   fn add_assign(&mut self, other: Self) {
-    let added = self.clone() + other;
-    self.mag = added.mag;
-    self.angle = added.angle;
+    *self = self.clone() + other;
+  }
+}
+
+impl AddAssign<f64> for Cplxpol {
+  fn add_assign(&mut self, other: f64) {
+    *self = self.clone() + other;
   }
 }
 
@@ -130,7 +127,7 @@ impl Resonator {
   pub fn tick(&mut self) {
     if self.wav_pos != 0 {
       self.wav_pos -= 1;
-      self.c.add_re(self.wav[self.wav_pos]);
+      self.c += self.wav[self.wav_pos]
     }
     self.c.rotate(self.w);
     self.c.mag *= self.decay;
