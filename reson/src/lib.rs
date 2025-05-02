@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Mul};
 
 #[wasm_bindgen]
 extern "C" {
@@ -105,6 +105,18 @@ impl AddAssign for Cplxpol {
 impl AddAssign<f64> for Cplxpol {
   fn add_assign(&mut self, other: f64) {
     *self = self.clone() + other;
+  }
+}
+
+impl Mul for Cplxpol {
+  type Output = Self;
+
+  fn mul(self, other: Self) -> Self {
+    let pi = std::f64::consts::PI;
+    let mag = self.mag*other.mag;
+    let angle_updt = self.angle + other.angle;
+    let angle_regu = angle_updt - ((angle_updt+pi)/(2.*pi)).floor()*(2.*pi);
+    Self { mag: mag, angle: angle_regu }
   }
 }
 
