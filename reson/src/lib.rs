@@ -47,6 +47,21 @@ pub struct Cplxpol {
 }
 
 impl Cplxpol {
+  pub fn from_reim(re: f64, im: f64) -> Self {
+    Self {
+      mag  : (re*re+im*im).sqrt(),
+      angle: im.atan2(re)
+    }
+  }
+
+  pub fn re(&self) -> f64 {
+    self.mag*self.angle.cos()
+  }
+
+  pub fn im(&self) -> f64 {
+    self.mag*self.angle.sin()
+  }
+
   pub fn rotate(&mut self, a: f64) {
     let pi = std::f64::consts::PI;
     self.angle += a;
@@ -227,4 +242,35 @@ pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
   .map( |(&v1, row)| row.iter().map( |&x| v1*x ).collect() )
   .reduce( |acc: Vec<f64>, row| acc.into_iter().zip(row).map( |(a, r)| a+r )
                                 .collect() ).unwrap()
+}
+
+#[cfg(test)]
+mod cplxpol_test {
+  use wasm_bindgen_test::*;
+  use super::Cplxpol;
+
+  #[wasm_bindgen_test(unsupported = test)]
+  fn add () {
+    use std::iter::once;
+    let crd = vec![3f64.sqrt()*0.5, 1.0, 3f64.sqrt()];
+    let crd = crd.iter().rev().map(|&x| -x).chain(once(0f64))
+              .chain(crd.iter().map(|&x| x)).collect::<Vec<_>>();
+    let mut points : Vec<(f64, f64)> = vec![];
+    for &re in &crd {
+      for &im in &crd {
+        points.push((re, im));
+      }
+    }
+    for &(are, aim) in &points {
+      for &(bre, bim) in &points {
+        let a = Cplxpol::from_reim(are, aim);
+        let b = Cplxpol::from_reim(bre, bim);
+        let sum = a + b;
+        assert!((are + bre - sum.re()) < 1e6,
+         "are: {are}, bre: {bre}, result: {}", sum.re());
+        assert!((aim + bim - sum.im()) < 1e6,
+         "aim: {aim}, bim: {bim}, result: {}", sum.im());
+      }
+    }
+  }
 }
