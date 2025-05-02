@@ -255,6 +255,7 @@ mod cplxpol_test {
     let crd = vec![3f64.sqrt()*0.5, 1.0, 3f64.sqrt()];
     let crd = crd.iter().rev().map(|&x| -x).chain(once(0f64))
               .chain(crd.iter().map(|&x| x)).collect::<Vec<_>>();
+    let pi = std::f64::consts::PI;
     let mut points : Vec<(f64, f64)> = vec![];
     for &re in &crd {
       for &im in &crd {
@@ -266,10 +267,12 @@ mod cplxpol_test {
         let a = Cplxpol::from_reim(are, aim);
         let b = Cplxpol::from_reim(bre, bim);
         let sum = a + b;
-        assert!((are + bre - sum.re()) < 1e6,
+        assert!((are + bre - sum.re()).abs() < 1e-6,
          "are: {are}, bre: {bre}, result: {}", sum.re());
-        assert!((aim + bim - sum.im()) < 1e6,
+        assert!((aim + bim - sum.im()).abs() < 1e-6,
          "aim: {aim}, bim: {bim}, result: {}", sum.im());
+        assert!(sum.angle.abs() < pi+0.1,
+         "angle: {}", sum.angle);
       }
     }
   }
