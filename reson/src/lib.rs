@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use std::ops::{Add, AddAssign, Mul};
+use std::ops::{Add, AddAssign, Mul, MulAssign};
 
 #[wasm_bindgen]
 extern "C" {
@@ -61,14 +61,6 @@ impl Cplxpol {
   pub fn im(&self) -> f64 {
     self.mag*self.angle.sin()
   }
-
-  pub fn rotate(&mut self, a: f64) {
-    let pi = std::f64::consts::PI;
-    self.angle += a;
-    if pi < self.angle {
-      self.angle -= 2.*pi;
-    }
-  }
 }
 
 pub fn angle_regu(angle: f64) -> f64 {
@@ -119,6 +111,12 @@ impl Mul for Cplxpol {
   }
 }
 
+impl MulAssign for Cplxpol {
+  fn mul_assign(&mut self, other: Self) {
+    *self = self.clone() * other;
+  }
+}
+
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Resonator {
@@ -155,8 +153,7 @@ impl Resonator {
       self.wav_pos -= 1;
       self.c += self.wav[self.wav_pos]
     }
-    self.c.rotate(self.w);
-    self.c.mag *= self.decay;
+    self.c *= Cplxpol { mag: self.decay, angle: self.w };
     self.out = self.c.mag * self.c.angle.cos();
   }
 
