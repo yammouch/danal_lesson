@@ -71,20 +71,22 @@ impl Cplxpol {
   }
 }
 
+pub fn angle_regu(angle: f64) -> f64 {
+  let pi = std::f64::consts::PI;
+  angle - ((angle+pi)/(2.*pi)).floor()*(2.*pi)
+}
+
 impl Add for Cplxpol {
   type Output = Self;
 
   fn add(self, other: Self) -> Self {
-    let pi = std::f64::consts::PI;
     let diff_angle = other.angle - self.angle;
     let mag = ( self.mag*self.mag + other.mag*other.mag
               + 2.*self.mag*other.mag*diff_angle.cos() )
             .max(0.).sqrt();
     let angle_add = (other.mag*diff_angle.sin()).atan2(
                      other.mag*diff_angle.cos()+self.mag );
-    let angle_updt = self.angle + angle_add;
-    let angle_regu = angle_updt - ((angle_updt+pi)/(2.*pi)).floor()*(2.*pi);
-    Self { mag: mag, angle: angle_regu }
+    Self { mag: mag, angle: angle_regu(self.angle + angle_add) }
   }
 }
 
@@ -112,11 +114,8 @@ impl Mul for Cplxpol {
   type Output = Self;
 
   fn mul(self, other: Self) -> Self {
-    let pi = std::f64::consts::PI;
     let mag = self.mag*other.mag;
-    let angle_updt = self.angle + other.angle;
-    let angle_regu = angle_updt - ((angle_updt+pi)/(2.*pi)).floor()*(2.*pi);
-    Self { mag: mag, angle: angle_regu }
+    Self { mag: mag, angle: angle_regu(self.angle + other.angle) }
   }
 }
 
@@ -261,19 +260,24 @@ mod cplxpol_test {
   use wasm_bindgen_test::*;
   use super::Cplxpol;
 
-  #[wasm_bindgen_test(unsupported = test)]
-  fn add () {
+  fn points() -> Vec<(f64, f64)> {
     use std::iter::once;
     let crd = vec![3f64.sqrt()*0.5, 1.0, 3f64.sqrt()];
     let crd = crd.iter().rev().map(|&x| -x).chain(once(0f64))
               .chain(crd.iter().map(|&x| x)).collect::<Vec<_>>();
-    let pi = std::f64::consts::PI;
     let mut points : Vec<(f64, f64)> = vec![];
     for &re in &crd {
       for &im in &crd {
         points.push((re, im));
       }
     }
+    points
+  }
+
+  #[wasm_bindgen_test(unsupported = test)]
+  fn add () {
+    let pi = std::f64::consts::PI;
+    let points = points();
     for &(are, aim) in &points {
       for &(bre, bim) in &points {
         let a = Cplxpol::from_reim(are, aim);
