@@ -292,4 +292,23 @@ mod cplxpol_test {
       }
     }
   }
+
+  #[wasm_bindgen_test(unsupported = test)]
+  fn mul () {
+    let pi = std::f64::consts::PI;
+    let points = points();
+    for &(are, aim) in &points {
+      for &(bre, bim) in &points {
+        let a = Cplxpol::from_reim(are, aim);
+        let b = Cplxpol::from_reim(bre, bim);
+        let prod = a * b;
+        assert!((are*bre - aim*bim - prod.re()).abs() < 1e-6,
+         "rere: {}, imim: {}, re: {}", are*bre, aim*bim, prod.re());
+        assert!((aim*bre + are*bim - prod.im()).abs() < 1e-6,
+         "imre: {}, reim: {}, im: {}", aim*bre, are*bim, prod.im());
+        assert!(prod.angle.abs() < pi+0.1,
+         "angle: {}", prod.angle);
+      }
+    }
+  }
 }
