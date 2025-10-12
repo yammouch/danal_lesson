@@ -122,7 +122,7 @@ impl MulAssign for Cplxpol {
 pub struct Resonator {
   c        : Cplxpol,
   w        : f64,
-  wav      : Vec<f64>,
+  wav      : Vec<Cplxpol>,
   wav_pos  : usize,
   decay_on : f64,
   decay_off: f64,
@@ -134,7 +134,9 @@ pub struct Resonator {
 impl Resonator {
   pub fn new(f: f64, wav: Vec<f64>, decay_on: f64, decay_off: f64) -> Self {
     let tau = std::f64::consts::TAU;
-    Self { c: Cplxpol { mag: 0., angle: 0. }, w: tau*f, wav: wav, wav_pos: 0,
+    Self { c: Cplxpol { mag: 0., angle: 0. }, w: tau*f,
+           wav: wav.into_iter().map(|x| Cplxpol::from_reim(0., x)).collect(),
+           wav_pos: 0,
            decay_on: decay_on, decay_off: decay_off,
            decay: decay_off, out: 0. }
   }
