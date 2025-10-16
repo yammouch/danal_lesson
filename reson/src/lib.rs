@@ -277,6 +277,26 @@ impl Rsn {
   }
 }
 
+struct Exc1 {
+  n: Vec<usize>,
+  v: Vec<Vec<Cplxpol>>,
+}
+
+impl Iterator for Exc1 {
+  type Item = Cplxpol;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    let mut acc = Cplxpol { mag: 0.0, angle: 0.0 };
+    for i in 0..self.n.len() {
+      if self.n[i] < 0 {
+        self.n[i] -= 1;
+        acc += self.v[i][self.n[i]]
+      }
+    }
+    Some(acc)
+  }
+}
+
 // 0 -> [0.0]
 // 1 -> [0.0, 0.5  ]
 // 2 -> [0.0, 0.333]             = [0/3, 1/3]
