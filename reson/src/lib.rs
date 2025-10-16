@@ -288,12 +288,33 @@ impl Iterator for Exc1 {
   fn next(&mut self) -> Option<Self::Item> {
     let mut acc = Cplxpol { mag: 0.0, angle: 0.0 };
     for i in 0..self.n.len() {
-      if self.n[i] < 0 {
+      if 0 < self.n[i] {
         self.n[i] -= 1;
         acc += self.v[i][self.n[i]]
       }
     }
     Some(acc)
+  }
+}
+
+struct Exc {
+  a  : Vec<Exc1>,
+  exi: Vec<Vec<(usize, usize)>>,
+}
+
+impl Exc {
+  fn tick(&mut self, dst: &mut [Cplxpol]) {
+    for i in 0..dst.len() {
+      let c = self.a[i].next().expect("Exc1 no value");
+      if c.mag != 0.0 {
+        dst[i] += c;
+      }
+    }
+  }
+  fn on(&mut self, i: usize) {
+    for &t in self.exi[i].iter() {
+      self.a[t.0].n[t.1] = self.a[t.0].v[t.1].len();
+    }
   }
 }
 
