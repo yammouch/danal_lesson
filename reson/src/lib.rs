@@ -245,6 +245,38 @@ fn k2r<T: AsRef<[usize]>>(nk: usize, cfg: &[T]) -> Vec<Vec<(usize, usize)>> {
   ret
 }
 
+struct Rsn {
+  c  : Vec<Cplxpol>,
+  lim: Vec<f64>,
+  dcn: Vec<f64>,
+  dcf: Vec<f64>,
+  k2r: Vec<Vec<(usize, usize)>>,
+  prs: Vec<Vec<bool>>,
+}
+
+impl Rsn {
+  fn tick(&self, dst: &mut [Cplxpol]) {
+    for i in 0..dst.len() {
+      dst[i] *= self.c[i];
+      dst[i].mag = dst[i].mag.min(self.lim[i]);
+    }
+  }
+  fn on(&mut self, i: usize) {
+    for &t in self.k2r[i].iter() {
+      self.prs[t.0][t.1] = true;
+      self.c[t.0].mag = self.dcn[t.0];
+    }
+  }
+  fn off(&mut self, i: usize) {
+    for &t in self.k2r[i].iter() {
+      self.prs[t.0][t.1] = false;
+      if self.prs[t.0].iter().all( |&x| x == false ) {
+        self.c[t.0].mag = self.dcf[t.0];
+      }
+    }
+  }
+}
+
 // 0 -> [0.0]
 // 1 -> [0.0, 0.5  ]
 // 2 -> [0.0, 0.333]             = [0/3, 1/3]
