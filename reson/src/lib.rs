@@ -40,7 +40,7 @@ impl Fir {
   }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Cplxpol {
   pub mag  : f64,
   pub angle: f64, // rad
@@ -278,7 +278,7 @@ impl Rsn {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 struct Exc1 {
   n: Vec<usize>,
   v: Vec<Vec<Cplxpol>>,
@@ -441,11 +441,33 @@ mod test_vecreson {
 
   #[wasm_bindgen_test(unsupported = test)]
   fn test_exc1() {
+    use super::Cplxpol;
+    use super::Exc1;
+
     let mut exc1 = Exc1 {
-      n: vec![0usize, 0],
+      n: vec![1usize, 2],
       v: vec![vec![ Cplxpol { mag: 1.0, angle: 1.0 } ],
               vec![ Cplxpol { mag: 1.0, angle: 0.0 },
                     Cplxpol { mag: 0.5, angle: 0.0 } ]],
     };
+
+    let e = exc1.next().unwrap();
+    assert_eq!(e, Cplxpol { mag: 1.0, angle: 1.0 } +
+                  Cplxpol { mag: 0.5, angle: 0.0 } );
+    assert_eq!(exc1, Exc1 {
+      n: vec![0usize, 1],
+      v: vec![vec![ Cplxpol { mag: 1.0, angle: 1.0 } ],
+              vec![ Cplxpol { mag: 1.0, angle: 0.0 },
+                    Cplxpol { mag: 0.5, angle: 0.0 } ]],
+    });
+
+    let e = exc1.next().unwrap();
+    assert_eq!(e, Cplxpol { mag: 1.0, angle: 0.0 });
+    assert_eq!(exc1, Exc1 {
+      n: vec![0usize, 0],
+      v: vec![vec![ Cplxpol { mag: 1.0, angle: 1.0 } ],
+              vec![ Cplxpol { mag: 1.0, angle: 0.0 },
+                    Cplxpol { mag: 0.5, angle: 0.0 } ]],
+    });
   }
 }
