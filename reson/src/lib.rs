@@ -245,6 +245,7 @@ fn k2r<T: AsRef<[usize]>>(nk: usize, cfg: &[T]) -> Vec<Vec<(usize, usize)>> {
   ret
 }
 
+#[derive(Debug, Clone)]
 struct Rsn {
   c  : Vec<Cplxpol>,
   lim: Vec<f64>,
@@ -277,6 +278,7 @@ impl Rsn {
   }
 }
 
+#[derive(Debug, Clone)]
 struct Exc1 {
   n: Vec<usize>,
   v: Vec<Vec<Cplxpol>>,
@@ -297,6 +299,7 @@ impl Iterator for Exc1 {
   }
 }
 
+#[derive(Debug, Clone)]
 struct Exc {
   a  : Vec<Exc1>,
   exi: Vec<Vec<(usize, usize)>>,
@@ -434,5 +437,15 @@ mod test_vecreson {
           [(10, 0), (22, 0), (35, 0), (42, 0)],
           [(11, 0), (23, 0), (36, 0), (43, 0)],
           [(12, 0), (24, 0), (37, 0), (44, 0)]]);
+  }
+
+  #[wasm_bindgen_test(unsupported = test)]
+  fn test_exc1() {
+    let mut exc1 = Exc1 {
+      n: vec![0usize, 0],
+      v: vec![vec![ Cplxpol { mag: 1.0, angle: 1.0 } ],
+              vec![ Cplxpol { mag: 1.0, angle: 0.0 },
+                    Cplxpol { mag: 0.5, angle: 0.0 } ]],
+    };
   }
 }
