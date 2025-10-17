@@ -299,7 +299,7 @@ impl Iterator for Exc1 {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 struct Exc {
   a  : Vec<Exc1>,
   exi: Vec<Vec<(usize, usize)>>,
@@ -468,6 +468,65 @@ mod test_vecreson {
       v: vec![vec![ Cplxpol { mag: 1.0, angle: 1.0 } ],
               vec![ Cplxpol { mag: 1.0, angle: 0.0 },
                     Cplxpol { mag: 0.5, angle: 0.0 } ]],
+    });
+  }
+
+  #[wasm_bindgen_test(unsupported = test)]
+  fn test_exc() {
+    use super::Cplxpol;
+    use super::Exc1;
+    use super::Exc;
+    let mut exc = Exc {
+      a  : vec![
+        Exc1 {
+          n: vec![0],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ]],
+        },
+        Exc1 {
+          n: vec![0, 0],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ],
+                  vec![ Cplxpol { mag: 0.5, angle: 0.0 } ] ],
+        },
+      ],
+      exi: vec![vec![(0, 0), (1, 1)],
+                vec![(1, 0)]],
+    };
+    exc.on(0);
+    assert_eq!(exc, Exc {
+      a  : vec![
+        Exc1 {
+          n: vec![1],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ]],
+        },
+        Exc1 {
+          n: vec![0, 1],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ],
+                  vec![ Cplxpol { mag: 0.5, angle: 0.0 } ] ],
+        },
+      ],
+      exi: vec![vec![(0, 0), (1, 1)],
+                vec![(1, 0)]],
+    });
+    let mut o = vec![Cplxpol { mag: 0.0, angle: 0.0 },
+                     Cplxpol { mag: 1.0, angle: 0.0 }];
+    exc.tick(&mut o);
+    assert_eq!(o,
+     vec![Cplxpol { mag: 1.0, angle: 0.0 },
+          Cplxpol { mag: 1.5, angle: 0.0 }] );
+    assert_eq!(exc, Exc {
+      a  : vec![
+        Exc1 {
+          n: vec![0],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ]],
+        },
+        Exc1 {
+          n: vec![0, 0],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ],
+                  vec![ Cplxpol { mag: 0.5, angle: 0.0 } ] ],
+        },
+      ],
+      exi: vec![vec![(0, 0), (1, 1)],
+                vec![(1, 0)]],
     });
   }
 }
