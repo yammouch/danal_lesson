@@ -45,9 +45,9 @@
      const wasm = initSync(buf);
      const sr = audioContext.sampleRate;
      const sound_src = Source.new(440.0/sr);
+     sound_src.on(12);
      sound_src.on(19);
-     sound_src.on(26);
-     sound_src.on(35);
+     sound_src.on(28);
      let y = new Float32Array(sr);
 
      sound_src.tick(sr);
