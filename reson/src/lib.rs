@@ -185,17 +185,26 @@ pub struct Source {
   r  : Vec<Resonator>,
   v  : Vec<f32>,
   exc: Exc,
+  rsn: Rsn,
 }
 
 #[wasm_bindgen]
 impl Source {
   pub fn new(f_master_a: f64) -> Self {
-    let mut exi: Vec<Vec<(usize, usize)>> = vec![];
     let mut slf = Self {
       r: vec![],
       v: Vec::with_capacity(128),
-      exc: Exc { a: vec![], exi: vec![] }
+      exc: Exc { a: vec![], exi: vec![] },
+      rsn: Rsn {
+        c  : vec![],
+        lim: vec![10.0; 40],
+        dcn: vec![1. - 1e-4; 40],
+        dcf: vec![1. - 1e-1; 40],
+        k2r: vec![],
+        prs: vec![vec![false]; 40],
+      }
     };
+    let tau = std::f64::consts::TAU;
     for i in 0..=39 {
       slf.r.push(
        Resonator::new(
@@ -206,6 +215,11 @@ impl Source {
        n: vec![0],
        v: vec![vec![Cplxpol {mag: 1.0, angle: 0.0}]]
       });
+      slf.rsn.c.push(Cplxpol {
+        mag: 1. - 1e-1,
+        angle: tau * f_master_a * 2f64.powf((i as f64 - 33.)/12.),
+      });
+      slf.rsn.k2r.push(vec![(i, 0)]);
     }
     slf
   }
