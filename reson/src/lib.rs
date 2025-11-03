@@ -226,10 +226,13 @@ impl Source {
 
   pub fn off(&mut self, i: usize) {
     self.r[i].off();
+    self.rsn.off(i);
   }
 
   pub fn on(&mut self, i: usize) {
     self.r[i].on();
+    self.rsn.on(i);
+    self.exc.on(i);
   }
 
   pub fn tick(&mut self, n: usize) {
