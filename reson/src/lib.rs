@@ -186,6 +186,7 @@ pub struct Source {
   v  : Vec<f32>,
   exc: Exc,
   rsn: Rsn,
+  stt: Vec<Cplxpol>,
 }
 
 #[wasm_bindgen]
@@ -202,7 +203,8 @@ impl Source {
         dcf: vec![1. - 1e-1; 40],
         k2r: vec![],
         prs: vec![vec![false]; 40],
-      }
+      },
+      stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; 40],
     };
     let tau = std::f64::consts::TAU;
     for i in 0..=39 {
@@ -238,8 +240,10 @@ impl Source {
   pub fn tick(&mut self, n: usize) {
     self.v.clear();
     for _ in 0..n {
-      self.r.iter_mut().for_each( |r| r.tick() );
-      self.v.push(self.r.iter().map(Resonator::out).sum::<f64>() as f32);
+      self.exc.tick(&mut self.stt);
+      self.rsn.tick(&mut self.stt);
+      let s : f64 = self.stt.iter().map(Cplxpol::re).sum();
+      self.v.push(s as f32);
     }
   }
 
