@@ -13,35 +13,6 @@ fn fir_test() {
 }
 
 #[wasm_bindgen_test]
-fn resonator_test() {
-  let mut re = reson::Resonator::new(
-   1./4.,
-   vec![1.],
-   1./2.,
-   1./4. );
-
-  let out : Vec<f64> = re.by_ref().take(3).collect();
-  let exp = [0., 0., 0.];
-  for i in 0..out.len() {
-    assert!((out[i] - exp[i]).abs() < 1e-6);
-  }
-
-  re.on();
-  let out : Vec<f64> = re.by_ref().take(4).collect();
-  let exp = [0., -1./4., 0., 1./16.];
-  for i in 0..out.len() {
-    assert!((out[i] - exp[i]).abs() < 1e-6);
-  }
-
-  re.off();
-  let out : Vec<f64> = re.by_ref().take(4).collect();
-  let exp = [0., -1./256., 0., 1./4096.];
-  for i in 0..out.len() {
-    assert!((out[i] - exp[i]).abs() < 1e-6);
-  }
-}
-
-#[wasm_bindgen_test]
 fn order_to_f_test() {
   let test_cases
   = vec![ (0, vec![0./1.]),

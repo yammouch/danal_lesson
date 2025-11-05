@@ -119,70 +119,7 @@ impl MulAssign for Cplxpol {
 
 #[derive(Debug)]
 #[wasm_bindgen]
-pub struct Resonator {
-  c        : Cplxpol,
-  w        : f64,
-  wav      : Vec<f64>,
-  wav_pos  : usize,
-  decay_on : f64,
-  decay_off: f64,
-  decay    : f64,
-  out      : f64,
-}
-
-#[wasm_bindgen]
-impl Resonator {
-  pub fn new(f: f64, wav: Vec<f64>, decay_on: f64, decay_off: f64) -> Self {
-    let tau = std::f64::consts::TAU;
-    Self { c: Cplxpol { mag: 0., angle: 0. }, w: tau*f, wav: wav, wav_pos: 0,
-           decay_on: decay_on, decay_off: decay_off,
-           decay: decay_off, out: 0. }
-  }
-
-  pub fn off(&mut self) {
-    self.decay = self.decay_off;
-  }
-
-  pub fn on(&mut self) {
-    self.decay = self.decay_on;
-    self.wav_pos = self.wav.len();
-  }
-
-  pub fn tick(&mut self) {
-    if self.wav_pos != 0 {
-      self.wav_pos -= 1;
-      self.c += self.wav[self.wav_pos]
-    }
-    self.c *= Cplxpol { mag: self.decay, angle: self.w };
-    self.out = self.c.mag * self.c.angle.cos();
-  }
-
-  pub fn out(&self) -> f64 {
-    self.out
-  }
-
-  pub fn ptr(&self) -> *const f64 {
-    &self.out
-  }
-
-  pub fn reson1(f: f64) -> Self {
-    Resonator::new(f, vec![1.], 1. - 1e-4, 1. - 1e-1)
-  }
-}
-
-impl Iterator for Resonator {
-  type Item = f64;
-
-  fn next(&mut self) -> Option<Self::Item> {
-    self.tick();
-    Some(self.out)
-  }
-}
-
-#[derive(Debug)]
-#[wasm_bindgen]
 pub struct Source {
-  r  : Vec<Resonator>,
   v  : Vec<f32>,
   exc: Exc,
   rsn: Rsn,
@@ -193,7 +130,6 @@ pub struct Source {
 impl Source {
   pub fn new(f_master_a: f64) -> Self {
     let mut slf = Self {
-      r: vec![],
       v: Vec::with_capacity(128),
       exc: Exc { a: vec![], exi: vec![] },
       rsn: Rsn {
@@ -208,10 +144,6 @@ impl Source {
     };
     let tau = std::f64::consts::TAU;
     for i in 0..=39 {
-      slf.r.push(
-       Resonator::new(
-        f_master_a * 2f64.powf((i as f64 - 33.)/12.),
-        vec![1.], 1. - 1e-4, 1. - 1e-1));
       slf.exc.exi.push(vec![(i, 0)]);
       slf.exc.a.push(Exc1 {
        n: vec![0],
@@ -227,12 +159,10 @@ impl Source {
   }
 
   pub fn off(&mut self, i: usize) {
-    self.r[i].off();
     self.rsn.off(i);
   }
 
   pub fn on(&mut self, i: usize) {
-    self.r[i].on();
     self.rsn.on(i);
     self.exc.on(i);
   }
