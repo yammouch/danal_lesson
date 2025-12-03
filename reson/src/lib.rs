@@ -7,39 +7,6 @@ extern "C" {
   pub fn log(s: &str);
 }
 
-#[derive(Debug)]
-#[wasm_bindgen]
-pub struct Fir {
-  pos     : usize,
-  skip    : usize,
-  buf     : Vec<f64>,
-  coeff   : Vec<f64>,
-  pub out : f64,
-}
-
-impl Fir {
-  pub fn new(v: Vec<f64>, skip: usize) -> Self {
-    Fir {
-      pos  : 0,
-      skip : skip,
-      buf  : vec![0.0; v.len()+skip],
-      coeff: v,
-      out  : 0.0,
-    }
-  }
-
-  pub fn tick(&mut self, din: f64) {
-    if self.pos == 0 {
-      self.pos = self.buf.len() - 1;
-    } else {
-      self.pos -= 1;
-    }
-    self.buf[self.pos] = din;
-    self.out = self.buf[self.pos..].iter().chain(&self.buf).skip(self.skip)
-               .zip(&self.coeff).map(|(&b, &c)| b*c).sum();
-  }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Cplxpol {
   pub mag  : f64,
@@ -278,35 +245,6 @@ impl Exc {
       self.a[t.0].n[t.1] = self.a[t.0].v[t.1].len();
     }
   }
-}
-
-// 0 -> [0.0]
-// 1 -> [0.0, 0.5  ]
-// 2 -> [0.0, 0.333]             = [0/3, 1/3]
-// 3 -> [0.0. 0.25 , 0.5]        = [0/4, 1/4, 2/4]
-// 4 -> [0.0. 0.2  , 0.4]        = [0/5, 1/5, 2/5]
-// 5 -> [0.0, 0.166, 0.333, 0.5] = [0/6, 1/6, 2/6, 3/6]
-pub fn order_to_f(ord: u32) -> Vec<f64> {
-  let denom = f64::from(ord+1);
-  (0..=(ord+1)/2).map( |i| f64::from(i)/denom ).collect()
-}
-
-pub fn div_wave(ord: u32) -> Vec<Vec<f64>> {
-  let tau   = std::f64::consts::TAU;
-  let denom = f64::from(ord+1);
-  order_to_f(ord).into_iter().map( |f|
-    (0..=ord).map( |i| {
-      (tau*f*f64::from(i)).cos()
-      / if f == 0.0 || f == 0.5 { denom } else { 0.5*denom }
-    }).collect()
-  ).collect()
-}
-
-pub fn vxm(v: &[f64], m: &[Vec<f64>]) -> Vec<f64> {
-  v.iter().zip(m)
-  .map( |(&v1, row)| row.iter().map( |&x| v1*x ).collect() )
-  .reduce( |acc: Vec<f64>, row| acc.into_iter().zip(row).map( |(a, r)| a+r )
-                                .collect() ).unwrap()
 }
 
 #[cfg(test)]
