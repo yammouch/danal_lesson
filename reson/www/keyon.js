@@ -1,5 +1,4 @@
-//import { initSync, Source } from "./sub01.js";
-import { initSync, Source } from "./node_modules/wasm_engine/reson.js";
+import { initSync, Source } from "./node_modules/wasm_engine/glue.js";
 
 class SquareProcessor extends AudioWorkletProcessor {
 
