@@ -84,6 +84,30 @@ impl MulAssign for Cplxpol {
   }
 }
 
+fn tune(c: &mut [Cplxpol], n: usize, f: f64, t: &[f64]) {
+  let mut j = 0usize;
+  let mut f0 = f;
+  for i in n..c.len() {
+    c[i].angle = f0*t[j];
+    j += 1;
+    if t.len() <= j {
+      j = 0;
+      f0 *= 2.0;
+    }
+  }
+  f0 = 0.5*f;
+  j = t.len() - 1;
+  for i in (0..n).rev() {
+    c[i].angle = f0*t[j];
+    if j == 0 {
+      j = t.len() - 1;
+      f0 *= 0.5;
+    } else {
+      j -= 1;
+    }
+  }
+}
+
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Source {
