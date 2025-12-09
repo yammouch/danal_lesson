@@ -334,6 +334,40 @@ mod test_vecreson {
   use wasm_bindgen_test::*;
 
   #[wasm_bindgen_test(unsupported = test)]
+  fn test_tune() {
+    use super::Cplxpol;
+    use super::tune;
+    let mut c = vec![ Cplxpol { mag: 1.0, angle: 0.0 },
+                      Cplxpol { mag: 1.0, angle: 0.0 },
+                      Cplxpol { mag: 1.0, angle: 0.0 },
+                      Cplxpol { mag: 1.0, angle: 0.0 } ];
+    tune(&mut c, 0, 2.0, &[1.0, 1.5]);
+    assert_eq!(c,
+     vec![ Cplxpol { mag: 1.0, angle: 2.0 },
+           Cplxpol { mag: 1.0, angle: 3.0 },
+           Cplxpol { mag: 1.0, angle: 4.0 },
+           Cplxpol { mag: 1.0, angle: 6.0 } ]);
+    tune(&mut c, 1, 2.0, &[1.0, 1.5]);
+    assert_eq!(c,
+     vec![ Cplxpol { mag: 1.0, angle: 1.5 },
+           Cplxpol { mag: 1.0, angle: 2.0 },
+           Cplxpol { mag: 1.0, angle: 3.0 },
+           Cplxpol { mag: 1.0, angle: 4.0 } ]);
+    tune(&mut c, 2, 2.0, &[1.0, 1.5]);
+    assert_eq!(c,
+     vec![ Cplxpol { mag: 1.0, angle: 1.0 },
+           Cplxpol { mag: 1.0, angle: 1.5 },
+           Cplxpol { mag: 1.0, angle: 2.0 },
+           Cplxpol { mag: 1.0, angle: 3.0 } ]);
+    tune(&mut c, 3, 2.0, &[1.0, 1.5]);
+    assert_eq!(c,
+     vec![ Cplxpol { mag: 1.0, angle: 0.75 },
+           Cplxpol { mag: 1.0, angle: 1.0  },
+           Cplxpol { mag: 1.0, angle: 1.5  },
+           Cplxpol { mag: 1.0, angle: 2.0  } ]);
+  }
+
+  #[wasm_bindgen_test(unsupported = test)]
   fn test_k2r() {
     let cfg = vec![vec![0usize]];
     let rv = super::k2r(13, &cfg);
