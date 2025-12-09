@@ -84,6 +84,38 @@ impl MulAssign for Cplxpol {
   }
 }
 
+fn chord_root(pr1: &[bool]) -> Option<usize> {
+  let mut oct = [0usize; 12];
+  let mut low : Option<usize> = None;
+  for i in 0..pr1.len() {
+    if pr1[i] {
+      if low == None {
+        low = Some(i);
+      }
+      oct[ i    %12] += 5;
+      oct[(i+ 5)%12] += 4;
+      oct[(i+ 8)%12] += 3;
+      oct[(i+10)%12] += 2;
+      oct[(i+ 2)%12] += 1;
+    }
+  }
+  let mx = oct.iter().enumerate().fold( (0usize, 0usize, 0usize),
+   |(mx, imx, cnt), (i, &x)| {
+    if x < mx {
+      (mx, imx, cnt)
+    } else if x == mx {
+      (mx, imx, cnt+1)
+    } else {
+      (x, i, 1) 
+    }
+  });
+  if mx.2 == 1 {
+    Some(mx.1)
+  } else {
+    None
+  }
+}
+
 fn tune(c: &mut [Cplxpol], n: usize, f: f64, t: &[f64]) {
   let mut j = 0usize;
   let mut f0 = f;
