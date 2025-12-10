@@ -148,6 +148,7 @@ pub struct Source {
   rsn: Rsn,
   stt: Vec<Cplxpol>,
   eqt: Vec<f64>,
+  crt: usize,
 }
 
 #[wasm_bindgen]
@@ -167,6 +168,7 @@ impl Source {
       },
       stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; 40],
       eqt: (0..12).map( |i| 2f64.powf((i as f64)/12.)).collect(),
+      crt: 0,
     };
     let tau = std::f64::consts::TAU;
     for i in 0..=39 {
@@ -188,6 +190,11 @@ impl Source {
   pub fn on(&mut self, i: usize) {
     self.rsn.on(i);
     self.exc.on(i);
+    if let Some(k) = chord_root(&self.rsn.pr1) {
+      self.crt = k;
+    } else {
+      self.crt = 12;
+    }
   }
 
   pub fn tick(&mut self, n: usize) {
@@ -202,6 +209,10 @@ impl Source {
 
   pub fn ptr(&self) -> *const f32 {
     self.v.as_ptr()
+  }
+
+  pub fn crt(&self) -> usize {
+    self.crt
   }
 }
 
