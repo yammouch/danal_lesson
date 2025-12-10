@@ -163,6 +163,7 @@ impl Source {
         dcf: vec![1. - 1e-1; 40],
         k2r: vec![],
         prs: vec![vec![false]; 40],
+        pr1: vec![false; 40],
       },
       stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; 40],
       eqt: (0..12).map( |i| 2f64.powf((i as f64)/12.)).collect(),
@@ -234,6 +235,7 @@ struct Rsn {
   dcf: Vec<f64>,
   k2r: Vec<Vec<(usize, usize)>>,
   prs: Vec<Vec<bool>>,
+  pr1: Vec<bool>,
 }
 
 impl Rsn {
@@ -248,6 +250,7 @@ impl Rsn {
       self.prs[t.0][t.1] = true;
       self.c[t.0].mag = self.dcn[t.0];
     }
+    self.pr1[i] = true;
   }
   fn off(&mut self, i: usize) {
     for &t in self.k2r[i].iter() {
@@ -256,6 +259,7 @@ impl Rsn {
         self.c[t.0].mag = self.dcf[t.0];
       }
     }
+    self.pr1[i] = false;
   }
 }
 
@@ -475,6 +479,7 @@ mod test_vecreson {
                 vec![(1, 0)]],
       prs: vec![vec![false],
                 vec![false, false]],
+      pr1: vec![false, false],
     };
 
     rsn.on(0);
@@ -488,6 +493,7 @@ mod test_vecreson {
                 vec![(1, 0)]],
       prs: vec![vec![true],
                 vec![false, true]],
+      pr1: vec![true, false],
     });
 
     let mut v = vec![Cplxpol { mag: 1.0, angle: 0.0 },
@@ -509,6 +515,7 @@ mod test_vecreson {
                 vec![(1, 0)]],
       prs: vec![vec![true],
                 vec![true, true]],
+      pr1: vec![true, true],
     });
 
     rsn.off(0);
@@ -522,6 +529,7 @@ mod test_vecreson {
                 vec![(1, 0)]],
       prs: vec![vec![false],
                 vec![true, false]],
+      pr1: vec![false, true],
     });
 
     rsn.off(1);
@@ -535,6 +543,7 @@ mod test_vecreson {
                 vec![(1, 0)]],
       prs: vec![vec![false],
                 vec![false, false]],
+      pr1: vec![false, false],
     });
   }
 
