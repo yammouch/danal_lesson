@@ -48,6 +48,7 @@ window.addEventListener("load", () => {
 async function play() {
   await audioContext.audioWorklet.addModule("keyon.js");
   console.log("keyon");
+  const chord_root = document.getElementById("chord_root");
   squareNode = new AudioWorkletNode(
     audioContext,
     "sq-pr",
@@ -60,6 +61,9 @@ async function play() {
     console.log("fetch failed");
   }
   squareNode.connect(audioContext.destination);
+  squareNode.port.onmessage = (e) => {
+    chord_root.innerText = "chord root: " + e.data.chord_root;
+  };
   squareNode.port.postMessage({
    cmd       : "init",
    sampleRate: audioContext.sampleRate,
@@ -132,5 +136,8 @@ async function play() {
 <td id="td_ShiftRight" colspan="2">Shift</td>
 </tr>
 </table>
+
+<div id="chord_root">chord root:</div>
+
 </body>
 </html>
