@@ -140,10 +140,26 @@ fn tune(c: &mut [Cplxpol], n: usize, f: f64, t: &[f64]) {
   }
 }
 
+const JUST_TABLE : [f64; 12] = [
+  1.0,
+ 17.0/16.0,
+  9.0/ 8.0,
+  6.0/ 5.0, //  7.0/ 6.0
+  5.0/ 4.0,
+  4.0/ 3.0,
+ 45.0/32.0, // 11.0/ 8.0
+  3.0/ 2.0,
+ 25.0/16.0, //  8.0/ 5.0
+ 27.0/16.0, //  5.0/ 3.0
+  9.0/ 5.0, //  7.0/ 4.0
+ 15.0/ 8.0,
+];
+
 #[derive(Debug)]
 #[wasm_bindgen]
 pub struct Source {
   v  : Vec<f32>,
+  mst: f64,
   exc: Exc,
   rsn: Rsn,
   stt: Vec<Cplxpol>,
@@ -156,6 +172,7 @@ impl Source {
   pub fn new(f_master_a: f64) -> Self {
     let mut slf = Self {
       v: Vec::with_capacity(128),
+      mst: f_master_a,
       exc: Exc { a: vec![], exi: vec![] },
       rsn: Rsn {
         c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; 40],
@@ -188,12 +205,16 @@ impl Source {
   }
 
   pub fn on(&mut self, i: usize) {
+    let tau = std::f64::consts::TAU;
+    let pi  = std::f64::consts::PI;
     self.rsn.on(i);
     self.exc.on(i);
     if let Some(k) = chord_root(&self.rsn.pr1) {
       self.crt = k;
+      tune(&mut self.rsn.c, 21+k, pi * self.mst * self.eqt[k], &JUST_TABLE);
     } else {
       self.crt = 12;
+      tune(&mut self.rsn.c, 33, tau * self.mst, &self.eqt);
     }
   }
 
