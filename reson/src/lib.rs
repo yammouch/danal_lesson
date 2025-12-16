@@ -163,13 +163,14 @@ impl Source {
     let mut slf = Self {
       v: Vec::with_capacity(128),
       mst: f_master_a,
-      exc: Exc { a: vec![], exi: vec![] },
+      exc: Exc { a: vec![ Exc1 { n: vec![], v: vec![] }; 40 ],
+                 exi: k2r(40, &[[0]]) },
       rsn: Rsn {
         c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; 40],
         lim: vec![10.0; 40],
         dcn: vec![1. - 1e-4; 40],
         dcf: vec![1. - 1e-1; 40],
-        k2r: vec![],
+        k2r: k2r(40, &[[0]]),
         prs: vec![vec![false]; 40],
         pr1: vec![false; 40],
       },
@@ -179,14 +180,10 @@ impl Source {
     };
     let tau = std::f64::consts::TAU;
     for i in 0..=39 {
-      slf.exc.exi.push(vec![(i, 0)]);
-      slf.exc.a.push(Exc1 {
-       n: vec![0],
-       v: vec![vec![Cplxpol {mag: 1.0, angle: 0.0}]]
-      });
-      tune(&mut slf.rsn.c, 33, tau * f_master_a, &slf.eqt);
-      slf.rsn.k2r.push(vec![(i, 0)]);
+      slf.exc.a[i].n.push(0);
+      slf.exc.a[i].v.push(vec![Cplxpol {mag: 1.0, angle: 0.0}]);
     }
+    tune(&mut slf.rsn.c, 33, tau * f_master_a, &slf.eqt);
     slf
   }
 
