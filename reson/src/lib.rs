@@ -164,13 +164,13 @@ impl Source {
       v: Vec::with_capacity(128),
       mst: f_master_a,
       exc: Exc { a: vec![ Exc1 { n: vec![], v: vec![] }; 40 ],
-                 exi: k2r(40, &[[0]]) },
+                 exi: k2r(40, &[0]) },
       rsn: Rsn {
         c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; 40],
         lim: vec![10.0; 40],
         dcn: vec![1. - 1e-4; 40],
         dcf: vec![1. - 1e-1; 40],
-        k2r: k2r(40, &[[0]]),
+        k2r: k2r(40, &[0]),
         prs: vec![vec![false]; 40],
         pr1: vec![false; 40],
       },
@@ -224,23 +224,14 @@ impl Source {
   }
 }
 
-fn k2r<T: AsRef<[usize]>>(nk: usize, cfg: &[T]) -> Vec<Vec<(usize, usize)>> {
-  use std::iter::once;
-  let mx : Vec<usize> = cfg.iter().map( |r|
-    r.as_ref().iter().max().expect("empty array").clone()
-  ).collect();
-  let cum : Vec<usize> = mx.iter().scan(0, |stt, &x| {
-    *stt += nk + x;
-    Some(*stt)
-  }).collect();
-  let mut cnt : Vec<usize> = vec![0; cum[cum.len()-1]];
+fn k2r(nk: usize, cfg: &[usize]) -> Vec<Vec<(usize, usize)>> {
+  let mx : usize = cfg.iter().max().expect("empty array").clone();
+  let mut cnt : Vec<usize> = vec![0; nk+mx];
   let mut ret : Vec<Vec<(usize, usize)>> = vec![vec![]; nk];
-  for (&ofs, v) in once(&0).chain(cum.iter()).zip(cfg) {
-    for h in v.as_ref().iter() {
-      for i in 0..nk {
-        ret[i].push((ofs+h+i, cnt[ofs+h+i]));
-        cnt[ofs+h+i] += 1;
-      }
+  for c in cfg {
+    for i in 0..nk {
+      ret[i].push((c+i, cnt[c+i]));
+      cnt[c+i] += 1;
     }
   }
   ret
@@ -458,29 +449,27 @@ mod test_vecreson {
 
   #[wasm_bindgen_test(unsupported = test)]
   fn test_k2r() {
-    let cfg = vec![vec![0usize]];
-    let rv = super::k2r(13, &cfg);
+    let rv = super::k2r(13, &[0]);
     assert_eq!(rv,
      vec![vec![(0, 0)], vec![(1, 0)], vec![(2, 0)], vec![(3, 0)], vec![(4, 0)],
           vec![(5, 0)], vec![(6, 0)], vec![(7, 0)], vec![(8, 0)], vec![(9, 0)],
           vec![(10, 0)], vec![(11, 0)], vec![(12, 0)]]);
 
-    let cfg = vec![vec![0usize, 12], vec![0, 7]];
-    let rv = super::k2r(13, &cfg);
+    let rv = super::k2r(13, &[0, 12]);
     assert_eq!(rv,
-     vec![[(0, 0), (12, 1), (25, 0), (32, 1)],
-          [(1, 0), (13, 0), (26, 0), (33, 1)],
-          [(2, 0), (14, 0), (27, 0), (34, 1)],
-          [(3, 0), (15, 0), (28, 0), (35, 1)],
-          [(4, 0), (16, 0), (29, 0), (36, 1)],
-          [(5, 0), (17, 0), (30, 0), (37, 1)],
-          [(6, 0), (18, 0), (31, 0), (38, 0)],
-          [(7, 0), (19, 0), (32, 0), (39, 0)],
-          [(8, 0), (20, 0), (33, 0), (40, 0)],
-          [(9, 0), (21, 0), (34, 0), (41, 0)],
-          [(10, 0), (22, 0), (35, 0), (42, 0)],
-          [(11, 0), (23, 0), (36, 0), (43, 0)],
-          [(12, 0), (24, 0), (37, 0), (44, 0)]]);
+     vec![[(0, 0), (12, 1)],
+          [(1, 0), (13, 0)],
+          [(2, 0), (14, 0)],
+          [(3, 0), (15, 0)],
+          [(4, 0), (16, 0)],
+          [(5, 0), (17, 0)],
+          [(6, 0), (18, 0)],
+          [(7, 0), (19, 0)],
+          [(8, 0), (20, 0)],
+          [(9, 0), (21, 0)],
+          [(10, 0), (22, 0)],
+          [(11, 0), (23, 0)],
+          [(12, 0), (24, 0)]]);
   }
 
   #[wasm_bindgen_test(unsupported = test)]
