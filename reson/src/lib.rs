@@ -163,18 +163,13 @@ impl Source {
     let mut slf = Self {
       v: Vec::with_capacity(128),
       mst: f_master_a,
-      exc: Exc { a: vec![ Exc1 { n: vec![], v: vec![] }; 40 ],
-                 exi: k2r(40, &[0]) },
+      exc: Exc::new(),
       rsn: Rsn::new(),
       stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; 40],
       eqt: (0..12).map( |i| 2f64.powf((i as f64)/12.)).collect(),
       crt: 0,
     };
     let tau = std::f64::consts::TAU;
-    for i in 0..=39 {
-      slf.exc.a[i].n.push(0);
-      slf.exc.a[i].v.push(vec![Cplxpol {mag: 1.0, angle: 0.0}]);
-    }
     tune(&mut slf.rsn.c, 33, tau * f_master_a, &slf.eqt);
     slf
   }
@@ -304,6 +299,15 @@ struct Exc {
 }
 
 impl Exc {
+  fn new() -> Self {
+    let mut a = vec![ Exc1 { n: vec![], v: vec![] }; 40 ];
+    for i in 0..=39 {
+      a[i].n.push(0);
+      a[i].v.push(vec![Cplxpol {mag: 1.0, angle: 0.0}]);
+    }
+    Self { a,
+           exi: k2r(40, &[0]) }
+  }
   fn tick(&mut self, dst: &mut [Cplxpol]) {
     for i in 0..dst.len() {
       let c = self.a[i].next().expect("Exc1 no value");
