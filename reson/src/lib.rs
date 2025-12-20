@@ -116,26 +116,16 @@ fn chord_root(pr1: &[bool]) -> Option<usize> {
   }
 }
 
-fn tune(c: &mut [Cplxpol], n: usize, f: f64, t: &[f64]) {
-  let mut j = 0usize;
-  let mut f0 = f;
-  for i in n..c.len() {
-    c[i].angle = f0*t[j];
+fn tune(c: &mut [Cplxpol], n: isize, f: f64, t: &[f64]) {
+  let i = (-n).div_euclid(t.len() as isize);
+  let mut f0 = f*2f64.powf(i as f64);
+  let mut j = (-n).rem_euclid(t.len() as isize) as usize;
+  for k in 0..c.len() {
+    c[k].angle = f0*t[j];
     j += 1;
     if t.len() <= j {
       j = 0;
-      f0 *= 2.0;
-    }
-  }
-  f0 = 0.5*f;
-  j = t.len() - 1;
-  for i in (0..n).rev() {
-    c[i].angle = f0*t[j];
-    if j == 0 {
-      j = t.len() - 1;
-      f0 *= 0.5;
-    } else {
-      j -= 1;
+      f0 *= 2.;
     }
   }
 }
@@ -211,7 +201,7 @@ impl Source {
     self.exc.on(i);
     if let Some(k) = chord_root(&self.rsn.pr1) {
       self.crt = k;
-      tune(&mut self.rsn.c, 21+k, pi * self.mst * self.eqt[k], &JUST_TABLE);
+      tune(&mut self.rsn.c, 21+k as isize, pi * self.mst * self.eqt[k], &JUST_TABLE);
     } else {
       self.crt = 12;
       tune(&mut self.rsn.c, 33, tau * self.mst, &self.eqt);
