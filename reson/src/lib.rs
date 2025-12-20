@@ -165,15 +165,7 @@ impl Source {
       mst: f_master_a,
       exc: Exc { a: vec![ Exc1 { n: vec![], v: vec![] }; 40 ],
                  exi: k2r(40, &[0]) },
-      rsn: Rsn {
-        c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; 40],
-        lim: vec![10.0; 40],
-        dcn: vec![1. - 1e-4; 40],
-        dcf: vec![1. - 1e-1; 40],
-        k2r: k2r(40, &[0]),
-        prs: vec![vec![false]; 40],
-        pr1: vec![false; 40],
-      },
+      rsn: Rsn::new(),
       stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; 40],
       eqt: (0..12).map( |i| 2f64.powf((i as f64)/12.)).collect(),
       crt: 0,
@@ -249,6 +241,17 @@ struct Rsn {
 }
 
 impl Rsn {
+  fn new() -> Self {
+    Self {
+      c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; 40],
+      lim: vec![10.0; 40],
+      dcn: vec![1. - 1e-4; 40],
+      dcf: vec![1. - 1e-1; 40],
+      k2r: k2r(40, &[0]),
+      prs: vec![vec![false]; 40],
+      pr1: vec![false; 40],
+    }
+  }
   fn tick(&self, dst: &mut [Cplxpol]) {
     for i in 0..dst.len() {
       dst[i] *= self.c[i];
