@@ -160,12 +160,15 @@ pub struct Source {
 #[wasm_bindgen]
 impl Source {
   pub fn new(f_master_a: f64) -> Self {
+    let nk = 40;   // the number of keys
+    let cfg = [0]; // harmonicses
+    let mx = cfg.into_iter().max().expect("empty array");
     let mut slf = Self {
       v: Vec::with_capacity(128),
       mst: f_master_a,
-      exc: Exc::new(),
-      rsn: Rsn::new(),
-      stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; 40],
+      exc: Exc::new(nk, &cfg),
+      rsn: Rsn::new(nk, &cfg),
+      stt: vec![Cplxpol{ mag: 0.0, angle: 0.0 }; nk+mx],
       eqt: (0..12).map( |i| 2f64.powf((i as f64)/12.)).collect(),
       crt: 0,
     };
@@ -236,12 +239,10 @@ struct Rsn {
 }
 
 impl Rsn {
-  fn new() -> Self {
-    let cfg = [0];
+  fn new(nk: usize, cfg: &[usize]) -> Self {
     let mx = cfg.iter().max().expect("empty array").clone();
-    let nk = 40;
     let mut prs = vec![vec![]; nk+mx];
-    for c in cfg {
+    for &c in cfg {
       for i in 0..nk {
         prs[c+i].push(false);
       }
@@ -251,7 +252,7 @@ impl Rsn {
       lim: vec![10.0; nk+mx],
       dcn: vec![1. - 1e-4; nk+mx],
       dcf: vec![1. - 1e-1; nk+mx],
-      k2r: k2r(nk, &cfg),
+      k2r: k2r(nk, cfg),
       prs,
       pr1: vec![false; nk],
     }
@@ -308,19 +309,17 @@ struct Exc {
 }
 
 impl Exc {
-  fn new() -> Self {
-    let cfg = [0];
-    let mx = cfg.into_iter().max().expect("empty array");
-    let nk = 40;
+  fn new(nk: usize, cfg: &[usize]) -> Self {
+    let mx = cfg.iter().max().expect("empty array").clone();
     let mut a = vec![ Exc1 { n: vec![], v: vec![] }; nk+mx ];
-    for c in cfg {
+    for &c in cfg {
       for i in 0..nk {
         a[c+i].n.push(0);
         a[c+i].v.push(vec![Cplxpol {mag: 1.0, angle: 0.0}]);
       }
     }
     Self { a,
-           exi: k2r(nk, &cfg) }
+           exi: k2r(nk, cfg) }
   }
   fn tick(&mut self, dst: &mut [Cplxpol]) {
     for i in 0..dst.len() {
