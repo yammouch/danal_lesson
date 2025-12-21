@@ -237,14 +237,23 @@ struct Rsn {
 
 impl Rsn {
   fn new() -> Self {
+    let cfg = [0];
+    let mx = cfg.iter().max().expect("empty array").clone();
+    let nk = 40;
+    let mut prs = vec![vec![]; nk+mx];
+    for c in cfg {
+      for i in 0..nk {
+        prs[c+i].push(false);
+      }
+    }
     Self {
-      c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; 40],
-      lim: vec![10.0; 40],
-      dcn: vec![1. - 1e-4; 40],
-      dcf: vec![1. - 1e-1; 40],
-      k2r: k2r(40, &[0]),
-      prs: vec![vec![false]; 40],
-      pr1: vec![false; 40],
+      c  : vec![Cplxpol { mag: 1. - 1e-1, angle: 0.0 }; nk+mx],
+      lim: vec![10.0; nk+mx],
+      dcn: vec![1. - 1e-4; nk+mx],
+      dcf: vec![1. - 1e-1; nk+mx],
+      k2r: k2r(nk, &cfg),
+      prs,
+      pr1: vec![false; nk],
     }
   }
   fn tick(&self, dst: &mut [Cplxpol]) {
@@ -300,13 +309,18 @@ struct Exc {
 
 impl Exc {
   fn new() -> Self {
-    let mut a = vec![ Exc1 { n: vec![], v: vec![] }; 40 ];
-    for i in 0..=39 {
-      a[i].n.push(0);
-      a[i].v.push(vec![Cplxpol {mag: 1.0, angle: 0.0}]);
+    let cfg = [0];
+    let mx = cfg.into_iter().max().expect("empty array");
+    let nk = 40;
+    let mut a = vec![ Exc1 { n: vec![], v: vec![] }; nk+mx ];
+    for c in cfg {
+      for i in 0..nk {
+        a[c+i].n.push(0);
+        a[c+i].v.push(vec![Cplxpol {mag: 1.0, angle: 0.0}]);
+      }
     }
     Self { a,
-           exi: k2r(40, &[0]) }
+           exi: k2r(nk, &cfg) }
   }
   fn tick(&mut self, dst: &mut [Cplxpol]) {
     for i in 0..dst.len() {
