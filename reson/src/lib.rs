@@ -161,7 +161,7 @@ pub struct Source {
 impl Source {
   pub fn new(f_master_a: f64) -> Self {
     let nk = 40;   // the number of keys
-    let cfg = [0]; // harmonicses
+    let cfg = [0, 12, 19, 24, 28, 31, 36, 38]; // harmonicses
     let mx = cfg.into_iter().max().expect("empty array");
     let mut slf = Self {
       v: Vec::with_capacity(128),
