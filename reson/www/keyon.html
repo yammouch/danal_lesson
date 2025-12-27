@@ -48,10 +48,72 @@ window.addEventListener("load", () => {
 function drawbar(port) {
   const harm1 = document.getElementById("harm1");
   harm1.addEventListener("input", (e) => {
-    console.log(e);
-    console.log(e.target.value);
     port.postMessage({
-      cmd   : "harm1",
+      cmd   : "harm",
+      harm  : 0,
+      value : e.target.value
+    });
+  });
+
+  const harm2 = document.getElementById("harm2");
+  harm2.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 1,
+      value : e.target.value
+    });
+  });
+
+  const harm3 = document.getElementById("harm3");
+  harm3.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 2,
+      value : e.target.value
+    });
+  });
+
+  const harm4 = document.getElementById("harm4");
+  harm4.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 3,
+      value : e.target.value
+    });
+  });
+
+  const harm5 = document.getElementById("harm5");
+  harm5.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 4,
+      value : e.target.value
+    });
+  });
+
+  const harm6 = document.getElementById("harm6");
+  harm6.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 5,
+      value : e.target.value
+    });
+  });
+
+  const harm8 = document.getElementById("harm8");
+  harm8.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 6,
+      value : e.target.value
+    });
+  });
+
+  const harm9 = document.getElementById("harm9");
+  harm9.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 7,
       value : e.target.value
     });
   });
