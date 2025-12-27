@@ -45,6 +45,18 @@ window.addEventListener("load", () => {
 
 });
 
+function drawbar(port) {
+  const harm1 = document.getElementById("harm1");
+  harm1.addEventListener("input", (e) => {
+    console.log(e);
+    console.log(e.target.value);
+    port.postMessage({
+      cmd   : "harm1",
+      value : e.target.value
+    });
+  });
+}
+
 async function play() {
   await audioContext.audioWorklet.addModule("keyon.js");
   console.log("keyon");
@@ -64,6 +76,7 @@ async function play() {
   squareNode.port.onmessage = (e) => {
     chord_root.innerText = "chord root: " + e.data.chord_root;
   };
+  drawbar(squareNode.port);
   squareNode.port.postMessage({
    cmd       : "init",
    sampleRate: audioContext.sampleRate,
