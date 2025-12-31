@@ -140,7 +140,7 @@ async function play() {
     "sq-pr",
   );
   let wasm = null;
-  const resp = await fetch("./node_modules/wasm_engine/reson_bg.wasm");
+  const resp = await fetch("./engine/pkg/reson_bg.wasm");
   if (resp.ok) {
     wasm = await resp.arrayBuffer();
   } else {

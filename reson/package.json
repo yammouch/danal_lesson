@@ -4,7 +4,6 @@
   },
   "dependencies": {
     "http-server"    : "^14.0.0",
-    "wasm_engine"    : "../pkg",
     "plotly.js-dist" : "~2.35.0"
   }
 }

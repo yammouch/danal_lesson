@@ -1,4 +1,4 @@
-import { initSync, Source } from "./node_modules/wasm_engine/glue.js";
+import { initSync, Source } from "./engine/pkg/glue.js";
 
 class SquareProcessor extends AudioWorkletProcessor {
 
