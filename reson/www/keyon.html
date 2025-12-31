@@ -20,23 +20,35 @@ window.addEventListener("load", () => {
     });
   });
   document.addEventListener("keydown", (e) => {
-    let td = document.getElementById("td_" + e.code);
+    let code;
+    if (e.key === "Shift" && e.code === "") {
+      code = "ShiftRight";
+    } else {
+      code = e.code;
+    }
+    let td = document.getElementById("td_" + code);
     if (td) {
       td.style.background = "#fcf";
     }
-    let on = updown2onoff.on(e.code);
+    let on = updown2onoff.on(code);
     console.log(on);
     if (on) {
-      console.log(e.code);
+      console.log(code);
       squareNode.port.postMessage(on);
     }
   });
   document.addEventListener("keyup", (e) => {
-    let td = document.getElementById("td_" + e.code);
+    let code;
+    if (e.key === "Shift" && e.code === "") {
+      code = "ShiftRight";
+    } else {
+      code = e.code;
+    }
+    let td = document.getElementById("td_" + code);
     if (td) {
       td.style.background = "#fff";
     }
-    let off = updown2onoff.off(e.code);
+    let off = updown2onoff.off(code);
     if (off) {
       squareNode.port.postMessage(off);
     }
