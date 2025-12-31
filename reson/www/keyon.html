@@ -57,6 +57,80 @@ window.addEventListener("load", () => {
 
 });
 
+function drawbar(port) {
+  const harm1 = document.getElementById("harm1");
+  harm1.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 0,
+      value : e.target.value
+    });
+  });
+
+  const harm2 = document.getElementById("harm2");
+  harm2.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 1,
+      value : e.target.value
+    });
+  });
+
+  const harm3 = document.getElementById("harm3");
+  harm3.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 2,
+      value : e.target.value
+    });
+  });
+
+  const harm4 = document.getElementById("harm4");
+  harm4.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 3,
+      value : e.target.value
+    });
+  });
+
+  const harm5 = document.getElementById("harm5");
+  harm5.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 4,
+      value : e.target.value
+    });
+  });
+
+  const harm6 = document.getElementById("harm6");
+  harm6.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 5,
+      value : e.target.value
+    });
+  });
+
+  const harm8 = document.getElementById("harm8");
+  harm8.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 6,
+      value : e.target.value
+    });
+  });
+
+  const harm9 = document.getElementById("harm9");
+  harm9.addEventListener("input", (e) => {
+    port.postMessage({
+      cmd   : "harm",
+      harm  : 7,
+      value : e.target.value
+    });
+  });
+}
+
 async function play() {
   await audioContext.audioWorklet.addModule("keyon.js");
   console.log("keyon");
@@ -76,6 +150,7 @@ async function play() {
   squareNode.port.onmessage = (e) => {
     chord_root.innerText = "chord root: " + e.data.chord_root;
   };
+  drawbar(squareNode.port);
   squareNode.port.postMessage({
    cmd       : "init",
    sampleRate: audioContext.sampleRate,
@@ -150,6 +225,46 @@ async function play() {
 </table>
 
 <div id="chord_root">chord root:</div>
+
+<div>
+  <input type="range" id="harm1" name="harm1" min="0" max="8" value="8" />
+  <label for="harm1">8'</label>
+</div>
+
+<div>
+  <input type="range" id="harm2" name="harm2" min="0" max="8" value="8" />
+  <label for="harm2">4'</label>
+</div>
+
+<div>
+  <input type="range" id="harm3" name="harm3" min="0" max="8" value="8" />
+  <label for="harm3">2 2/3'</label>
+</div>
+
+<div>
+  <input type="range" id="harm4" name="harm4" min="0" max="8" value="8" />
+  <label for="harm4">2'</label>
+</div>
+
+<div>
+  <input type="range" id="harm5" name="harm5" min="0" max="8" value="8" />
+  <label for="harm5">1 3/5'</label>
+</div>
+
+<div>
+  <input type="range" id="harm6" name="harm6" min="0" max="8" value="8" />
+  <label for="harm6">1 1/3'</label>
+</div>
+
+<div>
+  <input type="range" id="harm8" name="harm8" min="0" max="8" value="8" />
+  <label for="harm8">1'</label>
+</div>
+
+<div>
+  <input type="range" id="harm9" name="harm9" min="0" max="8" value="8" />
+  <label for="harm9">8/9'</label>
+</div>
 
 </body>
 </html>

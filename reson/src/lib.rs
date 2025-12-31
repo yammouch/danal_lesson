@@ -212,6 +212,10 @@ impl Source {
   pub fn crt(&self) -> usize {
     self.crt
   }
+
+  pub fn harm(&mut self, h: usize, mag: f64) {
+    self.exc.harm(h, mag);
+  }
 }
 
 fn k2r(nk: usize, cfg: &[usize]) -> Vec<Vec<(usize, usize)>> {
@@ -332,6 +336,12 @@ impl Exc {
   fn on(&mut self, i: usize) {
     for &t in self.exi[i].iter() {
       self.a[t.0].n[t.1] = self.a[t.0].v[t.1].len();
+    }
+  }
+  fn harm(&mut self, i: usize, mag: f64) {
+    for v in &self.exi {
+      let (i0, i1) = v[i];
+      self.a[i0].v[i1][0].mag = mag;
     }
   }
 }
@@ -659,6 +669,44 @@ mod test_vecreson {
           n: vec![0, 0],
           v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ],
                   vec![ Cplxpol { mag: 0.5, angle: 0.0 } ] ],
+        },
+      ],
+      exi: vec![vec![(0, 0), (1, 1)],
+                vec![(1, 0)]],
+    });
+  }
+
+  #[wasm_bindgen_test(unsupported = test)]
+  fn test_exc_harm() {
+    use super::Cplxpol;
+    use super::Exc1;
+    use super::Exc;
+    let mut exc = Exc {
+      a  : vec![
+        Exc1 {
+          n: vec![0],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ]],
+        },
+        Exc1 {
+          n: vec![0, 0],
+          v: vec![vec![ Cplxpol { mag: 1.0, angle: 0.0 } ],
+                  vec![ Cplxpol { mag: 0.5, angle: 0.0 } ] ],
+        },
+      ],
+      exi: vec![vec![(0, 0), (1, 1)],
+                vec![(1, 0)]],
+    };
+    exc.harm(0, 0.75);
+    assert_eq!(exc, Exc {
+      a  : vec![
+        Exc1 {
+          n: vec![0],
+          v: vec![vec![ Cplxpol { mag: 0.75, angle: 0.0 } ]],
+        },
+        Exc1 {
+          n: vec![0, 0],
+          v: vec![vec![ Cplxpol { mag: 0.75, angle: 0.0 } ],
+                  vec![ Cplxpol { mag: 0.5 , angle: 0.0 } ] ],
         },
       ],
       exi: vec![vec![(0, 0), (1, 1)],
